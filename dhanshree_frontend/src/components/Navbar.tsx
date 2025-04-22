@@ -3,7 +3,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
 const navigation = [
-  { name: 'Home', href: '#', current: true },
+  { name: 'Home', href: '/', current: true },
   { name: 'Featured', href: '#', current: false },
   { name: 'About', href: '#', current: false },
   { name: 'Tools', href: '#', current: false },
@@ -18,8 +18,8 @@ function Navbar() {
   return (
     <>
   {/* <Disclosure as="nav" className="bg-gradient-to-b from-sky-200 to-transparent"> */}
-  <Disclosure as="nav" className="bg-transparent ">
-  {/* <Disclosure as="nav" className="bg-sky-700 "> */}
+  {/* <Disclosure as="nav" className="bg-transparent "> */}
+  <Disclosure as="nav" className="bg-sky-100 ">
 
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
