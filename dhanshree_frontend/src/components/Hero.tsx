@@ -1,6 +1,8 @@
 import React from "react";
 import Image from "next/image";
 import Filter from "@/components/Filter";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRightLong} from "@fortawesome/free-solid-svg-icons"
 
 const images = [
     { src: '/user/hero/hero_1.jpg', shape: 'rounded-full' },
@@ -19,9 +21,10 @@ function Hero() {
       <p className="text-gray-700 text-lg mb-6">
         Explore the best properties in your area with us. Trusted by thousands of happy homeowners.
       </p>
-      <button className="bg-blue-600 text-white px-6 py-2 rounded-xl shadow hover:bg-blue-700 transition w-1/2">
-        Get Started
-      </button>
+      
+      <a className="bg-blue-600 text-white px-3 py-2 rounded-xl shadow hover:bg-blue-700 transition w-[200px] text-center" href="/List">
+        Get Started <FontAwesomeIcon icon={faArrowRightLong} style={{color: "#FFFFFF",}} />
+      </a>
     </div>
 
     {/* Right Image */}

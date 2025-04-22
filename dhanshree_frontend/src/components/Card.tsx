@@ -11,11 +11,12 @@ import {
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLocationDot,faRoad,faHouse} from "@fortawesome/free-solid-svg-icons"
+import { Button } from '@headlessui/react';
 
 function Cardfm() {
   return (
     <>
-<Card className='lg:w-1/4 w-full shadow-xl relative pt-0 group'>
+<Card className='lg:w-[350px] w-full shadow-xl relative pt-0 group cursor-pointer'>
 <div className="group">
 
 <img src="user/card/card_1.jpg" alt=""
@@ -23,16 +24,16 @@ function Cardfm() {
   />
 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-10 transition-opacity duration-300 z-20"></div>
 </div>
-<div className="absolute bg-green-700 text-white text-sm rounded-lg p-3 top-1 start-1">Featured</div>
+<button className="absolute bg-green-700 text-white text-sm rounded-lg p-3 top-1 start-1">Featured</button>
   <CardHeader className=''>
     <CardTitle>
         <div className="flex justify-between">
         <h1 className="text-xl">
             Property Code 
         </h1>
-        <h1 className="text-sm bg-sky-300 text-white rounded-lg px-2 py-1">
+        <button className="text-sm bg-sky-300 text-white rounded-lg px-2 py-1">
             House
-        </h1>
+        </button>
         </div>
     </CardTitle>
     <CardDescription className='flex flex-col space-y-2'>
@@ -50,9 +51,9 @@ function Cardfm() {
   <CardContent>
     <h1 className="font-bold text-xl">Asking Price:Rs 6000</h1>
   </CardContent>
-  <CardFooter>
+  {/* <CardFooter>
     <p>Card Footer</p>
-  </CardFooter>
+  </CardFooter> */}
 </Card>
 </>
   )
