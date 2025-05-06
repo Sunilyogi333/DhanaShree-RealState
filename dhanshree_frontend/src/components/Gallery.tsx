@@ -34,23 +34,23 @@ const Gallery = () => {
   const extraCount = images.length - 3;
 
   return (
-    <div className="flex flex-col gap-4 pt-8">
+    <div className="flex gap-4 pt-8">
       {/* Featured Image */}
       <div
-        className="w-full h-[400px] rounded-lg overflow-hidden cursor-pointer"
+        className="w-full h-[420px] rounded-lg overflow-hidden cursor-pointer"
         onClick={() => openLightbox(images.indexOf(selectedImg))}
       >
         <Image
           src={selectedImg}
           alt="Featured"
           width={1000}
-          height={400}
+          height={500}
           className="w-full h-full object-cover"
         />
       </div>
 
       {/* Thumbnails */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-rows-3 gap-4">
         {visibleImages.map((img, idx) => {
           const isLastVisible = idx === 2 && extraCount > 0;
 
@@ -74,7 +74,7 @@ const Gallery = () => {
                 )}
               />
               {isLastVisible && (
-                <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center text-white text-lg font-semibold rounded-md">
+                <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center text-white text-lg font-semibold rounded-md cursor-pointer">
                   +{extraCount} photos
                 </div>
               )}
@@ -85,14 +85,14 @@ const Gallery = () => {
 
       {/* Lightbox Modal */}
       {lightboxOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center ">
           <button
-            className="absolute top-4 right-4 text-white"
+            className="absolute top-4 right-4 text-white cursor-pointer"
             onClick={() => setLightboxOpen(false)}
           >
             <X size={32} />
           </button>
-          <button className="absolute left-4 text-white" onClick={prevImage}>
+          <button className="absolute left-4 text-white cursor-pointer" onClick={prevImage}>
             <ArrowLeft size={32} />
           </button>
           <Image
@@ -102,7 +102,7 @@ const Gallery = () => {
             height={600}
             className="max-w-[90vw] max-h-[80vh] object-contain rounded-lg"
           />
-          <button className="absolute right-4 text-white" onClick={nextImage}>
+          <button className="absolute right-4 text-white cursor-pointer" onClick={nextImage}>
             <ArrowRight size={32} />
           </button>
         </div>

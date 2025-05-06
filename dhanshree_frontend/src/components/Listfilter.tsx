@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -16,7 +15,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Slider } from "@/components/ui/slider"
-import React from "react"
+import React, { useState } from "react"
 import {
   Select,
   SelectContent,
@@ -24,7 +23,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
- 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {faFilter} from "@fortawesome/free-solid-svg-icons"
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
 const items = [
   { id: "Homes", label: "Homes" },
@@ -85,14 +95,19 @@ const filterForm = useForm<z.infer<typeof FilterFormSchema>>({
   const onFilterSubmit = (data: z.infer<typeof FilterFormSchema>) => {
     console.log("Other filters data:", data)
   }
+  const [showFilters, setShowFilters] = useState(false); // State to toggle filter visibility
 
-  return (
-    <div className="flex flex-col w-1/3 space-y-8">
+  const toggleFilters = () => setShowFilters(!showFilters);
+
+  return(
+    <div className="flex flex-col space-y-8 relative">
       {/* Code Filter */}
       <div className="p-10 w-full shadow-2xl rounded-xl">
         <h1 className="text-lg font-bold text-sky-700">Search By Code</h1>
         <Form {...codeForm}>
           <form onSubmit={codeForm.handleSubmit(onCodeSubmit)} className="space-y-6 py-6">
+            
+            <div className="flex gap-2">
             <FormField
               control={codeForm.control}
               name="code"
@@ -105,14 +120,22 @@ const filterForm = useForm<z.infer<typeof FilterFormSchema>>({
                 </FormItem>
               )}
             />
-            <Button type="submit" className="bg-green-600">Search</Button>
-          </form>
-        </Form>
-      </div>
-
-      {/* Other Filters */}
-      <div className="p-10 w-full shadow-2xl rounded-xl">
-        <h1 className="text-lg font-bold text-sky-700 mb-4">Other Filters</h1>
+            <div className="lg:hidden ">
+              
+      <Sheet>
+      <SheetTrigger asChild>
+        {/* <Button > */}
+        <FontAwesomeIcon icon={faFilter} style={{color: "#74C0FC"}} />
+                {/* </Button> */}
+      </SheetTrigger>
+      <SheetContent className="overflow-y-scroll">
+        <SheetHeader>
+          <SheetTitle className="text-lg font-bold text-sky-700 mb-4">Other Filters</SheetTitle>
+          {/* <SheetDescription>
+            Make changes to your profile here. Click save when you're done.
+          </SheetDescription> */}
+        </SheetHeader>
+        <div className={`p-10 w-full shadow-2xl rounded-xl ${showFilters || 'lg:block'}`}>
         <Form {...filterForm}>
           <form onSubmit={filterForm.handleSubmit(onFilterSubmit)} className="space-y-8">
             {/* Checkbox Group */}
@@ -135,14 +158,13 @@ const filterForm = useForm<z.infer<typeof FilterFormSchema>>({
                           >
                             <FormControl>
                               <Checkbox
-                           
                                 checked={field.value?.includes(item.id)}
                                 onCheckedChange={(checked) => {
                                   return checked
                                     ? field.onChange([...field.value, item.id])
                                     : field.onChange(
                                         field.value?.filter((val) => val !== item.id)
-                                      )
+                                      );
                                 }}
                               />
                             </FormControl>
@@ -150,7 +172,7 @@ const filterForm = useForm<z.infer<typeof FilterFormSchema>>({
                               {item.label}
                             </FormLabel>
                           </FormItem>
-                        )
+                        );
                       }}
                     />
                   ))}
@@ -185,50 +207,198 @@ const filterForm = useForm<z.infer<typeof FilterFormSchema>>({
               )}
             />
 
-    <FormField
-          control={filterForm.control}
-          name="type"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel  className="text-md font-semibold text-green-700" >Property Status</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a property status" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="m@example.com">Featured</SelectItem>
-                  <SelectItem value="m@google.com">Exclusive</SelectItem>
-                  <SelectItem value="m@support.com">Free</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-           <FormField
-  control={filterForm.control}
-  name="location"
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel  className="text-md font-semibold text-green-700">Select location</FormLabel>
-      <Select onValueChange={field.onChange} defaultValue={field.value}>
-        <FormControl>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a property location" />
-          </SelectTrigger>
-        </FormControl>
-        <SelectContent>
-          <SelectItem value="Kathmandu">Kathmandu</SelectItem>
-          <SelectItem value="Lalitpur">Lalitpur</SelectItem>
-          <SelectItem value="Bhaktapur">Bhaktapur</SelectItem>
-        </SelectContent>
-      </Select>
-      <FormMessage />
-    </FormItem>
-  )}
-/>
+            {/* Property Status */}
+            <FormField
+              control={filterForm.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-md font-semibold text-green-700">Property Status</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a property status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="m@example.com">Featured</SelectItem>
+                      <SelectItem value="m@google.com">Exclusive</SelectItem>
+                      <SelectItem value="m@support.com">Free</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Location Select */}
+            <FormField
+              control={filterForm.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-md font-semibold text-green-700">Select location</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a property location" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Kathmandu">Kathmandu</SelectItem>
+                      <SelectItem value="Lalitpur">Lalitpur</SelectItem>
+                      <SelectItem value="Bhaktapur">Bhaktapur</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button type="submit" className="bg-green-600">Apply Filters</Button>
+          </form>
+        </Form>
+      </div>
+       
+      </SheetContent>
+    </Sheet>
+       
+      </div>
+
+            </div>
+             {/* Filter Icon for Small Screens */}
+             
+
+      
+            <Button type="submit" className="bg-green-600">Search</Button>
+
+          </form>
+        </Form>
+      </div>
+
+
+      {/* Other Filters */}
+      <div className={`p-10 w-full shadow-2xl rounded-xl hidden lg:block`}>
+        <h1 className="text-lg font-bold text-sky-700 mb-4">Other Filters</h1>
+        <Form {...filterForm}>
+          <form onSubmit={filterForm.handleSubmit(onFilterSubmit)} className="space-y-8">
+            {/* Checkbox Group */}
+            <FormField
+              control={filterForm.control}
+              name="items"
+              render={() => (
+                <FormItem>
+                  <FormLabel className="text-md font-semibold text-green-700">Property Type</FormLabel>
+                  {items.map((item) => (
+                    <FormField
+                      key={item.id}
+                      control={filterForm.control}
+                      name="items"
+                      render={({ field }) => {
+                        return (
+                          <FormItem
+                            key={item.id}
+                            className="flex flex-row items-start space-x-3 space-y-0"
+                          >
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(item.id)}
+                                onCheckedChange={(checked) => {
+                                  return checked
+                                    ? field.onChange([...field.value, item.id])
+                                    : field.onChange(
+                                        field.value?.filter((val) => val !== item.id)
+                                      );
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className="text-sm font-semibold text-sky-700">
+                              {item.label}
+                            </FormLabel>
+                          </FormItem>
+                        );
+                      }}
+                    />
+                  ))}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Slider */}
+            <FormField
+              control={filterForm.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-md font-semibold text-green-700">Price Range</FormLabel>
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>Rs {field.value}</span>
+                  </div>
+                  <Slider
+                    min={1000}
+                    max={10000}
+                    step={500}
+                    value={[field.value]}
+                    onValueChange={(val) => field.onChange(val[0])}
+                  />
+                  <div className="flex justify-between text-xs text-gray-500 px-1 pt-1">
+                    <span>Rs 1000</span>
+                    <span>Rs 10000</span>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Property Status */}
+            <FormField
+              control={filterForm.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-md font-semibold text-green-700">Property Status</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a property status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="m@example.com">Featured</SelectItem>
+                      <SelectItem value="m@google.com">Exclusive</SelectItem>
+                      <SelectItem value="m@support.com">Free</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Location Select */}
+            <FormField
+              control={filterForm.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-md font-semibold text-green-700">Select location</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a property location" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Kathmandu">Kathmandu</SelectItem>
+                      <SelectItem value="Lalitpur">Lalitpur</SelectItem>
+                      <SelectItem value="Bhaktapur">Bhaktapur</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <Button type="submit" className="bg-green-600">Apply Filters</Button>
           </form>
         </Form>

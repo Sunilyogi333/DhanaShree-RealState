@@ -32,7 +32,7 @@ function Hero() {
       {/* Gradient overlay for blending */}
       <div className=" hidden md:block absolute inset-0 bg-gradient-to-r from-white via-white/40 to-transparent z-10 pe-20" />
       <Image
-        src="/user/hero/hero_1.jpg"
+        src="/user/hero/hero_2.jpg"
         alt="Hero"
         fill
         className="object-cover"
