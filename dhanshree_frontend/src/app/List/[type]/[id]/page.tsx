@@ -1,5 +1,6 @@
 'use client';
-import React, { useState } from "react";
+
+import React, { useState,useEffect } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,8 +15,18 @@ import Gallery from "@/components/Gallery";
 import { Tabs } from "@radix-ui/react-tabs";
 import InnerTab from "@/components/InnerDetail/Tabs";
 import Innerform from "@/components/InnerDetail/form";
+import { useParams } from 'next/navigation';  // Correct way to get dynamic params
+
+
 
 function page() {
+  const params = useParams();
+  const { type, id } = params;  // Get type and id from params
+
+  // If the params are missing, show a loading message
+  if (!type || !id) return <div>Loading...</div>;
+
+  console.log("type and id is",type,id);
 
   return (
     <>
@@ -71,7 +82,7 @@ function page() {
           
             <div className="flex flex-col lg:flex-row gap-8  py-20 px-4">
       {/* Left Section - Property Details */}
-<InnerTab/>
+<InnerTab propertyType={type}/>
 
       {/* Right Section - Booking Form */}
   <Innerform/>
