@@ -1,0 +1,17 @@
+node_modules
+.env
+public/uploads
+pnpm-lock.yaml 
+yark.lock
+npm.lock
+node_modules
+.env 
+schema.gql
+build
+yarn-error.log
+.log
+public
+log
+yarn.lock
+yarn-error.log
+log

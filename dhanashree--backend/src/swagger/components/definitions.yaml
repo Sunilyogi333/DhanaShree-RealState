@@ -1,0 +1,52 @@
+components:
+  definitions:
+    Address:
+      type: object
+      properties:
+        province:
+          type: number
+          description: Province ID
+        district:
+          type: number
+          description: District ID
+        municipality:
+          type: number
+          description: Municipality ID
+        ward:
+          type: number
+          description: Ward ID
+        village:
+          type: string
+          description: Village / Tole name
+      required:
+        - province
+        - district
+        - municipality
+        - ward
+        - village
+
+    MultiLanguageName:
+      type: object
+      properties:
+        en:
+          type: string
+          description: Name in English
+        ne:
+          type: string
+          description: Name in Nepali
+      required:
+        - en
+        - ne
+
+    UpdatePassword:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+          description: 'Old Password'
+        newPassword:
+          type: string
+          description: 'New Password'
+      required:
+        - oldPassword
+        - newPassword
