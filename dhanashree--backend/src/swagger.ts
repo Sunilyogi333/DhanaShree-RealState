@@ -8,12 +8,11 @@ const swaggerDefinition = {
   },
   components: {
     securitySchemes: {
-      Authorization: {
-        type: 'apiKey',
-        in: 'header',
-        description:
-          'All requests to the API should contain an Authorization header with your API Token : NOTE [Add Bearer before token] ',
-        name: 'Authorization',
+      bearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Enter your JWT token. Example: Bearer <your-token>',
       },
     },
   },
