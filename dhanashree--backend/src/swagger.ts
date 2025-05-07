@@ -22,7 +22,7 @@ const swaggerDefinition = {
       description: 'Development server',
     },
     {
-      url: 'https://project-dhanashree-backend.onrender.com/api/',
+      url: 'https://dhanashree-realstate.onrender.com/api/',
       description: 'Production server',
     },
   ],
