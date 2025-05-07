@@ -1,0 +1,86 @@
+tags:
+  - name: 'Address'
+    description: 'Endpoints related to Address'
+paths:
+  /address/province:
+    get:
+      summary: 'Get Province'
+      tags:
+        - Address
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /address/district/${id}:
+    get:
+      summary: 'Get District by Province ID'
+      tags:
+        - Address
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: 'ID of the Province.'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /address/district:
+    get:
+      summary: 'Get all District'
+      tags:
+        - Address
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /address/municipality/${id}:
+    get:
+      summary: 'Get Municipality by District ID'
+      tags:
+        - Address
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: 'ID of the District.'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /address/ward/${id}:
+    get:
+      summary: 'Get Ward by Municipality ID'
+      tags:
+        - Address
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: 'ID of the Municipality.'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'

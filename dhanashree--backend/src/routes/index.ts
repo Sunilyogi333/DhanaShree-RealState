@@ -1,0 +1,50 @@
+import { Request, Response, Router } from 'express'
+import AuthRoute from './auth.route'
+import AdminRoute from './admin.route'
+import PropertyRoute from './property.route'
+import AddressRoute from './address.route'
+import ImageRoute from './image.route'
+
+export interface Route {
+  path: string
+  route: Router
+}
+
+const router = Router()
+
+const routes: Route[] = [
+  {
+    path: '/auth',
+    route: AuthRoute,
+  },
+  {
+    path: '/admin',
+    route: AdminRoute,
+  },
+  {
+    path: '/address',
+    route: AddressRoute,
+  },
+  {
+    path: '/image',
+    route: ImageRoute,
+  },
+  {
+    path: '/property',
+    route: PropertyRoute,
+  },
+]
+
+routes.forEach((route) => {
+  router.use(route.path, route.route)
+})
+
+router.get('/', (req: Request, res: Response) => {
+  res.send({
+    success: true,
+    message: 'Welcome to Dhanashree API',
+    data: [],
+  })
+})
+
+export default router

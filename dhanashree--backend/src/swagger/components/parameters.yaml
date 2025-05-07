@@ -1,0 +1,60 @@
+components:
+  parameters:
+    Page:
+      in: query
+      name: page
+      schema:
+        type: number
+      description: Page number.
+
+    PerPage:
+      in: query
+      name: perpage
+      schema:
+        type: number
+      description: Row per page.
+
+    Search:
+      in: query
+      name: search
+      schema:
+        type: string
+      description: search here.
+
+    Server:
+      in: query
+      name: server
+      schema:
+        $ref: '#/components/definitions/ServerType'
+
+    StoreType:
+      in: query
+      name: storetype
+      schema:
+        $ref: '#/components/definitions/StoreType'
+
+    UserType:
+      in: query
+      name: userType
+      schema:
+        $ref: '#/components/definitions/UserType'
+
+    ServiceType:
+      in: query
+      name: type
+      schema:
+        $ref: '#/components/definitions/ServiceType'
+
+    Product:
+      in: query
+      name: product
+      schema:
+        type: string
+      description: Product Id.
+
+    Category:
+      in: query
+      name: category
+      schema:
+        type: string
+      description: Category Id.
