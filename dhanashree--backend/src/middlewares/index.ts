@@ -9,16 +9,28 @@ import { EnvironmentConfiguration } from '../config/env.config'
 import swaggerUI from 'swagger-ui-express'
 import swaggerSpec from '../swagger'
 import errorHandler from './error.middleware'
-import{ErrorRequestHandler} from 'express'
+import { ErrorRequestHandler } from 'express'
 
 const middleware = (app: Application) => {
   app.use(compression())
+  // app.use(
+  //   cors({
+  //     origin: true, // Replace with your frontend's URL
+  //     credentials: true, // Allow cookies and other credentials
+  //   })
+  // )
   app.use(
     cors({
-      origin: true, // Replace with your frontend's URL
-      credentials: true, // Allow cookies and other credentials
+      origin: [
+        EnvironmentConfiguration.FRONTEND_URL,
+        'http://localhost:4005',
+        'http://localhost:3000',
+        'https://dhanashree-realstate.onrender.com',
+      ],
+      credentials: true,
     })
   )
+  console.log('CORS enabled for:', EnvironmentConfiguration.FRONTEND_URL)
   app.use(cookieParser())
 
   // Set payload size limits
