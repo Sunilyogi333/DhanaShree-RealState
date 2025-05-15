@@ -10,6 +10,7 @@ export const AppDataSource = new DataSource({
   password: EnvironmentConfiguration.DATABASE_PASSWORD,
   database: EnvironmentConfiguration.DATABASE_NAME,
   entities: [__dirname + '/../entities/*/**.entity{.ts,.js}'],
+  migrations: ['src/migration/**/*.ts'],
   synchronize: true,
   logging: false,
   dropSchema: false,

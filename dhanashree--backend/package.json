@@ -12,7 +12,14 @@
     "seed:province": "ts-node-dev src/seeder/address.seed.ts -province",
     "seed:district": "ts-node-dev src/seeder/address.seed.ts -district",
     "seed:municipality": "ts-node-dev src/seeder/address.seed.ts -municipality",
-    "seed:ward": "ts-node-dev src/seeder/address.seed.ts -ward"
+    "seed:ward": "ts-node-dev src/seeder/address.seed.ts -ward",
+    "seed": "npm run seed:admin && npm run seed:province && npm run seed:district && npm run seed:municipality && npm run seed:ward",
+    "migration:create": "npm run migration:create -- src/migration/CreateTable",
+    "migration:generate": "npm run migration:generate -- src/migration/AddColumn",
+    "migration:up": "npm run migration:up --",
+    "migration:down": "npm run migration:down --"
+
+
   },
   "keywords": [],
   "author": "",

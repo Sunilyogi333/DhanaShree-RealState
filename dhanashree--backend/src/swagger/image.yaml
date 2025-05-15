@@ -1,0 +1,66 @@
+/image:
+  post:
+    tags:
+      - Image
+    summary: Upload images
+    description: >
+      Upload a thumbnail and multiple images. Only accessible to users with the `ADMIN` role.
+      Only JPG and PNG file types are allowed.
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              thumbnail:
+                type: string
+                format: binary
+                description: Single thumbnail image (JPG/PNG)
+              images:
+                type: array
+                items:
+                  type: string
+                  format: binary
+                description: Array of up to 10 normal images (JPG/PNG)
+          encoding:
+            thumbnail:
+              contentType: image/jpeg, image/png
+            images:
+              contentType: image/jpeg, image/png
+    responses:
+      '201':
+        description: Images uploaded successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Images uploaded successfully
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        example: 'a9fef3e0-1234-4efb-8b67-847b4e0fa6a3'
+                      url:
+                        type: string
+                        example: 'https://res.cloudinary.com/demo/image/upload/v12345678/sample.jpg'
+                      type:
+                        type: string
+                        enum: [thumbnail, normal]
+                        example: normal
+      '400':
+        $ref: '#/components/responses/BadRequestResponse'
+      '500':
+        $ref: '#/components/responses/InternalServerErrorResponse'
