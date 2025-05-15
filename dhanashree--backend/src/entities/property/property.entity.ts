@@ -3,57 +3,26 @@ import { Entity, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'type
 import Base from '../base/base.entity'
 import Admin from '../admin/admin.entity'
 import { Image } from '../images/image.entity'
-import { MultiLanguage } from '../../constants/global'
 import { Address } from '../address/address.entity'
-import { PropertyType, PropertyStatus, FurnishingType, PurposeType } from '../../constants/enum'
+import { PropertyDetails } from '../../types/express/property.type'
+import { PropertyStatus, PropertyType } from '../../constants/enum/property'
+
 @Entity()
 export class Property extends Base {
-  @Column()
-  name: string
-
   @Column({ unique: true })
   propertyCode: string
 
-  @Column('decimal')
+  @Column({ nullable: true })
   price: number
 
-  @Column()
-  description: string
+  @Column({ type: 'enum', enum: PropertyType, default: PropertyType.land })
+  type: PropertyType
 
+  @Column({ type: 'enum', enum: PropertyStatus, default: PropertyStatus.emerging })
+  status: PropertyStatus
 
-  @Column({ nullable: true })
-  facing: string
-
-  @Column({ nullable: true })
-  bedrooms: number
-
-  @Column({ nullable: true })
-  bathrooms: number
-
-  @Column({ nullable: true })
-  kitchens: number
-
-  @Column({ nullable: true })
-  floors: number
-
-
-  @Column({ nullable: true })
-  livingRooms: number
-
-  @Column('decimal', { nullable: true })
-  landArea: number
-
-  @Column('decimal', { nullable: true })
-  builtInArea: number
-
-  @Column({ nullable: true })
-  builtYear: number
-
-  @Column({ nullable: true })
-  parking: number
-
-  @Column({ nullable: true })
-  road: string
+  @Column({ nullable: true, type: 'jsonb' })
+  propertyDetails: PropertyDetails
 
   @OneToOne(() => Address, (address) => address.property, { cascade: true })
   @JoinColumn()

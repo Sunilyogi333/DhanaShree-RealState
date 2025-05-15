@@ -8,6 +8,7 @@ import WebToken from '../utils/webToken.service'
 
 const authentication = (allowedRoles?: ROLE | ROLE[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
+    console.log("i am here");
     const { authorization } = req.headers
     // console.log('Authorization:', authorization);
 

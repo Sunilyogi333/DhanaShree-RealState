@@ -88,11 +88,11 @@ paths:
                 token:
                   type: string
                   example: 'jwt_token_here'
-                  email:
+                email:
                     type: string
                     format: email
                     example: admin@example.com
-                  password:
+                password:
                     type: string
                     example: 'newpassword123'
               required:

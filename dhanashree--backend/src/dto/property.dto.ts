@@ -1,61 +1,38 @@
-import { IsNotEmpty, IsOptional, IsNumber, IsString, IsArray, IsUUID, ArrayNotEmpty } from 'class-validator'
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsNumber,
+  IsString,
+  IsArray,
+  IsEnum,
+  IsUUID,
+  ArrayNotEmpty,
+  ValidateNested,
+} from 'class-validator'
+import { Type } from 'class-transformer'
+import { PropertyStatus, PropertyType } from '../constants/enum/property'
+import { MultiLanguageDTO } from './multiLanguage.dto'
+import { facilities } from '../constants/enum/property'
 
-export class CreatePropertyDTO {
+
+class LandAreaDTO {
   @IsNotEmpty()
   @IsString()
-  name: string
-
-  @IsNotEmpty()
-  @IsString()
-  propertyCode: string
+  unit: string
 
   @IsNotEmpty()
   @IsNumber()
-  price: number
+  value: number
+}
 
-  @IsNotEmpty()
-  @IsString()
-  description: string
-
-  @IsOptional()
-  @IsString()
-  propertyType?: string
-
-  @IsOptional()
-  @IsString()
-  status?: string
-
-  @IsOptional()
-  @IsString()
-  facing?: string
-
-  @IsOptional()
-  @IsNumber()
-  bedrooms?: number
-
+class PropertyDetailsDTO {
   @IsOptional()
   @IsNumber()
   bathrooms?: number
 
   @IsOptional()
   @IsNumber()
-  kitchens?: number
-
-  @IsOptional()
-  @IsNumber()
-  floors?: number
-
-  @IsOptional()
-  @IsString()
-  furnishing?: string
-
-  @IsOptional()
-  @IsNumber()
-  livingRooms?: number
-
-  @IsOptional()
-  @IsNumber()
-  landArea?: number
+  bedrooms?: number
 
   @IsOptional()
   @IsNumber()
@@ -65,19 +42,84 @@ export class CreatePropertyDTO {
   @IsNumber()
   builtYear?: number
 
-  // parking
+  @IsOptional()
+  @Type(() => MultiLanguageDTO)
+  description?: MultiLanguageDTO
+
+  @IsOptional()
+  @IsString()
+  facing?: string
+
+  @IsOptional()
+  @IsArray()
+  @IsEnum(facilities, { each: true })
+  facilities?: facilities[]
+
+  @IsOptional()
+  @IsNumber()
+  floors?: number
+
+  @IsOptional()
+  @IsString()
+  Frontage?: string
+
+  @IsOptional()
+  @IsString()
+  furnishing?: string
+
+  @IsOptional()
+  @IsNumber()
+  kitchens?: number
+
+  @ValidateNested()
+  @Type(() => LandAreaDTO)
+  landArea: LandAreaDTO
+
+  @IsOptional()
+  @IsNumber()
+  livingRooms?: number
+
   @IsOptional()
   @IsNumber()
   parking?: number
 
-  //purpose
-  @IsOptional()
-  @IsString()
-  purpose?: string
-  // road
   @IsOptional()
   @IsString()
   road?: string
+
+  @IsOptional()
+  @IsNumber()
+  totalFloors?: number
+
+  @IsOptional()
+  @IsString()
+  type?: string
+
+  @IsOptional()
+  @IsString()
+  zoning?: string
+}
+
+export class CreatePropertyDTO {
+  @IsOptional()
+  @IsNumber()
+  price?: number
+
+  @IsOptional()
+  @IsEnum(PropertyType, {
+    message: "Invalid property type",
+  })
+  type?: PropertyType
+
+  @IsOptional()
+  @IsEnum(PropertyStatus, {
+    message: "Invalid property status",
+  })
+  status?: PropertyStatus
+
+  @ValidateNested()
+  @Type(() => PropertyDetailsDTO)
+  propertyDetails: PropertyDetailsDTO
 
   @IsNotEmpty()
   @IsNumber()
@@ -95,11 +137,6 @@ export class CreatePropertyDTO {
   @IsNumber()
   ward: number
 
-  // 🆕 New fields for image references
-  @IsNotEmpty()
-  @IsUUID()
-  thumbnailId: string
-
   @IsArray()
   @ArrayNotEmpty()
   @IsUUID('all', { each: true })
@@ -113,68 +150,11 @@ export class UpdatePropertyDTO {
 
   @IsOptional()
   @IsString()
-  description?: string
+  propertyCode?: string
 
   @IsOptional()
   @IsNumber()
   price?: number
-
-  @IsOptional()
-  @IsNumber()
-  province?: number
-
-  @IsOptional()
-  @IsNumber()
-  district?: number
-
-  @IsOptional()
-  @IsNumber()
-  municipality?: number
-
-  @IsOptional()
-  @IsNumber()
-  ward?: number
-
-  @IsOptional()
-  @IsNumber()
-  bedroomCount?: number
-
-  @IsOptional()
-  @IsNumber()
-  bathroomCount?: number
-
-  @IsOptional()
-  @IsNumber()
-  kitchenCount?: number
-
-  @IsOptional()
-  @IsNumber()
-  floorCount?: number
-
-  @IsOptional()
-  @IsNumber()
-  area?: number
-
-  @IsOptional()
-  @IsNumber()
-  builtYear?: number
-
-  @IsOptional()
-  @IsString()
-  facing?: string
-
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  features?: string[]
-
-  @IsOptional()
-  @IsString()
-  furnishing?: string
-
-  @IsOptional()
-  @IsString()
-  availability?: string
 
   @IsOptional()
   @IsString()
@@ -185,9 +165,12 @@ export class UpdatePropertyDTO {
   status?: string
 
   @IsOptional()
-  @IsArray()
-  imageFiles?: Express.Multer.File[]
+  @ValidateNested()
+  @Type(() => PropertyDetailsDTO)
+  propertyDetails?: PropertyDetailsDTO
 
   @IsOptional()
-  thumbnailFile?: Express.Multer.File
+  @IsArray()
+  @IsUUID('all', { each: true })
+  imageIds?: string[]
 }

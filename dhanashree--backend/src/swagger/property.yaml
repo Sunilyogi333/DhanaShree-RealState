@@ -1,0 +1,203 @@
+tags:
+  - name: 'Property'
+    description: 'Endpoints related to Property management'
+
+paths:
+  /property:
+    post:
+      summary: 'Create Property'
+      tags:
+        - Property
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                price:
+                  type: number
+                  example: 5000000
+                type:
+                  type: string
+                  enum: [land, house, apartment, flat, space]
+                status:
+                  type: string
+                  enum: [exclusive, featured, emerging]
+                propertyDetails:
+                        type: object
+                        properties:
+                          bathrooms:
+                            type: number
+                            example: 2
+                          bedrooms:
+                            type: number
+                            example: 3
+                          builtInArea:
+                            type: number
+                            example: 1600
+                          builtYear:
+                            type: number
+                            example: 2020
+                          description:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                example: "Spacious 3BHK apartment"
+                              np:
+                                type: string
+                                example: "तीन कोठाको अपार्टमेन्ट"
+                          facing:
+                            type: string
+                            example: "East"
+                          facilities:
+                            type: array
+                            items:
+                              type: string
+                              enum: [water_supply, drainage, parking, elevator, security, gym]
+                          floors:
+                            type: number
+                            example: 2
+                          Frontage:
+                            type: string
+                            example: "20 ft"
+                          furnishing:
+                            type: string
+                            example: "Semi"
+                          kitchens:
+                            type: number
+                            example: 1
+                          landArea:
+                            type: object
+                            properties:
+                              unit:
+                                type: string
+                                example: "sqft"
+                              value:
+                                type: number
+                                example: 1200    
+                          livingRooms:
+                            type: number
+                            example: 1
+                          parking:
+                            type: number
+                            example: 1
+                          road:
+                            type: string
+                            example: "Pitched"
+                          totalFloors:
+                            type: number
+                            example: 3
+                          type:
+                            type: string
+                            example: "Residential"
+                          zoning:
+                            type: string
+                            example: "R1"
+                province:
+                  type: number
+                  example: 3
+                district:
+                  type: number
+                  example: 5
+                municipality:
+                  type: number
+                  example: 7
+                ward:
+                  type: number
+                  example: 12
+                imageIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  minItems: 4
+                  example:
+                    - a2e8a191-f450-4e1c-b8b7-cd46bd312eab
+                    - b3c9b282-e561-4d2f-b9c8-dd57bd422eac
+                    - c4d0c373-f672-4e3f-bad9-ee68ce533ebd
+                    - d5e1d464-g783-4f40-cbe0-ff79df644fce
+              required:
+                - type
+                - price
+                - province
+                - district
+                - municipality
+                - imageIds
+                - status    
+      responses:
+        '201':
+          $ref: '#/components/responses/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+    get:
+      summary: 'Get All Properties (Paginated)'
+      tags:
+        - Property
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          required: false
+          example: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+          required: false
+          example: 10
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /property/{id}:
+    get:
+      summary: 'Get One Property by ID'
+      tags:
+        - Property
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+    delete:
+      summary: 'Delete Property (Admin Only)'
+      tags:
+        - Property
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
