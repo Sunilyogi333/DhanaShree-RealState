@@ -17,12 +17,12 @@ paths:
             schema:
               type: object
               properties:
-                price:
-                  type: number
-                  example: 5000000
                 propertyCode: 
                   type: string
                   example: 73CH81
+                price:
+                  type: number
+                  example: 5000000
                 type:
                   type: string
                   enum: [land, house, apartment, flat, space]
@@ -137,13 +137,15 @@ paths:
                     - c4d0c373-f672-4e3f-bad9-ee68ce533ebd
                     - d5e1d464-g783-4f40-cbe0-ff79df644fce
               required:
-                - type
+                - propertyCode
                 - price
+                - type
+                - status
+                - purpose
                 - province
                 - district
                 - municipality
                 - imageIds
-                - status    
       responses:
         '201':
           $ref: '#/components/responses/SuccessResponse'
