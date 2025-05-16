@@ -26,11 +26,12 @@ paths:
                 type:
                   type: string
                   enum: [land, house, apartment, flat, space]
-                  description: "Allowed values: land, house, apartment, flat, space."
                 status:
                   type: string
                   enum: [exclusive, featured, emerging, latest]
-                  description: "Allowed values: exclusive, featured, emerging, latest."
+                purpose: 
+                  type: string
+                  enum: [rent, sale]
                 propertyDetails:
                         type: object
                         properties:
@@ -72,7 +73,7 @@ paths:
                           floors:
                             type: number
                             example: 2
-                          Frontage:
+                          frontage:
                             type: object
                             properties:
                               unit:
