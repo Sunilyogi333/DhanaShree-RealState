@@ -10,10 +10,9 @@ import {
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
-import { PropertyStatus, PropertyType } from '../constants/enum/property'
+import { ApartmentType, Facing, PropertyStatus, PropertyType, Purpose } from '../constants/enum/property'
 import { MultiLanguageDTO } from './multiLanguage.dto'
-import { facilities } from '../constants/enum/property'
-
+import { Facilities, Zoning } from '../constants/enum/property'
 
 class LandAreaDTO {
   @IsNotEmpty()
@@ -47,13 +46,13 @@ class PropertyDetailsDTO {
   description?: MultiLanguageDTO
 
   @IsOptional()
-  @IsString()
-  facing?: string
+  @IsEnum(Facing)
+  facing?: Facing
 
   @IsOptional()
   @IsArray()
-  @IsEnum(facilities, { each: true })
-  facilities?: facilities[]
+  @IsEnum(Facilities, { each: true })
+  facilities?: Facilities[]
 
   @IsOptional()
   @IsNumber()
@@ -84,38 +83,41 @@ class PropertyDetailsDTO {
   parking?: number
 
   @IsOptional()
-  @IsString()
-  road?: string
-
-  @IsOptional()
   @IsNumber()
   totalFloors?: number
 
   @IsOptional()
-  @IsString()
-  type?: string
+  @IsEnum(ApartmentType, {
+    message: "Invalid apartment type"
+  })
+  apartmentType?: ApartmentType
 
   @IsOptional()
-  @IsString()
-  zoning?: string
+  @IsEnum(Zoning)
+  Zoning?: Zoning
 }
 
 export class CreatePropertyDTO {
-  @IsOptional()
   @IsNumber()
   price?: number
 
-  @IsOptional()
+  @IsString()
+  propertyCode?: string
+
   @IsEnum(PropertyType, {
-    message: "Invalid property type",
+    message: 'Invalid property type',
   })
   type?: PropertyType
 
-  @IsOptional()
   @IsEnum(PropertyStatus, {
-    message: "Invalid property status",
+    message: 'Invalid property status',
   })
   status?: PropertyStatus
+
+  @IsEnum(Purpose, {
+    message: 'Invalid purpose'
+  })
+  purpose?: Purpose
 
   @ValidateNested()
   @Type(() => PropertyDetailsDTO)

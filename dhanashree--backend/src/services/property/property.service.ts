@@ -16,47 +16,70 @@ class PropertyService {
   private imageRepository = AppDataSource.getRepository(Image)
 
   async create(adminId: string, data: CreatePropertyDTO, imageIds: number[]) {
-    const createdAddress = await addressService.create({
-      province: +data.province,
-      district: +data.district,
-      municipality: +data.municipality,
-      ward: +data.ward,
-    })
-
+    // 1. Fetch admin first, OUTSIDE transaction
     const admin = await AppDataSource.getRepository(Admin).findOne({ where: { id: adminId } })
-    if (!admin) throw new Error('Admin not found')
-
-    const images = await this.imageRepository.findByIds(imageIds)
-    const propertyCode = await this.generateUniquePropertyCode()
-
-    const { price, type, status, propertyDetails } = data
-
-    const propertyData: Partial<Property> = {
-      propertyCode,
-      price,
-      type: type,
-      status: status as any,
-      propertyDetails: propertyDetails as any,
-      address: createdAddress,
-      admin,
-      images,
+    if (!admin) {
+      throw new HttpException('Admin not found', 404)
     }
 
-    const property = this.propertyRepository.create(propertyData)
-    return await this.propertyRepository.save(property)
-  }
-
-  private async generateUniquePropertyCode(): Promise<string> {
-    let code = '' // 🔧 Initialize to an empty string
-
-    while (true) {
-      code = Math.floor(100000 + Math.random() * 900000).toString()
-      const existing = await this.propertyRepository.findOne({ where: { propertyCode: code } })
-      if (!existing) break
+    // 2. Check for unique propertyCode
+    const existingProperty = await this.propertyRepository.findOne({ where: { propertyCode: data.propertyCode } })
+    if (existingProperty) {
+      throw new HttpException(`Property with code ${data.propertyCode} already exists`, 400)
     }
 
-    return code
+    // 3. Start transaction for address creation, property creation, image association
+    return await AppDataSource.transaction(async (transactionalEntityManager) => {
+      // Validate images
+      const images = await transactionalEntityManager.findByIds(Image, imageIds)
+      if (images.length !== imageIds.length) {
+        throw new HttpException('Some images not found', 404)
+      }
+
+      const associatedImages = images.filter((img) => img.property !== null)
+      if (associatedImages.length > 0) {
+        throw new HttpException(
+          `Images already associated with another property: ${associatedImages.map((img) => img.id).join(', ')}`,
+          400
+        )
+      }
+
+      // Create address
+      const createdAddress = await addressService.create({
+        province: +data.province,
+        district: +data.district,
+        municipality: +data.municipality,
+        ward: +data.ward,
+      })
+
+      // Create property entity with relations
+      const propertyData: Partial<Property> = {
+        propertyCode: data.propertyCode,
+        price: data.price,
+        type: data.type,
+        status: data.status,
+        propertyDetails: data.propertyDetails as any,
+        address: createdAddress,
+        admin,
+        images,
+      }
+
+      const property = this.propertyRepository.create(propertyData)
+      return await transactionalEntityManager.save(property)
+    })
   }
+
+  // private async generateUniquePropertyCode(): Promise<string> {
+  //   let code = ''
+
+  //   while (true) {
+  //     code = Math.floor(100000 + Math.random() * 900000).toString()
+  //     const existing = await this.propertyRepository.findOne({ where: { propertyCode: code } })
+  //     if (!existing) break
+  //   }
+
+  //   return code
+  // }
 
   async getAll(page: number, size: number) {
     const { limit, offset } = getPagination(page, size)
