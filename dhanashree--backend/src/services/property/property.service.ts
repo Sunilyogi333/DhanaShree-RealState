@@ -30,18 +30,22 @@ class PropertyService {
 
     // 3. Start transaction for address creation, property creation, image association
     return await AppDataSource.transaction(async (transactionalEntityManager) => {
-      // Validate images
-      const images = await transactionalEntityManager.findByIds(Image, imageIds)
-      if (images.length !== imageIds.length) {
-        throw new HttpException('Some images not found', 404)
+      // Fetch the count of images already associated with a property
+      const associatedImagesCount = await transactionalEntityManager
+        .createQueryBuilder(Image, 'image')
+        .where('image.id IN (:...imageIds)', { imageIds })
+        .andWhere('image.property IS NOT NULL')
+        .getCount()
+
+      if (associatedImagesCount > 0) {
+        throw new HttpException('Some images are already associated with a property', 400)
       }
 
-      const associatedImages = images.filter((img) => img.property !== null)
-      if (associatedImages.length > 0) {
-        throw new HttpException(
-          `Images already associated with another property: ${associatedImages.map((img) => img.id).join(', ')}`,
-          400
-        )
+      // Fetch images only after validation to avoid unnecessary data fetching
+      const images = await transactionalEntityManager.findByIds(Image, imageIds)
+
+      if (images.length !== imageIds.length) {
+        throw new HttpException('Some images not found', 404)
       }
 
       // Create address
@@ -58,6 +62,7 @@ class PropertyService {
         price: data.price,
         type: data.type,
         status: data.status,
+        purpose: data.purpose,
         propertyDetails: data.propertyDetails as any,
         address: createdAddress,
         admin,
