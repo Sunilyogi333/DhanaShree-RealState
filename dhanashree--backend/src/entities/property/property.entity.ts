@@ -5,7 +5,7 @@ import Admin from '../admin/admin.entity'
 import { Image } from '../images/image.entity'
 import { Address } from '../address/address.entity'
 import { PropertyDetails } from '../../types/express/property.type'
-import { PropertyStatus, PropertyType } from '../../constants/enum/property'
+import { PropertyStatus, PropertyType, Purpose } from '../../constants/enum/property'
 
 @Entity()
 export class Property extends Base {
@@ -15,11 +15,14 @@ export class Property extends Base {
   @Column({ nullable: true })
   price: number
 
-  @Column({ type: 'enum', enum: PropertyType, default: PropertyType.land })
+  @Column({ type: 'enum', enum: PropertyType })
   type: PropertyType
 
-  @Column({ type: 'enum', enum: PropertyStatus, default: PropertyStatus.emerging })
+  @Column({ type: 'enum', enum: PropertyStatus })
   status: PropertyStatus
+
+  @Column({ type:'enum', enum:Purpose })
+  purpose: Purpose
 
   @Column({ nullable: true, type: 'jsonb' })
   propertyDetails: PropertyDetails
@@ -34,3 +37,4 @@ export class Property extends Base {
   @OneToMany(() => Image, (image) => image.property, { cascade: true })
   images: Image[]
 }
+

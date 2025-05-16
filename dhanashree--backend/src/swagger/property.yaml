@@ -20,12 +20,17 @@ paths:
                 price:
                   type: number
                   example: 5000000
+                propertyCode: 
+                  type: string
+                  example: 73CH81
                 type:
                   type: string
                   enum: [land, house, apartment, flat, space]
+                  description: "Allowed values: land, house, apartment, flat, space."
                 status:
                   type: string
-                  enum: [exclusive, featured, emerging]
+                  enum: [exclusive, featured, emerging, latest]
+                  description: "Allowed values: exclusive, featured, emerging, latest."
                 propertyDetails:
                         type: object
                         properties:
@@ -34,10 +39,16 @@ paths:
                             example: 2
                           bedrooms:
                             type: number
-                            example: 3
+                            example: 3  
                           builtInArea:
-                            type: number
-                            example: 1600
+                            type: object
+                            properties:
+                                unit:
+                                  type: string
+                                  enum: [sqft, ft, sqm, katha, aana, bigha, dhur, paisa, daam, ropani]
+                                value:
+                                  type: number
+                                  example: 1200  
                           builtYear:
                             type: number
                             example: 2020
@@ -52,21 +63,28 @@ paths:
                                 example: "तीन कोठाको अपार्टमेन्ट"
                           facing:
                             type: string
-                            example: "East"
+                            enum: [east, west, north, south, north east, north west, south east, south west]
                           facilities:
                             type: array
                             items:
                               type: string
-                              enum: [water_supply, drainage, parking, elevator, security, gym]
+                              enum: [water supply, drainage, parking, elevator, security, gym, internet, electricity, swimming pool, garden]
                           floors:
                             type: number
                             example: 2
                           Frontage:
-                            type: string
-                            example: "20 ft"
+                            type: object
+                            properties:
+                              unit:
+                                type: string
+                                enum: [sqft, ft, sqm, katha, aana, bigha, dhur, paisa, daam, ropani]
+                              value:
+                                type: number
+                                example: 1200    
                           furnishing:
                             type: string
-                            example: "Semi"
+                            enum: [full, semi, none]
+                            description: "Allowed furnishing types: full, semi, none."
                           kitchens:
                             type: number
                             example: 1
@@ -75,7 +93,7 @@ paths:
                             properties:
                               unit:
                                 type: string
-                                example: "sqft"
+                                enum: [sqft, ft, sqm, katha, aana, bigha, dhur, paisa, daam, ropani]
                               value:
                                 type: number
                                 example: 1200    
@@ -85,18 +103,15 @@ paths:
                           parking:
                             type: number
                             example: 1
-                          road:
-                            type: string
-                            example: "Pitched"
                           totalFloors:
                             type: number
                             example: 3
-                          type:
+                          apartmentType:
                             type: string
-                            example: "Residential"
+                            enum: [studio, 1 bhk, 2 bhk, 3 bhk, penthouse, duplex]
                           zoning:
                             type: string
-                            example: "R1"
+                            enum: [residential, commercial, agricultural, mixed]
                 province:
                   type: number
                   example: 3
