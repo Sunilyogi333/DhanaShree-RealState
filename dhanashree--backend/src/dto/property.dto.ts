@@ -94,7 +94,7 @@ class PropertyDetailsDTO {
 
   @IsOptional()
   @IsEnum(Zoning)
-  Zoning?: Zoning
+  zoning?: Zoning
 }
 
 export class CreatePropertyDTO {
