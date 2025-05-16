@@ -99,25 +99,25 @@ class PropertyDetailsDTO {
 
 export class CreatePropertyDTO {
   @IsNumber()
-  price?: number
+  price: number
 
   @IsString()
-  propertyCode?: string
+  propertyCode: string
 
   @IsEnum(PropertyType, {
     message: 'Invalid property type',
   })
-  type?: PropertyType
+  type: PropertyType
 
   @IsEnum(PropertyStatus, {
     message: 'Invalid property status',
   })
-  status?: PropertyStatus
+  status: PropertyStatus
 
   @IsEnum(Purpose, {
     message: 'Invalid purpose'
   })
-  purpose?: Purpose
+  purpose: Purpose
 
   @ValidateNested()
   @Type(() => PropertyDetailsDTO)
