@@ -35,7 +35,7 @@ class PropertyDetailsDTO {
 
   @IsOptional()
   @Type(() => UnitValueDTO)
-  builtInArea: UnitValueDTO
+  builtInArea?: UnitValueDTO
 
   @IsOptional()
   @IsNumber()
@@ -60,7 +60,7 @@ class PropertyDetailsDTO {
 
   @IsOptional()
   @Type(() => UnitValueDTO)
-  frontage: UnitValueDTO
+  frontage?: UnitValueDTO
 
   @IsOptional()
   @IsString()
@@ -72,7 +72,7 @@ class PropertyDetailsDTO {
 
   @ValidateNested()
   @Type(() => UnitValueDTO)
-  landArea: UnitValueDTO
+  landArea?: UnitValueDTO
 
   @IsOptional()
   @IsNumber()
