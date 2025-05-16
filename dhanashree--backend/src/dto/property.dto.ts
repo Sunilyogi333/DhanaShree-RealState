@@ -121,7 +121,7 @@ export class CreatePropertyDTO {
 
   @ValidateNested()
   @Type(() => PropertyDetailsDTO)
-  propertyDetails: PropertyDetailsDTO
+  propertyDetails?: PropertyDetailsDTO
 
   @IsNotEmpty()
   @IsNumber()
