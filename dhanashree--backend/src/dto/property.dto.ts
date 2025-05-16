@@ -14,7 +14,7 @@ import { ApartmentType, Facing, PropertyStatus, PropertyType, Purpose } from '..
 import { MultiLanguageDTO } from './multiLanguage.dto'
 import { Facilities, Zoning } from '../constants/enum/property'
 
-class LandAreaDTO {
+class UnitValueDTO {
   @IsNotEmpty()
   @IsString()
   unit: string
@@ -34,8 +34,8 @@ class PropertyDetailsDTO {
   bedrooms?: number
 
   @IsOptional()
-  @IsNumber()
-  builtInArea?: number
+  @Type(() => UnitValueDTO)
+  builtInArea: UnitValueDTO
 
   @IsOptional()
   @IsNumber()
@@ -59,8 +59,8 @@ class PropertyDetailsDTO {
   floors?: number
 
   @IsOptional()
-  @IsString()
-  Frontage?: string
+  @Type(() => UnitValueDTO)
+  frontage: UnitValueDTO
 
   @IsOptional()
   @IsString()
@@ -71,8 +71,8 @@ class PropertyDetailsDTO {
   kitchens?: number
 
   @ValidateNested()
-  @Type(() => LandAreaDTO)
-  landArea: LandAreaDTO
+  @Type(() => UnitValueDTO)
+  landArea: UnitValueDTO
 
   @IsOptional()
   @IsNumber()
