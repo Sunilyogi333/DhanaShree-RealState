@@ -72,7 +72,7 @@ class PropertyDetailsDTO {
 
   @ValidateNested()
   @Type(() => UnitValueDTO)
-  landArea?: UnitValueDTO
+  landArea: UnitValueDTO
 
   @IsOptional()
   @IsNumber()
@@ -121,7 +121,7 @@ export class CreatePropertyDTO {
 
   @ValidateNested()
   @Type(() => PropertyDetailsDTO)
-  propertyDetails?: PropertyDetailsDTO
+  details: PropertyDetailsDTO
 
   @IsNotEmpty()
   @IsNumber()

@@ -34,7 +34,7 @@ class PropertyController {
     if (!adminId) return res.status(401).json({ message: 'Unauthorized: Admin ID missing' })
 
     const propertyId = req.params.id
-    await propertyService.delete(propertyId, adminId)
+    await propertyService.delete(propertyId)
     res.status(StatusCodes.SUCCESS).json({ success: true, message: Message.deleted })
   }
 }

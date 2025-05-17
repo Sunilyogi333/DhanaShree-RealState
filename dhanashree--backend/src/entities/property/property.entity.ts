@@ -25,7 +25,7 @@ export class Property extends Base {
   purpose: Purpose
 
   @Column({ nullable: true, type: 'jsonb' })
-  propertyDetails: PropertyDetails
+  details: PropertyDetails
 
   @OneToOne(() => Address, (address) => address.property, { cascade: true })
   @JoinColumn()

@@ -63,7 +63,7 @@ class PropertyService {
         type: data.type,
         status: data.status,
         purpose: data.purpose,
-        propertyDetails: data.propertyDetails as any,
+        details: data.details as any,
         address: createdAddress,
         admin,
         images,
@@ -89,35 +89,51 @@ class PropertyService {
   async getAll(page: number, size: number) {
     const { limit, offset } = getPagination(page, size)
 
-    const [properties, total] = await this.propertyRepository
+    const properties = await this.propertyRepository
       .createQueryBuilder('property')
-      .leftJoinAndSelect('property.images', 'images')
+      .leftJoinAndSelect('property.images', 'images', 'images.type = :type', { type: 'thumbnail' })
       .leftJoinAndSelect('property.address', 'address')
-      .leftJoinAndSelect('property.admin', 'admin')
+      .leftJoinAndSelect('address.province', 'province')
+      .leftJoinAndSelect('address.district', 'district')
+      .leftJoinAndSelect('address.municipality', 'municipality')
+      .leftJoinAndSelect('address.ward', 'ward')
       .select([
-        'property.id',
-        'property.propertyCode',
-        'property.type',
-        'property.price',
-        'property.propertyDetails',
-        'images.url',
-        'images.id',
-        'images.type',
-        'address.province',
-        'address.district',
-        'address.municipality',
-        'address.ward',
-        'property.createdAt',
+        'property.id AS "id"',
+        'property.createdAt AS "createdAt"',
+        'property.propertyCode AS "propertyCode"',
+        'property.price AS "price"',
+        'property.type AS "type"',
+        'property.status As "status"',
+        'property.purpose AS "purpose"',
+        'images.url as "thumbnail"',
+        `json_build_object(
+          'value', property.details->'frontage'->>'value',
+          'unit', property.details->'frontage'->>'unit'
+        ) AS "frontage"`,
+        `json_build_object(
+          'value', property.details->'landArea'->>'value',
+          'unit', property.details->'landArea'->>'unit'
+        ) AS "landArea"`,
+        'province.province_title',
+        'province.province_title_nepali',
+        'district.district_title',
+        'district.district_title_nepali',
+        'municipality.municipality_title',
+        'municipality.municipality_title_nepali',
+        'ward.ward_number',
       ])
       .skip(offset)
       .take(limit)
       .orderBy('property.createdAt', 'DESC')
-      .getManyAndCount()
+      .getRawMany()
 
-    // Pagination info
-    const pagination = getPagingData(total, page, size)
+    const totalRecords = await this.propertyRepository.count()
+    const pagination = getPagingData(totalRecords, page, size)
 
-    return { properties, pagination }
+    return {
+      properties: properties, // Now properties is an array
+      pagination,
+    }
   }
 
   async getOne(propertyId: string) {
@@ -125,13 +141,19 @@ class PropertyService {
       .createQueryBuilder('property')
       .leftJoinAndSelect('property.images', 'images')
       .leftJoinAndSelect('property.address', 'address')
-      .leftJoinAndSelect('property.admin', 'admin')
+      .leftJoinAndSelect('address.province', 'province')
+      .leftJoinAndSelect('address.district', 'district')
+      .leftJoinAndSelect('address.municipality', 'municipality')
+      .leftJoinAndSelect('address.ward', 'ward')
       .select([
         'property.id',
+        'property.createdAt',
         'property.propertyCode',
-        'property.type',
         'property.price',
-        'property.propertyDetails',
+        'property.status',
+        'property.type',
+        'property.purpose',
+        'property.details',
         'images.url',
         'images.id',
         'images.type',
@@ -139,6 +161,13 @@ class PropertyService {
         'address.district',
         'address.municipality',
         'address.ward',
+        'province.province_title',
+        'province.province_title_nepali',
+        'district.district_title',
+        'district.district_title_nepali',
+        'municipality.municipality_title',
+        'municipality.municipality_title_nepali',
+        'ward.ward_number',
       ])
       .where('property.id = :propertyId', { propertyId })
       .getOne()
@@ -150,9 +179,10 @@ class PropertyService {
     return property
   }
 
-  async delete(propertyId: string, adminId: string) {
+  async delete(propertyId: string) {
+    console.log('property herr ta', propertyId)
     const property = await this.propertyRepository.findOne({
-      where: { id: propertyId, admin: { id: adminId } },
+      where: { id: propertyId },
       relations: ['images'],
     })
     if (!property) throw HttpException.notFound('Property not found')

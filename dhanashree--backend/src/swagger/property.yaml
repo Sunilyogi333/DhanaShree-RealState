@@ -32,8 +32,11 @@ paths:
                 purpose: 
                   type: string
                   enum: [rent, sale]
-                propertyDetails:
+                details:
                         type: object
+                        required: 
+                          - landArea
+                          - frontage
                         properties:
                           bathrooms:
                             type: number
@@ -142,9 +145,11 @@ paths:
                 - type
                 - status
                 - purpose
+                - details
                 - province
                 - district
                 - municipality
+                - ward
                 - imageIds
       responses:
         '201':

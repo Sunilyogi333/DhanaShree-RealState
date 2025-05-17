@@ -26,7 +26,7 @@ export class Address extends Base {
   village?: string
 
   @OneToOne(() => Property, (property) => property.address)
-  @JoinColumn() // 👈 foreign key lives here!
+  @JoinColumn()
   property: Property
   
 }
