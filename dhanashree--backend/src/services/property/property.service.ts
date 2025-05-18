@@ -88,6 +88,8 @@ class PropertyService {
 
   async getAll(page: number, size: number) {
     const { limit, offset } = getPagination(page, size)
+    console.log('🚀 ~ PropertyService ~ getAll ~ limit:', limit)
+    console.log('🚀 ~ PropertyService ~ getAll ~ offset:', offset)
 
     const properties = await this.propertyRepository
       .createQueryBuilder('property')
@@ -97,41 +99,29 @@ class PropertyService {
       .leftJoinAndSelect('address.district', 'district')
       .leftJoinAndSelect('address.municipality', 'municipality')
       .leftJoinAndSelect('address.ward', 'ward')
-      .select([
-        'property.id AS "id"',
-        'property.createdAt AS "createdAt"',
-        'property.propertyCode AS "propertyCode"',
-        'property.price AS "price"',
-        'property.type AS "type"',
-        'property.status As "status"',
-        'property.purpose AS "purpose"',
-        'images.url as "thumbnail"',
-        `json_build_object(
-          'value', property.details->'frontage'->>'value',
-          'unit', property.details->'frontage'->>'unit'
-        ) AS "frontage"`,
-        `json_build_object(
-          'value', property.details->'landArea'->>'value',
-          'unit', property.details->'landArea'->>'unit'
-        ) AS "landArea"`,
-        'province.province_title',
-        'province.province_title_nepali',
-        'district.district_title',
-        'district.district_title_nepali',
-        'municipality.municipality_title',
-        'municipality.municipality_title_nepali',
-        'ward.ward_number',
-      ])
-      .skip(offset)
-      .take(limit)
       .orderBy('property.createdAt', 'DESC')
-      .getRawMany()
+      .limit(limit)
+      .offset(offset)
+      .getManyAndCount()
 
-    const totalRecords = await this.propertyRepository.count()
-    const pagination = getPagingData(totalRecords, page, size)
+    const [propertyData, totalProperty] = properties
+
+    const pagination = getPagingData(totalProperty, page, size)
+
+    const modifiedData = propertyData.map((property) => {
+      const { details, ...rest } = property
+
+      return {
+        ...rest,
+        details: {
+          frontage: details?.frontage || null,
+          landArea: details?.landArea || null,
+        },
+      }
+    })
 
     return {
-      properties: properties, // Now properties is an array
+      properties: modifiedData,
       pagination,
     }
   }
