@@ -1,0 +1,202 @@
+components:
+  schemas:
+    UnitValue:
+      type: object
+      properties:
+        unit:
+          type: string
+          enum: [sqft, ft, sqm, katha, aana, bigha, dhur, paisa, daam, ropani]
+        value:
+          type: number
+
+    MultiLanguage:
+      type: object
+      properties:
+        en:
+          type: string
+        np:
+          type: string
+
+    PropertyDetails:
+      type: object
+      properties:
+        bathrooms:
+          type: number
+        bedrooms:
+          type: number
+        builtInArea:
+          $ref: '#/components/schemas/UnitValue'
+        builtYear:
+          type: number
+        description:
+          $ref: '#/components/schemas/MultiLanguage'
+        facing:
+          type: string
+          enum: [east, west, north, south, north east, north west, south east, south west]
+        facilities:
+          type: array
+          items:
+            type: string
+            enum:
+              [water supply, drainage, parking, elevator, security, gym, internet, electricity, swimming pool, garden]
+        floors:
+          type: number
+        frontage:
+          $ref: '#/components/schemas/UnitValue'
+        furnishing:
+          type: string
+          enum: [full, semi, none]
+        kitchens:
+          type: number
+        landArea:
+          $ref: '#/components/schemas/UnitValue'
+        livingRooms:
+          type: number
+        parking:
+          type: number
+        totalFloors:
+          type: number
+        apartmentType:
+          type: string
+          enum: [studio, 1 bhk, 2 bhk, 3 bhk, penthouse, duplex]
+        zoning:
+          type: string
+          enum: [residential, commercial, agricultural, mixed]
+
+    Address:
+      type: object
+      properties:
+        id:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+        province:
+          $ref: '#/components/schemas/Province'
+        district:
+          $ref: '#/components/schemas/District'
+        municipality:
+          $ref: '#/components/schemas/Municipality'
+        ward:
+          $ref: '#/components/schemas/Ward'
+        village:
+          type: string
+
+    Province:
+      type: object
+      properties:
+        id:
+          type: number
+        provinceTitle:
+          type: string
+        provinceTitleNepali:
+          type: string
+        code:
+          type: number
+
+    District:
+      type: object
+      properties:
+        id:
+          type: number
+        districtTitle:
+          type: string
+        districtTitleNepali:
+          type: string
+        code:
+          type: number
+        province:
+          $ref: '#/components/schemas/Province'
+
+    Municipality:
+      type: object
+      properties:
+        id:
+          type: number
+        municipalityTitle:
+          type: string
+        municipalityTitleNepali:
+          type: string
+        code:
+          type: number
+        district:
+          $ref: '#/components/schemas/District'
+
+    Ward:
+      type: object
+      properties:
+        id:
+          type: number
+        wardNumber:
+          type: number
+        wardNumberNepali:
+          type: string
+        municipality:
+          $ref: '#/components/schemas/Municipality'
+
+    Image:
+      type: object
+      properties:
+        id:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+        url:
+          type: string
+        type:
+          type: string
+          enum: [thumbnail, normal]
+
+    Property:
+      type: object
+      properties:
+        id:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+        propertyCode:
+          type: string
+        price:
+          type: number
+        type:
+          type: string
+          enum: [land, house, apartment, flat, space]
+        status:
+          type: string
+          enum: [latest, exclusive, featured, emerging]
+        purpose:
+          type: string
+          enum: [rent, sale]
+        details:
+          $ref: '#/components/schemas/PropertyDetails'
+        address:
+          $ref: '#/components/schemas/Address'
+        admin:
+          type: object
+          properties:
+            id:
+              type: string
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/Image'

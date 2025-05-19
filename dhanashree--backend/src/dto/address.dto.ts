@@ -16,9 +16,6 @@ export class AddressInput {
   @IsOptional()
   @IsNumber()
   ward?: number
-
-  @IsOptional()
-  village?: string
 }
 
 export class UpdateAddressInput extends AddressInput {

@@ -123,7 +123,6 @@ class AddressService {
     address.district = addressData.district
     address.municipality = addressData.municipality
     address.ward = addressData.ward
-    address.village = data.village
     return await this.addressRepository.save(address)
   }
 
@@ -138,7 +137,6 @@ class AddressService {
     address.district = addressData.district
     address.municipality = addressData.municipality
     address.ward = addressData.ward
-    address.village = data.village
     return await this.addressRepository.save(address)
   }
 

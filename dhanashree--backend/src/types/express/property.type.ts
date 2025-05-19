@@ -1,6 +1,6 @@
 import { MultiLanguage } from '../../constants/global'
 import { ApartmentType, Facing, FurnishingType, UnitEnum, Zoning } from '../../constants/enum/property'
-import { Facilities} from '../../constants/enum/property'
+import { Facilities } from '../../constants/enum/property'
 
 export interface PropertyDetails {
   bathrooms: number
@@ -9,7 +9,7 @@ export interface PropertyDetails {
   builtYear: number
   description: MultiLanguage
   facing: Facing
-  facilities?: Facilities[]  
+  facilities?: Facilities[]
   floors: number
   frontage: UnitValue
   furnishing: FurnishingType
@@ -18,11 +18,11 @@ export interface PropertyDetails {
   livingRooms: number
   parking: number
   totalFloors: number
-  apartmentType: ApartmentType      
+  apartmentType: ApartmentType
   zoning: Zoning
 }
 
-export interface UnitValue{
+export interface UnitValue {
   unit: UnitEnum
   value: number
 }

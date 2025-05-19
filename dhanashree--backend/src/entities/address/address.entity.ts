@@ -22,11 +22,7 @@ export class Address extends Base {
   @ManyToOne(() => Ward, (ward) => ward.address)
   ward: Ward
 
-  @Column({ nullable: true })
-  village?: string
-
   @OneToOne(() => Property, (property) => property.address)
   @JoinColumn()
   property: Property
-  
 }
