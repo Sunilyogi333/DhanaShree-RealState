@@ -4,16 +4,11 @@ import { X, ArrowLeft, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import clsx from "clsx";
 
-const images = [
-  "/user/category/category_1.jpg",
-  "/user/category/category_2.jpg",
-  "/user/category/category_3.jpg",
-  "/user/category/category_4.jpg",
-  "/user/category/category_5.jpg",
-  "/user/category/category_6.jpg",
-];
+interface GalleryProps {
+  images: string[];
+}
 
-const Gallery = () => {
+const Gallery: React.FC<GalleryProps> = ({ images }) => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [selectedImg, setSelectedImg] = useState(images[0]);
@@ -34,10 +29,10 @@ const Gallery = () => {
   const extraCount = images.length - 3;
 
   return (
-    <div className="flex gap-4 pt-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {/* Featured Image */}
       <div
-        className="w-full h-[420px] rounded-lg overflow-hidden cursor-pointer"
+        className="w-full h-[420px] rounded-lg overflow-hidden cursor-pointer md:col-span-2 lg:col-span-2"
         onClick={() => openLightbox(images.indexOf(selectedImg))}
       >
         <Image
@@ -60,7 +55,7 @@ const Gallery = () => {
               className="relative"
               onClick={() => {
                 setSelectedImg(img);
-                openLightbox(idx);
+                openLightbox(images.indexOf(img));
               }}
             >
               <Image
@@ -85,14 +80,17 @@ const Gallery = () => {
 
       {/* Lightbox Modal */}
       {lightboxOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center ">
+        <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center">
           <button
             className="absolute top-4 right-4 text-white cursor-pointer"
             onClick={() => setLightboxOpen(false)}
           >
             <X size={32} />
           </button>
-          <button className="absolute left-4 text-white cursor-pointer" onClick={prevImage}>
+          <button
+            className="absolute left-4 text-white cursor-pointer"
+            onClick={prevImage}
+          >
             <ArrowLeft size={32} />
           </button>
           <Image
@@ -102,7 +100,10 @@ const Gallery = () => {
             height={600}
             className="max-w-[90vw] max-h-[80vh] object-contain rounded-lg"
           />
-          <button className="absolute right-4 text-white cursor-pointer" onClick={nextImage}>
+          <button
+            className="absolute right-4 text-white cursor-pointer"
+            onClick={nextImage}
+          >
             <ArrowRight size={32} />
           </button>
         </div>

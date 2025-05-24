@@ -7,46 +7,85 @@ import {
   faRulerCombined,
   faCalendarAlt,
   faArrowUpRightFromSquare,
+  faCouch, // optional: better suited for furnished type
 } from "@fortawesome/free-solid-svg-icons";
+import { fetchPropertyDetails } from "@/types/property";
 
-function ApartmentOverview() {
+function ApartmentOverview({
+  isLoading,
+  error,
+  property,
+}: {
+  isLoading: boolean;
+  error: any;
+  property: fetchPropertyDetails;
+}) {
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading property details.</div>;
+  if (!property) return <div>No property data available.</div>;
+
   const features = [
-    //bhk,furnished type,
-    { label: "BHK", value: "2", icon: faBed },
-    { label: "Area", value: "1000 sqft", icon: faRulerCombined },
-    { label: "Floor", value: "5th Floor", icon: faArrowUpRightFromSquare },
-    { label: "Furnished Type", value: "semi", icon: faBath },
-    { label: "Built Year", value: "2020", icon: faCalendarAlt },
+    { label: "BHK", value: property.details.apartmentType, icon: faBed },
+    { label: "Built Area", value: `${ property.details?.builtInArea?.unit,property.details?.builtInArea?.value}`, icon: faRulerCombined },
+    {
+      label: "Floor",
+      value: property.details.floors,
+      icon: faArrowUpRightFromSquare,
+    },
+    {
+      label: "Furnished Type",
+      value: property.details.furnishing,
+      icon: faCouch, 
+    },
+    {
+      label: "Built Year",
+      value: property.details.builtYear,
+      icon: faCalendarAlt,
+    },
+
   ];
 
   const propertyDetails = [
-    { label: "Apartment ID", value: "APT2025" },
-    { label: "Property Face", value: "North" },
-    { label: "Floor Level", value: "5th" },
-    { label: "Purpose", value: "Residential" },
-    { label: "Total Area", value: "1000 sqft" },
-    { label: "Built Up Area", value: "850 sqft" },
-    { label: "Date Posted", value: "2025-05-01" },
-    { label: "Price", value: "Rs 95,00,000" },
-    { label: "Status", value: "For Sale" },
+    { label: "Apartment ID", value:  `${property.propertyCode } `},
+    { label: "Property Face", value: property.details.facing },
+    { label: "Total Floors", value: property.details.floors },
+    { label: "Total Area", value:`${ property.details.landArea.unit,property.details.landArea.value }`},
+    { label: "Built Up Area", value:  `${property.details?.builtInArea?.value} ${property.details?.builtInArea?.unit}`},
+    {
+      label: "Date Posted",
+      value: new Date(property.createdAt).toLocaleDateString(),
+    },
+    {
+      label: "Price",
+      value: property.price
+        ? `Rs ${Number(property.price).toLocaleString()}`
+        : "N/A",
+    },
+    { label: "Status", value: property.status },
+    { label: "Purpose", value: property.purpose },
+    {label:"road Access", value:`${property.details.frontage.value} ${property.details.frontage.unit}`}
   ];
 
   return (
     <div className="flex flex-col gap-4">
       <div className="bg-white p-4 rounded-lg shadow">
         <div className="flex justify-between py-6">
-          <h1 className="font-medium">Overview</h1>
-          <h1>
-            <span className="font-semibold">Apartment ID:</span> [APT2025]
-          </h1>
-        </div>
+          <h2 className="font-medium text-lg">Overview</h2>
+          <h2>
+            <span className="font-semibold">Apartment ID:</span>{" "}
+            {property.propertyCode}
+          </h2>
+        </div>  
 
         <div className="flex flex-wrap gap-6">
           {features.map((item, index) => (
             <div key={item.label} className="flex gap-3 items-center">
               <div className="flex flex-col gap-1 text-gray-500">
                 <div className="flex gap-3 items-center">
-                  <FontAwesomeIcon icon={item.icon} style={{ color: "#74C0FC" }} />
+                  <FontAwesomeIcon
+                    icon={item.icon}
+                    style={{ color: "#74C0FC" }}
+                  />
                   <p className="font-semibold text-black">{item.value}</p>
                 </div>
                 <p className="text-sm">{item.label}</p>
@@ -60,14 +99,14 @@ function ApartmentOverview() {
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow">
-        <h1 className="font-medium py-4">Description</h1>
+        <h2 className="font-medium py-4">Description</h2>
         <p className="text-gray-500 font-light">
-          Well-maintained 2 BHK apartment in a prime residential tower with modern amenities.
+          {property.details.description.en || "No description available."}
         </p>
       </div>
 
       <div className="flex flex-col gap-5 bg-sky-100 p-4 rounded-lg shadow">
-        <h1 className="font-medium py-4">Apartment Details</h1>
+        <h2 className="font-medium py-4">Apartment Details</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-8">
           {propertyDetails.map((item, index) => (
             <div key={index} className="grid grid-cols-2">

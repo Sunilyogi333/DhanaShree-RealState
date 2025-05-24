@@ -1,7 +1,7 @@
 'use state';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-
+import Link from 'next/link';
 const navigation = [
   { name: 'Home', href: '/', current: true },
   { name: 'Featured', href: '#', current: false },
@@ -12,7 +12,8 @@ const navigation = [
 function classNames(...classes: (string | false | null | undefined)[]): string {
   return classes.filter(Boolean).join(' ')
 }
-import React from 'react'
+import React from 'react' 
+import { Button } from './ui/button';
 
 function Navbar() {
   return (
@@ -36,8 +37,8 @@ function Navbar() {
             <div className="flex shrink-0 items-center">
               <img
                 alt="Your Company"
-                src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-                className="h-8 w-auto"
+                src="/user/logo.png"
+                className="h-12 w-auto"
               />
             </div>
             <div className="hidden sm:ml-6 sm:block">
@@ -69,7 +70,7 @@ function Navbar() {
             </button>
 
             {/* Profile dropdown */}
-            <Menu as="div" className="relative ml-3">
+            {/* <Menu as="div" className="relative ml-3">
               <div>
                 <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
                   <span className="absolute -inset-1.5" />
@@ -110,7 +111,12 @@ function Navbar() {
                   </a>
                 </MenuItem>
               </MenuItems>
-            </Menu>
+            </Menu> */}
+            <Link href="/admin">
+            <Button variant="outline" className='ml-3 border-sky-700 text-sky-700 hover:bg-sky-700 hover:text-white trasnsition-all duration-300'>
+              Login as admin
+            </Button>
+            </Link>
           </div>
         </div>
       </div>
