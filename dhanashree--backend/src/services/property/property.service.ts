@@ -9,28 +9,27 @@ import { Image } from '../../entities/images/image.entity'
 import { CreatePropertyDTO, UpdatePropertyDTO } from '../../dto/property.dto'
 import { getPagination, getPagingData } from '../../utils/pagination'
 import HttpException from '../../utils/HttpException'
+import { UnitEnum, Facing, Zoning, ApartmentType, FurnishingType } from '../../constants/enum/property'
+import { PropertyDetails } from '../../types/express/property.type'
 
 class PropertyService {
-  private propertyRepository = AppDataSource.getRepository(Property)
-  private addressRepository = AppDataSource.getRepository(Address)
-  private imageRepository = AppDataSource.getRepository(Image)
+  constructor(private readonly propertyRepository = AppDataSource.getRepository(Property)) {}
 
   async create(adminId: string, data: CreatePropertyDTO, imageIds: number[]) {
-    // 1. Fetch admin first, OUTSIDE transaction
+    // 1. Fetch admin
     const admin = await AppDataSource.getRepository(Admin).findOne({ where: { id: adminId } })
     if (!admin) {
-      throw new HttpException('Admin not found', 404)
+      throw HttpException.notFound('Admin not found')
     }
 
-    // 2. Check for unique propertyCode
+    // 2. Check propertyCode uniqueness
     const existingProperty = await this.propertyRepository.findOne({ where: { propertyCode: data.propertyCode } })
     if (existingProperty) {
-      throw new HttpException(`Property with code ${data.propertyCode} already exists`, 400)
+      throw HttpException.notFound(`Property with code ${data.propertyCode} already exists`)
     }
 
-    // 3. Start transaction for address creation, property creation, image association
     return await AppDataSource.transaction(async (transactionalEntityManager) => {
-      // Fetch the count of images already associated with a property
+      // 3. Check if any image is already attached
       const associatedImagesCount = await transactionalEntityManager
         .createQueryBuilder(Image, 'image')
         .where('image.id IN (:...imageIds)', { imageIds })
@@ -38,27 +37,35 @@ class PropertyService {
         .getCount()
 
       if (associatedImagesCount > 0) {
-        throw new HttpException('Some images are already associated with a property', 400)
+        throw HttpException.notFound('Some images are already associated with a property')
       }
 
-      // Fetch images only after validation to avoid unnecessary data fetching
+      // 4. Fetch images
       const images = await transactionalEntityManager.findByIds(Image, imageIds)
 
       if (images.length !== imageIds.length) {
-        throw new HttpException('Some images not found', 404)
+        throw HttpException.notFound('Some images not found')
       }
 
-      // Create address
-      const createdAddress = await addressService.create({
-        province: +data.province,
-        district: +data.district,
-        municipality: +data.municipality,
-        ward: +data.ward,
+      // ✅ 5. Enforce exactly one thumbnail
+      const thumbnailCount = images.filter((img) => img.type === 'thumbnail').length
+      if (thumbnailCount !== 1) {
+        throw HttpException.notFound('Exactly one thumbnail is required. Found: ' + thumbnailCount)
+      }
+
+      // ✅ 6. Inline address creation (inside transaction)
+      const address = transactionalEntityManager.getRepository(Address).create({
+        province: { id: +data.province },
+        district: { id: +data.district },
+        municipality: { id: +data.municipality },
+        ward: { id: +data.ward },
       })
 
-      // Create property entity with relations
+      const createdAddress = await transactionalEntityManager.save(Address, address)
+
+      // 7. Create property
       const propertyData: Partial<Property> = {
-        propertyCode: data.propertyCode,
+        propertyCode: data.propertyCode.toUpperCase(),
         price: data.price,
         type: data.type,
         status: data.status,
@@ -74,24 +81,10 @@ class PropertyService {
     })
   }
 
-  // private async generateUniquePropertyCode(): Promise<string> {
-  //   let code = ''
-
-  //   while (true) {
-  //     code = Math.floor(100000 + Math.random() * 900000).toString()
-  //     const existing = await this.propertyRepository.findOne({ where: { propertyCode: code } })
-  //     if (!existing) break
-  //   }
-
-  //   return code
-  // }
-
-  async getAll(page: number, size: number) {
+  async getAll(page: number, size: number, filters: any) {
     const { limit, offset } = getPagination(page, size)
-    console.log('🚀 ~ PropertyService ~ getAll ~ limit:', limit)
-    console.log('🚀 ~ PropertyService ~ getAll ~ offset:', offset)
 
-    const properties = await this.propertyRepository
+    const query = this.propertyRepository
       .createQueryBuilder('property')
       .leftJoinAndSelect('property.images', 'images', 'images.type = :type', { type: 'thumbnail' })
       .leftJoinAndSelect('property.address', 'address')
@@ -99,14 +92,54 @@ class PropertyService {
       .leftJoinAndSelect('address.district', 'district')
       .leftJoinAndSelect('address.municipality', 'municipality')
       .leftJoinAndSelect('address.ward', 'ward')
-      .orderBy('property.createdAt', 'DESC')
-      .limit(limit)
-      .offset(offset)
-      .getManyAndCount()
+      .skip(offset)
+      .take(limit)
 
-    const [propertyData, totalProperty] = properties
+    // ✅ Default: exclude sold unless explicitly asked
+    if (!filters.status) {
+      query.andWhere('property.status != :sold', { sold: 'sold' })
+    }
 
-    const pagination = getPagingData(totalProperty, page, size)
+    // ✅ Filters
+    if (filters.propertyCode) {
+      query.andWhere('LOWER(property.propertyCode) = LOWER(:propertyCode)', {
+        propertyCode: filters.propertyCode,
+      })
+    }
+
+    if (filters.price) {
+      query.andWhere('property.price = :price', { price: filters.price })
+    }
+
+    if (filters.status) {
+      query.andWhere('property.status = :status', { status: filters.status })
+    }
+
+    if (filters.purpose) {
+      query.andWhere('property.purpose = :purpose', { purpose: filters.purpose })
+    }
+
+    if (filters.type) {
+      query.andWhere('property.type = :type', { type: filters.type })
+    }
+
+    if (filters.district) {
+      query.andWhere('district.id = :districtId', { districtId: filters.district })
+    }
+
+    if (filters.municipality) {
+      query.andWhere('municipality.id = :municipalityId', { municipalityId: filters.municipality })
+    }
+
+    // ✅ Sorting
+    const sortBy = filters.sortBy === 'price' ? 'property.price' : 'property.createdAt' 
+    const order: 'ASC' | 'DESC' = filters.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'
+
+    query.orderBy(sortBy, order)
+
+    const [propertyData, total] = await query.getManyAndCount()
+
+    const pagination = getPagingData(total, page, size)
 
     const modifiedData = propertyData.map((property) => {
       const { details, ...rest } = property
@@ -135,30 +168,6 @@ class PropertyService {
       .leftJoinAndSelect('address.district', 'district')
       .leftJoinAndSelect('address.municipality', 'municipality')
       .leftJoinAndSelect('address.ward', 'ward')
-      .select([
-        'property.id',
-        'property.createdAt',
-        'property.propertyCode',
-        'property.price',
-        'property.status',
-        'property.type',
-        'property.purpose',
-        'property.details',
-        'images.url',
-        'images.id',
-        'images.type',
-        'address.province',
-        'address.district',
-        'address.municipality',
-        'address.ward',
-        'province.province_title',
-        'province.province_title_nepali',
-        'district.district_title',
-        'district.district_title_nepali',
-        'municipality.municipality_title',
-        'municipality.municipality_title_nepali',
-        'ward.ward_number',
-      ])
       .where('property.id = :propertyId', { propertyId })
       .getOne()
 
@@ -167,6 +176,112 @@ class PropertyService {
     }
 
     return property
+  }
+
+  // src/services/property/property.service.ts
+
+  async update(propertyId: string, adminId: string, data: UpdatePropertyDTO, imageIds: string[]) {
+    return await AppDataSource.transaction(async (manager) => {
+      const property = await manager.findOne(Property, {
+        where: { id: propertyId },
+        relations: ['images', 'address'],
+      })
+
+      if (!property) throw HttpException.notFound('Property not found')
+
+      // ✅ Fetch & Validate new images
+      const images = await manager.findByIds(Image, imageIds)
+      if (images.length !== imageIds.length) {
+        throw HttpException.badRequest('Some images not found')
+      }
+
+      const thumbnailCount = images.filter((img) => img.type === 'thumbnail').length
+      const normalCount = images.filter((img) => img.type === 'normal').length
+
+      if (thumbnailCount !== 1) {
+        throw HttpException.badRequest('Exactly one thumbnail is required')
+      }
+      if (normalCount < 3) {
+        throw HttpException.badRequest('At least 3 normal images are required')
+      }
+
+      // ✅ Remove orphaned images
+      const oldImageIds = property.images.map((img) => img.id)
+      const toDelete = oldImageIds.filter((oldId) => !imageIds.includes(oldId))
+
+      if (toDelete.length > 0) {
+        const imagesToDelete = property.images.filter((img) => toDelete.includes(img.id))
+        for (const img of imagesToDelete) {
+          await cloudinaryService.deleteByUrl(img.url)
+        }
+        await manager.remove(imagesToDelete)
+      }
+
+      // ✅ Update address if needed
+      if (data.province || data.district || data.municipality || data.ward) {
+        if (!property.address) {
+          property.address = manager.create(Address, {})
+        }
+
+        if (data.province) property.address.province = { id: data.province } as any
+        if (data.district) property.address.district = { id: data.district } as any
+        if (data.municipality) property.address.municipality = { id: data.municipality } as any
+        if (data.ward) property.address.ward = { id: data.ward } as any
+
+        await manager.save(Address, property.address)
+      }
+
+      // ✅ Manually assign core fields
+      if (data.propertyCode) property.propertyCode = data.propertyCode.toUpperCase()
+      if (data.price !== undefined) property.price = data.price
+      if (data.type) property.type = data.type
+      if (data.status) property.status = data.status
+      if (data.purpose) property.purpose = data.purpose
+      if (data.details) {
+        const updatedDetails = {
+          ...property.details,
+          ...data.details,
+
+          ...(data.details.builtInArea && {
+            builtInArea: {
+              unit: data.details.builtInArea.unit,
+              value: data.details.builtInArea.value,
+            },
+          }),
+
+          ...(data.details.frontage && {
+            frontage: {
+              unit: data.details.frontage.unit,
+              value: data.details.frontage.value,
+            },
+          }),
+
+          ...(data.details.facing && {
+            facing: data.details.facing,
+          }),
+
+          ...(data.details.apartmentType && {
+            apartmentType: data.details.apartmentType,
+          }),
+
+          ...(data.details.zoning && {
+            zoning: data.details.zoning,
+          }),
+
+          ...(data.details.furnishing && {
+            furnishing: data.details.furnishing,
+          }),
+        }
+
+        property.details = updatedDetails as PropertyDetails
+      }
+
+      // ✅ Update images & address references
+      property.images = images
+      property.address = property.address
+
+      return await manager.save(property)
+    })
   }
 
   async delete(propertyId: string) {

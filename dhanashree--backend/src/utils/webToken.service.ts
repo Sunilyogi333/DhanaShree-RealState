@@ -11,7 +11,7 @@ class WebTokenService {
     }
 
     const signOptions: SignOptions = {
-      expiresIn: options.expiresIn, 
+      expiresIn: options.expiresIn,
     }
 
     return jwt.sign(payload, options.secret as string, signOptions)
@@ -64,6 +64,23 @@ class WebTokenService {
   async decode(token: string): Promise<string | JwtPayload | null> {
     const payload = jwt.decode(token)
     return payload
+  }
+
+  generateBookingToken(payload: { bookingId: string; email: string }) {
+    return jwt.sign(payload, EnvironmentConfiguration.ACCESS_TOKEN_SECRET, {
+      expiresIn: '24h',
+    })
+  }
+
+  verifyBookingToken(token: string): { bookingId: string; email: string } {
+    try {
+      return jwt.verify(token, EnvironmentConfiguration.ACCESS_TOKEN_SECRET) as {
+        bookingId: string
+        email: string
+      }
+    } catch (err) {
+      throw new Error('Invalid or expired token')
+    }
   }
 }
 

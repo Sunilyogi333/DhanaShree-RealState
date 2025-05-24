@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm'
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm'
 import Base from '../base/base.entity'
 import { Property } from '../property/property.entity'
 
@@ -10,6 +10,10 @@ export class Image extends Base {
   @Column({ default: 'normal' })
   type: 'thumbnail' | 'normal'
 
+  @Column({ nullable: true })
+  propertyId: string
+
   @ManyToOne(() => Property, (property) => property.images, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'propertyId' })
   property: Property
 }

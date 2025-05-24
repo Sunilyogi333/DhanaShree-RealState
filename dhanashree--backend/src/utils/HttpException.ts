@@ -32,6 +32,9 @@ class HttpException extends Error {
   static forbidden(message: string) {
     return new HttpException(message, StatusCodes.FORBIDDEN)
   }
+  static tooManyRequests(message: string) {
+  return new HttpException(message, StatusCodes.TOO_MANY_REQUESTS)
+  }
   static internalServerError(message: string) {
     return new HttpException(message, StatusCodes.INTERNAL_SERVER_ERROR)
   }

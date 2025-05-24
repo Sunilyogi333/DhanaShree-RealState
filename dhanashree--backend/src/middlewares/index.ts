@@ -40,7 +40,13 @@ const middleware = (app: Application) => {
   app.use(rateLimiter)
   app.use(morgan('dev'))
   app.use('/api', router)
-  app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec))
+  app.use(
+    '/api-docs',
+    swaggerUI.serve,
+    swaggerUI.setup(swaggerSpec, {
+      customSiteTitle: 'Dhanashree Backend',
+    })
+  )
 
   console.log('Environment:', EnvironmentConfiguration.NODE_ENV)
 

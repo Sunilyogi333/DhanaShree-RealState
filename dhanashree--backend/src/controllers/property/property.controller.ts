@@ -7,10 +7,10 @@ class PropertyController {
   async create(req: Request, res: Response) {
     const adminId = req.user?.id
     if (!adminId) return res.status(401).json({ message: 'Unauthorized: Admin ID missing' })
-  
+
     const data = req.body
     const imageIds: number[] = req.body.imageIds // expecting from frontend
-  
+
     await propertyService.create(adminId, data, imageIds)
     res.status(StatusCodes.CREATED).json({ success: true, message: Message.created })
   }
@@ -19,14 +19,49 @@ class PropertyController {
     const page = parseInt(req.query.page as string) || 1
     const size = parseInt(req.query.size as string) || 10
 
-    const result = await propertyService.getAll(page, size)
-    res.status(StatusCodes.SUCCESS).json({ success: true, data: result })
+    const filters = {
+      propertyCode: req.query.propertyCode as string,
+      price: req.query.price ? parseFloat(req.query.price as string) : undefined,
+      status: req.query.status as string,
+      purpose: req.query.purpose as string,
+      type: req.query.type as string,
+      district: req.query.district ? parseInt(req.query.district as string) : undefined,
+      municipality: req.query.municipality ? parseInt(req.query.municipality as string) : undefined,
+      sortBy: req.query.sortBy as 'createdAt' | 'price',
+      order: req.query.order as 'asc' | 'desc',
+    }
+
+    const result = await propertyService.getAll(page, size, filters)
+
+    return res.status(StatusCodes.SUCCESS).json({
+      success: true,
+      data: result,
+    })
   }
 
   async getOne(req: Request, res: Response) {
     const propertyId = req.params.id
     const property = await propertyService.getOne(propertyId)
     res.status(StatusCodes.SUCCESS).json({ success: true, data: property })
+  }
+
+  async update(req: Request, res: Response) {
+    const propertyId = req.params.id
+    const adminId = req.user?.id
+
+    if (!adminId) {
+      return res.status(401).json({ message: 'Unauthorized: Admin ID missing' })
+    }
+
+    const data = req.body
+    const imageIds: string[] = req.body.imageIds
+
+    await propertyService.update(propertyId, adminId, data, imageIds)
+
+    res.status(StatusCodes.SUCCESS).json({
+      success: true,
+      message: Message.updated,
+    })
   }
 
   async delete(req: Request, res: Response) {

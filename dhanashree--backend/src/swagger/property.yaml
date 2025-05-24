@@ -17,7 +17,7 @@ paths:
             schema:
               type: object
               properties:
-                propertyCode: 
+                propertyCode:
                   type: string
                   example: 73CH81
                 price:
@@ -29,93 +29,105 @@ paths:
                 status:
                   type: string
                   enum: [exclusive, featured, emerging, latest]
-                purpose: 
+                purpose:
                   type: string
                   enum: [rent, sale]
                 details:
-                        type: object
-                        required: 
-                          - landArea
-                          - frontage
-                        properties:
-                          bathrooms:
-                            type: number
-                            example: 2
-                          bedrooms:
-                            type: number
-                            example: 3  
-                          builtInArea:
-                            type: object
-                            properties:
-                                unit:
-                                  type: string
-                                  enum: [sqft, ft, sqm, katha, aana, bigha, dhur, paisa, daam, ropani]
-                                value:
-                                  type: number
-                                  example: 1200  
-                          builtYear:
-                            type: number
-                            example: 2020
-                          description:
-                            type: object
-                            properties:
-                              en:
-                                type: string
-                                example: "Spacious 3BHK apartment"
-                              np:
-                                type: string
-                                example: "तीन कोठाको अपार्टमेन्ट"
-                          facing:
-                            type: string
-                            enum: [east, west, north, south, north east, north west, south east, south west]
-                          facilities:
-                            type: array
-                            items:
-                              type: string
-                              enum: [water supply, drainage, parking, elevator, security, gym, internet, electricity, swimming pool, garden]
-                          floors:
-                            type: number
-                            example: 2
-                          frontage:
-                            type: object
-                            properties:
-                              unit:
-                                type: string
-                                enum: [sqft, ft, sqm, katha, aana, bigha, dhur, paisa, daam, ropani]
-                              value:
-                                type: number
-                                example: 1200    
-                          furnishing:
-                            type: string
-                            enum: [full, semi, none]
-                            description: "Allowed furnishing types: full, semi, none."
-                          kitchens:
-                            type: number
-                            example: 1
-                          landArea:
-                            type: object
-                            properties:
-                              unit:
-                                type: string
-                                enum: [sqft, ft, sqm, katha, aana, bigha, dhur, paisa, daam, ropani]
-                              value:
-                                type: number
-                                example: 1200    
-                          livingRooms:
-                            type: number
-                            example: 1
-                          parking:
-                            type: number
-                            example: 1
-                          totalFloors:
-                            type: number
-                            example: 3
-                          apartmentType:
-                            type: string
-                            enum: [studio, 1 bhk, 2 bhk, 3 bhk, penthouse, duplex]
-                          zoning:
-                            type: string
-                            enum: [residential, commercial, agricultural, mixed]
+                  type: object
+                  required:
+                    - landArea
+                    - frontage
+                  properties:
+                    bathrooms:
+                      type: number
+                      example: 2
+                    bedrooms:
+                      type: number
+                      example: 3
+                    builtInArea:
+                      type: object
+                      properties:
+                        unit:
+                          type: string
+                          enum: [sqft, ft, sqm, katha, aana, bigha, dhur, paisa, daam, ropani]
+                        value:
+                          type: number
+                          example: 1200
+                    builtYear:
+                      type: number
+                      example: 2020
+                    description:
+                      type: object
+                      properties:
+                        en:
+                          type: string
+                          example: 'Spacious 3BHK apartment'
+                        np:
+                          type: string
+                          example: 'तीन कोठाको अपार्टमेन्ट'
+                    facing:
+                      type: string
+                      enum: [east, west, north, south, north east, north west, south east, south west]
+                    facilities:
+                      type: array
+                      items:
+                        type: string
+                        enum:
+                          [
+                            water supply,
+                            drainage,
+                            parking,
+                            elevator,
+                            security,
+                            gym,
+                            internet,
+                            electricity,
+                            swimming pool,
+                            garden,
+                          ]
+                    floors:
+                      type: number
+                      example: 2
+                    frontage:
+                      type: object
+                      properties:
+                        unit:
+                          type: string
+                          enum: [sqft, ft, sqm, katha, aana, bigha, dhur, paisa, daam, ropani]
+                        value:
+                          type: number
+                          example: 1200
+                    furnishing:
+                      type: string
+                      enum: [full, semi, none]
+                      description: 'Allowed furnishing types: full, semi, none.'
+                    kitchens:
+                      type: number
+                      example: 1
+                    landArea:
+                      type: object
+                      properties:
+                        unit:
+                          type: string
+                          enum: [sqft, ft, sqm, katha, aana, bigha, dhur, paisa, daam, ropani]
+                        value:
+                          type: number
+                          example: 1200
+                    livingRooms:
+                      type: number
+                      example: 1
+                    parking:
+                      type: number
+                      example: 1
+                    totalFloors:
+                      type: number
+                      example: 3
+                    apartmentType:
+                      type: string
+                      enum: [studio, 1 bhk, 2 bhk, 3 bhk, penthouse, duplex]
+                    zoning:
+                      type: string
+                      enum: [residential, commercial, agricultural, mixed]
                 province:
                   type: number
                   example: 3
@@ -160,7 +172,7 @@ paths:
           $ref: '#/components/responses/InternalServerErrorResponse'
 
     get:
-      summary: 'Get All Properties (Paginated)'
+      summary: 'Get All Properties (Paginated & Filtered)'
       tags:
         - Property
       parameters:
@@ -176,6 +188,62 @@ paths:
             type: integer
           required: false
           example: 10
+        - name: propertyCode
+          in: query
+          schema:
+            type: string
+          required: false
+          example: 754CM3
+        - name: price
+          in: query
+          schema:
+            type: number
+          required: false
+          example: 5000000
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [land, house, apartment, flat, space]
+          required: false
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [exclusive, featured, emerging, latest, sold]
+          required: false
+        - name: purpose
+          in: query
+          schema:
+            type: string
+            enum: [rent, sale]
+          required: false
+        - name: district
+          in: query
+          schema:
+            type: number
+          required: false
+          example: 5
+        - name: municipality
+          in: query
+          schema:
+            type: number
+          required: false
+          example: 12
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [price, createdAt]
+          required: false
+          example: createdAt
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [ASC, DESC]
+          required: false
+          example: DESC
       responses:
         '200':
           $ref: '#/components/responses/SuccessResponse'
@@ -217,6 +285,163 @@ paths:
           schema:
             type: string
             format: uuid
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+    patch:
+      summary: 'Update Property'
+      tags:
+        - Property
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                propertyCode:
+                  type: string
+                  example: 73CH81
+                price:
+                  type: number
+                  example: 5500000
+                type:
+                  type: string
+                  enum: [land, house, apartment, flat, space]
+                status:
+                  type: string
+                  enum: [exclusive, featured, emerging, latest, sold]
+                purpose:
+                  type: string
+                  enum: [rent, sale]
+                details:
+                  type: object
+                  properties:
+                    bathrooms:
+                      type: number
+                      example: 2
+                    bedrooms:
+                      type: number
+                      example: 3
+                    builtInArea:
+                      type: object
+                      properties:
+                        unit:
+                          type: string
+                          enum: [sqft, ft, sqm, katha, aana, bigha, dhur, paisa, daam, ropani]
+                        value:
+                          type: number
+                          example: 1200
+                    builtYear:
+                      type: number
+                      example: 2020
+                    description:
+                      type: object
+                      properties:
+                        en:
+                          type: string
+                          example: 'Updated spacious 3BHK apartment'
+                        np:
+                          type: string
+                          example: 'अद्यावधिक गरिएको तीन कोठाको अपार्टमेन्ट'
+                    facing:
+                      type: string
+                      enum: [east, west, north, south, north east, north west, south east, south west]
+                    facilities:
+                      type: array
+                      items:
+                        type: string
+                        enum:
+                          [
+                            water supply,
+                            drainage,
+                            parking,
+                            elevator,
+                            security,
+                            gym,
+                            internet,
+                            electricity,
+                            swimming pool,
+                            garden,
+                          ]
+                    floors:
+                      type: number
+                      example: 2
+                    frontage:
+                      type: object
+                      properties:
+                        unit:
+                          type: string
+                          enum: [sqft, ft, sqm, katha, aana, bigha, dhur, paisa, daam, ropani]
+                        value:
+                          type: number
+                          example: 1200
+                    furnishing:
+                      type: string
+                      enum: [full, semi, none]
+                    kitchens:
+                      type: number
+                      example: 1
+                    landArea:
+                      type: object
+                      properties:
+                        unit:
+                          type: string
+                          enum: [sqft, ft, sqm, katha, aana, bigha, dhur, paisa, daam, ropani]
+                        value:
+                          type: number
+                          example: 1500
+                    livingRooms:
+                      type: number
+                      example: 1
+                    parking:
+                      type: number
+                      example: 1
+                    totalFloors:
+                      type: number
+                      example: 3
+                    apartmentType:
+                      type: string
+                      enum: [studio, 1 bhk, 2 bhk, 3 bhk, penthouse, duplex]
+                    zoning:
+                      type: string
+                      enum: [residential, commercial, agricultural, mixed]
+                province:
+                  type: number
+                  example: 3
+                district:
+                  type: number
+                  example: 5
+                municipality:
+                  type: number
+                  example: 7
+                ward:
+                  type: number
+                  example: 12
+                imageIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  example:
+                    - a2e8a191-f450-4e1c-b8b7-cd46bd312eab
+                    - b3c9b282-e561-4d2f-b9c8-dd57bd422eac
+                    - c4d0c373-f672-4e3f-bad9-ee68ce533ebd
+                    - d5e1d464-g783-4f40-cbe0-ff79df644fce
       responses:
         '200':
           $ref: '#/components/responses/SuccessResponse'

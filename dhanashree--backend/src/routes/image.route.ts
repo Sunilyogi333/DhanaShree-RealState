@@ -21,4 +21,16 @@ router.post(
   catchAsync(imageController.upload.bind(imageController))
 )
 
+router.patch(
+  '/:propertyId',
+  authentication([ROLE.ADMIN]),
+  upload.fields([
+    { name: 'thumbnail', maxCount: 1 },
+    { name: 'images', maxCount: 10 },
+  ]),
+  validateImageBuffer,
+  catchAsync(imageController.updateImages.bind(imageController))
+)
+
+
 export default router

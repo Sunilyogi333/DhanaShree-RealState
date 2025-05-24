@@ -22,6 +22,13 @@ router.get('/', catchAsync(propertyController.getAll.bind(propertyController)))
 // Get single property (public)
 router.get('/:id', catchAsync(propertyController.getOne.bind(propertyController)))
 
+router.patch(
+  '/:id',
+  authentication([ROLE.ADMIN]),
+  RequestValidator.validate(UpdatePropertyDTO),
+  catchAsync(propertyController.update.bind(propertyController))
+)
+
 // Delete property
 router.delete('/:id', authentication([ROLE.ADMIN]), catchAsync(propertyController.delete.bind(propertyController)))
 

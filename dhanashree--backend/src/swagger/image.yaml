@@ -68,4 +68,80 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
+/image/{propertyId}:
+  patch:
+    tags:
+      - Image
+    summary: Update images for a property
+    description: >
+      Replace the existing thumbnail and/or normal images of a property. Only accessible to users with the `ADMIN` role.
+      At least one of `thumbnail` or `images` must be provided. Old images will be deleted from Cloudinary.
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: propertyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: UUID of the property whose images are to be updated
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              thumbnail:
+                type: string
+                format: binary
+                description: New thumbnail image (JPG/PNG)
+              images:
+                type: array
+                items:
+                  type: string
+                  format: binary
+                description: Array of new normal images (JPG/PNG)
+            required: []
+          encoding:
+            thumbnail:
+              contentType: image/jpeg, image/png
+            images:
+              contentType: image/jpeg, image/png
+    responses:
+      '200':
+        description: Images updated successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Images updated
+                images:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        example: 'e3a1bc74-8f90-4d3a-b294-8a91dcfb71d6'
+                      url:
+                        type: string
+                        example: 'https://res.cloudinary.com/demo/image/upload/v12345678/image.jpg'
+                      type:
+                        type: string
+                        enum: [thumbnail, normal]
+                        example: normal
+      '400':
+        $ref: '#/components/responses/BadRequestResponse'
+      '500':
+        $ref: '#/components/responses/InternalServerErrorResponse'
+
   

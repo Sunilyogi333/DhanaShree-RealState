@@ -1,9 +1,9 @@
-// property.entity.ts
 import { Entity, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm'
 import Base from '../base/base.entity'
 import Admin from '../admin/admin.entity'
 import { Image } from '../images/image.entity'
 import { Address } from '../address/address.entity'
+import { Booking } from '../booking/booking.entity'
 import { PropertyDetails } from '../../types/express/property.type'
 import { PropertyStatus, PropertyType, Purpose } from '../../constants/enum/property'
 
@@ -21,7 +21,7 @@ export class Property extends Base {
   @Column({ type: 'enum', enum: PropertyStatus })
   status: PropertyStatus
 
-  @Column({ type:'enum', enum:Purpose })
+  @Column({ type: 'enum', enum: Purpose })
   purpose: Purpose
 
   @Column({ nullable: true, type: 'jsonb' })
@@ -36,5 +36,7 @@ export class Property extends Base {
 
   @OneToMany(() => Image, (image) => image.property, { cascade: true })
   images: Image[]
-}
 
+  @OneToMany(() => Booking, (booking) => booking.property)
+  bookings: Booking[]
+}

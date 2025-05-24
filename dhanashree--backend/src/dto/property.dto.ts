@@ -13,11 +13,12 @@ import { Type } from 'class-transformer'
 import { ApartmentType, Facing, PropertyStatus, PropertyType, Purpose } from '../constants/enum/property'
 import { MultiLanguageDTO } from './multiLanguage.dto'
 import { Facilities, Zoning } from '../constants/enum/property'
+import { UnitEnum } from '../constants/enum/property'
 
 class UnitValueDTO {
   @IsNotEmpty()
-  @IsString()
-  unit: string
+  @IsEnum(UnitEnum)
+  unit: UnitEnum
 
   @IsNotEmpty()
   @IsNumber()
@@ -88,7 +89,7 @@ class PropertyDetailsDTO {
 
   @IsOptional()
   @IsEnum(ApartmentType, {
-    message: "Invalid apartment type"
+    message: 'Invalid apartment type',
   })
   apartmentType?: ApartmentType
 
@@ -115,7 +116,7 @@ export class CreatePropertyDTO {
   status: PropertyStatus
 
   @IsEnum(Purpose, {
-    message: 'Invalid purpose'
+    message: 'Invalid purpose',
   })
   purpose: Purpose
 
@@ -148,10 +149,6 @@ export class CreatePropertyDTO {
 export class UpdatePropertyDTO {
   @IsOptional()
   @IsString()
-  name?: string
-
-  @IsOptional()
-  @IsString()
   propertyCode?: string
 
   @IsOptional()
@@ -159,20 +156,39 @@ export class UpdatePropertyDTO {
   price?: number
 
   @IsOptional()
-  @IsString()
-  propertyType?: string
+  @IsEnum(PropertyType)
+  type?: PropertyType
 
   @IsOptional()
-  @IsString()
-  status?: string
+  @IsEnum(PropertyStatus)
+  status?: PropertyStatus
+
+  @IsOptional()
+  @IsEnum(Purpose)
+  purpose?: Purpose
 
   @IsOptional()
   @ValidateNested()
   @Type(() => PropertyDetailsDTO)
-  propertyDetails?: PropertyDetailsDTO
+  details?: PropertyDetailsDTO
 
   @IsOptional()
+  @IsNumber()
+  province?: number
+
+  @IsOptional()
+  @IsNumber()
+  district?: number
+
+  @IsOptional()
+  @IsNumber()
+  municipality?: number
+
+  @IsOptional()
+  @IsNumber()
+  ward?: number
+
   @IsArray()
   @IsUUID('all', { each: true })
-  imageIds?: string[]
+  imageIds: string[] // All image IDs (old + new)
 }

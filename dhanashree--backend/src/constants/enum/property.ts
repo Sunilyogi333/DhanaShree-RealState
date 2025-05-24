@@ -9,7 +9,7 @@ export enum UnitEnum {
   paisa = 'paisa',
   daam = 'daam',
   ropani = 'ropani',
-}
+} 
 
 export enum PropertyType {
   land = 'land',
@@ -24,6 +24,7 @@ export enum PropertyStatus {
   exclusive = 'exclusive',
   featured = 'featured',
   emerging = 'emerging',
+  sold = "sold"
 }
 
 export enum FurnishingType {
@@ -76,3 +77,4 @@ export enum ApartmentType {
   penthouse = 'penthouse',
   duplex = 'duplex',
 }
+

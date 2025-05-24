@@ -4,6 +4,7 @@ import AdminRoute from './admin.route'
 import PropertyRoute from './property.route'
 import AddressRoute from './address.route'
 import ImageRoute from './image.route'
+import BookingRoute from './booking.route'
 
 export interface Route {
   path: string
@@ -32,6 +33,10 @@ const routes: Route[] = [
   {
     path: '/property',
     route: PropertyRoute,
+  },
+  {
+    path: '/booking',
+    route: BookingRoute,
   },
 ]
 
