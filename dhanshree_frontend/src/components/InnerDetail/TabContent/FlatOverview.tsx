@@ -7,25 +7,30 @@ import {
   faCalendarAlt,
   faArrowUpRightFromSquare,
 } from "@fortawesome/free-solid-svg-icons";
-export default function FlatOverview() {
+import { fetchPropertyDetails } from "@/types/property";
+export default function FlatOverview({property, isLoading, error}: { property: fetchPropertyDetails, isLoading: boolean, error: any }) {
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading property details.</div>;
     const features = [
-      { label: "Bedrooms", value: "3", icon: faBed },
-      { label: "Bathrooms", value: "2", icon: faBath },
-      { label: "Flat Size", value: "1200 sqft", icon: faRulerCombined },
-      { label: "Floor", value: "2nd Floor", icon: faArrowUpRightFromSquare },
-      { label: "Built Year", value: "2018", icon: faCalendarAlt },
+      { label: "Bedrooms", value: property.details.bedrooms, icon: faBed },
+      { label: "Bathrooms", value: property.details.bathrooms, icon: faBath },
+      { label: "Built in Area", value: `${property.details.builtInArea?.value,property.details.builtInArea?.unit}`, icon: faRulerCombined },
+      { label: "Floor Number", value:  property.details.floors, icon: faArrowUpRightFromSquare },
+      { label: "Built Year", value:  property.details.builtYear, icon: faCalendarAlt },
+      { label: "Flat Type", value: property.details.apartmentType, icon: faBuilding },
     ];
   
     const propertyDetails = [
-      { label: "Flat ID", value: "FLT1220" },
-      { label: "Facing", value: "West" },
-      { label: "Floor Level", value: "2nd" },
-      { label: "Purpose", value: "Residential" },
-      { label: "Total Area", value: "1200 sqft" },
-      { label: "Built Up Area", value: "950 sqft" },
-      { label: "Date Posted", value: "2025-05-01" },
-      { label: "Price", value: "Rs 1,10,00,000" },
-      { label: "Status", value: "For Sale" },
+      { label: "Flat ID", value: `${property.propertyCode}` },
+      { label: "Facing", value: property.details.facing },
+      { label: "Total Floors", value: `${property.details.totalFloors} ` },
+      { label: "Purpose", value: property.purpose },
+      { label: "Total Area", value: `${property.details.landArea.value} ${property.details.landArea.unit}` },
+      { label: "Built Up Area", value: `${property.details.builtInArea?.value} ${property.details.builtInArea?.unit}` },
+      { label: "Date Posted", value: new Date(property.createdAt).toLocaleDateString() },
+      { label: "Price", value: `Rs ${property.price.toLocaleString()}` },
+      { label: "Status", value: property.status },
     ];
   
     return (
@@ -59,7 +64,7 @@ export default function FlatOverview() {
           <div className="bg-white p-4 rounded-lg shadow">
             <h1 className="font-medium py-4">Description</h1>
             <p className="text-gray-500 font-light">
-              Well-maintained 2 BHK apartment in a prime residential tower with modern amenities.
+             {property.details.description.en || "No description available for this flat."}
             </p>
           </div>
     

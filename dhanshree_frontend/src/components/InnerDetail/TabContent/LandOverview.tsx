@@ -7,49 +7,47 @@ import {
   faCalendarAlt,
   faMountain,
 } from "@fortawesome/free-solid-svg-icons";
+import { fetchPropertyDetails } from "@/types/property";
 
-function LandOverview() {
-  const features = [
+function LandOverview({ property,isLoading,error}: { property: fetchPropertyDetails ,isLoading:boolean, error:any}) {
+  const features = [  
     {
       label: "Area",
-      value: "3500 sqft",
+      value: `${property.details.landArea.value} ${property.details.landArea.unit}`,
       icon: faRulerCombined,
     },
     {
       label: "Road Access",
-      value: "20ft",
+      value: `${property.details.frontage.value} ${property.details.frontage.unit}`,
       icon: faRoad,
     },
-    {
-      label: "Location",
-      value: "Kathmandu",
-      icon: faMapMarkerAlt,
-    },
+   
     {
       label: "Land Type",
-      value: "Residential",
+        value: property.details.zoning,
       icon: faMountain,
     },
     {
       label: "Listed Year",
-      value: "2024",
+      value: new Date(property.createdAt).toLocaleDateString(),
       icon: faCalendarAlt,
     },
   ];
 
   const propertyDetails = [
-    { label: "Land ID", value: "LND2301" },
-    { label: "Property Face", value: "South-East" },
-    { label: "Road Access", value: "20ft" },
-    { label: "Purpose", value: "Residential" },
-    { label: "Land Area", value: "3500 sqft" },
-    { label: "Date Posted", value: "2025-05-01" },
-    { label: "Price", value: "Rs 1,50,00,000" },
-    { label: "Status", value: "For Sale" },
+    { label: "Land ID", value: property.propertyCode },
+    { label: "Property Face", value: property.details.facing },
+    { label: "Road Access", value: `${property.details.frontage.value} ${property.details.frontage.unit}` },
+    { label: "Purpose", value: property.purpose },
+    { label: "Land Area", value: `${property.details.landArea.value} ${property.details.landArea.unit}` },
+    { label: "Date Posted", value: new Date(property.createdAt).toLocaleDateString() },
+    { label: "Price", value: `Rs ${property.price.toLocaleString()}` },
+    { label: "Status", value: property.status },
   ];
 
   return (
     <div className="flex flex-col gap-4">
+  
       <div className="bg-white p-4 rounded-lg shadow">
         <div className="flex justify-between py-6">
           <h1 className="font-medium">Overview</h1>
@@ -82,8 +80,7 @@ function LandOverview() {
       <div className="bg-white p-4 rounded-lg shadow">
         <h1 className="font-medium py-4">Description</h1>
         <p className="text-gray-500 font-light">
-          Beautiful residential plot in a peaceful neighborhood of Kathmandu,
-          perfect for building your dream home or investing.
+          {property.details.description.en}
         </p>
       </div>
 
