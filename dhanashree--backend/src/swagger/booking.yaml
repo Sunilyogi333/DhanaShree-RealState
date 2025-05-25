@@ -51,7 +51,7 @@ paths:
           $ref: '#/components/responses/InternalServerErrorResponse'
 
     get:
-      summary: Get all bookings (Admin only)
+      summary: Get all bookings
       tags:
         - Booking
       security:
