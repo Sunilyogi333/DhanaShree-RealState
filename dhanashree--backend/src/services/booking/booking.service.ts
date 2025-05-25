@@ -34,8 +34,10 @@ class BookingService {
 
       // ✅ Find or create user
       let user = await userRepo.findOne({ where: { email } })
+
+      let userEmail = email.toLowerCase()
       if (!user) {
-        user = userRepo.create({ fullName, email, phone })
+        user = userRepo.create({ fullName, email: userEmail, phone })
         await userRepo.save(user)
       }
 
@@ -50,21 +52,21 @@ class BookingService {
         .getOne()
 
       // ✅ If latest booking is already verified and not cancelled, block
-      if (existingBooking && existingBooking.status !== BookingStatus.CANCELLED && existingBooking.isVerified) {
+      if (existingBooking && existingBooking.status !== BookingStatus.cancelled && existingBooking.isVerified) {
         throw HttpException.badRequest('You’ve already booked this property.')
       }
 
       // ✅ Reuse or create new booking
       let booking = existingBooking
 
-      if (!booking || booking.status === BookingStatus.CANCELLED) {
+      if (!booking || booking.status === BookingStatus.cancelled) {
         booking = bookingRepo.create({
           user,
           property,
           date,
           message,
           isVerified: false,
-          status: BookingStatus.PENDING,
+          status: BookingStatus.pending,
           emailSentCount: 0,
         })
       }
@@ -84,31 +86,31 @@ class BookingService {
 
       const mailOptions = {
         from: EnvironmentConfiguration.MAIL_FROM,
-        to: email,
-        subject: 'Verify Your Booking',
         text: 'Booking verification',
+        to: email,
         html: generateHtml(
           user.fullName,
           new Date().toLocaleString(),
           `<p style="margin: 0; margin-top: 17px; font-weight: 500; letter-spacing: 0.56px;">
-            <p style="line-height: 2vh; text-align: center;">
-              Thank you for booking a property with us. To confirm your booking, please click the button below:
-            </p>
-            <p style="text-align: center;">
-              <a href="${verifyUrl}" style="cursor: pointer; text-decoration: none; padding: 10px 20px; background-color: #4CAF50; color: white; border-radius: 5px;">
-                Verify Booking
-              </a>
-            </p>
-            <p style="text-align: center;">
-              This link will expire in 24 hours for security reasons.
-            </p>
-
-            <b>Note:</b>
-            <p style="font-size: 14px;">
-              If you did not make this booking, you can safely ignore this email.
-            </p>
+          <p style="line-height: 2vh; text-align: center;">
+          Thank you for booking a property with us. To confirm your booking, please click the button below:
+          </p>
+          <p style="text-align: center;">
+          <a href="${verifyUrl}" style="cursor: pointer; text-decoration: none; padding: 10px 20px; background-color: #4CAF50; color: white; border-radius: 5px;">
+          Verify Booking
+          </a>
+          </p>
+          <p style="text-align: center;">
+          This link will expire in 24 hours for security reasons.
+          </p>
+          
+          <b>Note:</b>
+          <p style="font-size: 14px;">
+          If you did not make this booking, you can safely ignore this email.
+          </p>
           </p>`
         ),
+        subject: 'Verify Your Booking',
       }
 
       try {
@@ -207,7 +209,7 @@ class BookingService {
     if (data.date) booking.date = new Date(data.date)
     if (data.status) {
       booking.status = data.status
-      if (data.status === BookingStatus.CONFIRMED) {
+      if (data.status === BookingStatus.confirmed) {
         booking.adminConfirmedAt = new Date()
       }
     }
@@ -216,7 +218,17 @@ class BookingService {
     return { success: true, message: 'Booking updated successfully' }
   }
 
-  async getAllBookings(status: BookingStatus | undefined, page: number, size: number) {
+  async getAllBookings({
+    status,
+    page,
+    size,
+    email,
+  }: {
+    status?: BookingStatus
+    page: number
+    size: number
+    email?: string
+  }) {
     const { limit, offset } = getPagination(page, size)
 
     const query = this.bookingRepo
@@ -229,6 +241,10 @@ class BookingService {
 
     if (status) {
       query.where('booking.status = :status', { status })
+    }
+
+    if (email) {
+      query.andWhere('user.email = :email', { email })
     }
 
     const [bookings, total] = await query.getManyAndCount()

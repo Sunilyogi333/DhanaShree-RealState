@@ -15,7 +15,7 @@ export class Booking extends Base {
   @Column({ default: false })
   isVerified: boolean
 
-  @Column({ type: 'enum', enum: BookingStatus, default: BookingStatus.PENDING })
+  @Column({ type: 'enum', enum: BookingStatus, default: BookingStatus.pending })
   status: BookingStatus
 
   @Column({ type: 'timestamp', nullable: true })

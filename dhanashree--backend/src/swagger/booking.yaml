@@ -1,0 +1,196 @@
+tags:
+  - name: Booking
+    description: Endpoints for booking properties
+
+paths:
+  /booking:
+    post:
+      summary: Create a new booking
+      tags:
+        - Booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - fullName
+                - email
+                - phone
+                - propertyId
+                - date
+              properties:
+                fullName:
+                  type: string
+                  example: 'Sunil Nath'
+                email:
+                  type: string
+                  format: email
+                  example: 'user@example.com'
+                phone:
+                  type: string
+                  example: '9812345678'
+                propertyId:
+                  type: string
+                  format: uuid
+                  example: '8dc9c531-3c11-4cc4-bc65-d7551520b3c0'
+                date:
+                  type: string
+                  format: date-time
+                  example: '2025-06-01T10:00:00Z'
+                message:
+                  type: string
+                  example: 'I am interested in this property.'
+      responses:
+        '201':
+          description: Booking verification email sent
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+    get:
+      summary: Get all bookings (Admin only)
+      tags:
+        - Booking
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+          example: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, confirmed, cancelled, success]
+            example: confirmed
+        - name: email
+          in: query
+          schema:
+            type: string
+            format: email
+            example: 'user@example.com'
+          description: Filter bookings by user's email
+      responses:
+        '200':
+          description: List of bookings
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /booking/verify:
+    get:
+      summary: Verify a booking via token
+      tags:
+        - Booking
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: JWT token received via email
+      responses:
+        '200':
+          description: Booking verified successfully
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /booking/resend:
+    post:
+      summary: Resend booking verification email
+      tags:
+        - Booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - propertyId
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'user@example.com'
+                propertyId:
+                  type: string
+                  format: uuid
+                  example: '8dc9c531-3c11-4cc4-bc65-d7551520b3c0'
+      responses:
+        '200':
+          description: Verification email resent
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /booking/{id}:
+    get:
+      summary: Get booking by ID (Admin only)
+      tags:
+        - Booking
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Single booking details
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+
+    patch:
+      summary: Update booking date or status (Admin only)
+      tags:
+        - Booking
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                  format: date-time
+                  example: '2025-06-15T10:30:00Z'
+                status:
+                  type: string
+                  enum: [pending, confirmed, cancelled, success]
+                  example: confirmed
+      responses:
+        '200':
+          description: Booking updated
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'

@@ -200,3 +200,40 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Image'
+    Booking:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+        date:
+          type: string
+          format: date-time
+        message:
+          type: string
+        isVerified:
+          type: boolean
+        status:
+          type: string
+          enum: [pending, confirmed, cancelled, success]
+        emailSentCount:
+          type: number
+        lastEmailSentAt:
+          type: string
+          format: date-time
+        adminConfirmedAt:
+          type: string
+          format: date-time
+        user:
+          $ref: '#/components/schemas/User'
+        property:
+          $ref: '#/components/schemas/Property'
