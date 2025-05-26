@@ -10,6 +10,7 @@ import Cardfm from "@/components/Card";
 import { useAxiosQuery } from "@/hooks/useAxiosQuery";
 import { Skeleton } from "@/components/ui/skeleton";
 
+
 type Property = {
   propertyCode: string;
   price: string;
@@ -41,6 +42,7 @@ type Property = {
   };
   id: string;
   category: string;
+  status: string;
 };
 
 export default function AddProperty() {
@@ -60,9 +62,7 @@ export default function AddProperty() {
 
   const properties: Property[] = data?.data?.properties || [];
 
-  const handleEdit = (id: string) => {
-    console.log("Edit property:", id);
-  };
+
 
   const handleDelete = (id: string) => {
     console.log("Delete property:", id);
@@ -111,7 +111,6 @@ export default function AddProperty() {
               <AdminCard
                 key={property.id}
                 property={property}
-                onEdit={handleEdit}
                 onDelete={handleDelete}
               />
             ))

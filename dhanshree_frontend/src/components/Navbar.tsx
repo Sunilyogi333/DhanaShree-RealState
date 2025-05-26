@@ -113,7 +113,7 @@ function Navbar() {
               </MenuItems>
             </Menu> */}
             <Link href="/admin">
-            <Button variant="outline" className='ml-3 border-sky-700 text-sky-700 hover:bg-sky-700 hover:text-white trasnsition-all duration-300'>
+            <Button variant="outline" className=' cursor-pointer ml-3 border-sky-700 text-sky-700 hover:bg-sky-700 hover:text-white trasnsition-all duration-300'>
               Login as admin
             </Button>
             </Link>
