@@ -23,3 +23,14 @@ export const createProperty = async (data: CreatePropertyData) => {
     throw new Error((error as string) || "Failed to create property");
   }
 };
+
+export const updateProperty = async (id: string, data: CreatePropertyData) => {
+  try {
+    console.log("final data before sending to the backend ", data);
+    const response = await $axios.patch(`/property/${id}`, data);
+    return response.data;
+  } catch (error) {
+    console.log("error in the update property ", error);
+    throw new Error((error as string) || "Failed to update property");
+  }
+}

@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { faFilter, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { houseDefaultValues } from "@/config/defaultValues";
 const ApartmentForm = dynamic(
   () => import("@/components/admin/Properties/Form/ApartmentForm"),
   {
@@ -39,10 +40,12 @@ function page() {
     setSelectedCategory(category);
   };
 
+  console.log("houseDefaultValues", houseDefaultValues);
+
   const renderForm = () => {
     switch (selectedCategory) {
       case "house":
-        return <HouseForm />;
+        return <HouseForm/>;
       case "land":
         return <LandForm />;
       case "apartment":

@@ -80,15 +80,29 @@ const defaultValues: Partial<HouseFormValues> = {
   propertyPurpose: "sale",
 
   province: 1,
-  district: 1,
+  district: 0,
   municipality: 1,
   wardNo: 1,
 };
 
-export default function HouseForm() {
+export default function HouseForm ( { values ,initialImages}: { values?: Partial<HouseFormValues>,initialImages?: {url?:string,type:string,id:string}[] }) {
+  console.log("values in the house form ", values,initialImages);
+  
+  const mergedDefaultValues = {
+    ...defaultValues,
+    ...values, 
+  };
+
+console.log("merged default values in the house form ", mergedDefaultValues);
+
+const thumbnail = initialImages?.find((img) => img.type === "thumbnail")?.url || "";
+const normalImages = initialImages
+  ?.filter((img) => img.type === "normal")
+  .map((img) => img.url);
+
   const form = useForm<HouseFormValues>({
     resolver: zodResolver(houseFormSchema),
-    defaultValues,
+    defaultValues:mergedDefaultValues,
   });
 
   const { createProperty, isLoading } = useCreateProperty();
@@ -221,7 +235,9 @@ export default function HouseForm() {
               <h3 className="text-lg font-semibold mb-4 text-center">
                 Property Images
               </h3>
-              <PropertyImageUpload form={form} />
+              <PropertyImageUpload form={form} 
+                // initialImageUrls={normalImages}
+               initialThumbnailUrl={thumbnail}/>
               <div className="flex justify-center">
                 <Button
                   type="submit"

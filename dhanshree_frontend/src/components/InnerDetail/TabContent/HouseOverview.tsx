@@ -12,7 +12,6 @@ import {
   faCouch,
   faMountain,
 } from "@fortawesome/free-solid-svg-icons";
-import { useProperty, getPropertyFeatures } from "@/hooks/useProperty";
 import { useParams } from "next/navigation";
 import { fetchPropertyDetails } from "@/types/property";
 

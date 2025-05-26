@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import {
   FormField,
@@ -13,13 +13,31 @@ import { Camera, X } from "lucide-react";
 
 interface PropertyImageUploadProps {
   form: UseFormReturn<any>;
+  initialThumbnailUrl?: string;
+  initialImageUrls?:{}[];
 }
 
 export const PropertyImageUpload: React.FC<PropertyImageUploadProps> = ({
   form,
+  initialThumbnailUrl,
+  initialImageUrls = [],
 }) => {
+
+  
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+
+  // useEffect(() => {
+  //   if (initialThumbnailUrl) {
+  //     setThumbnailUrl(initialThumbnailUrl);
+  //     form.setValue("thumbnail", initialThumbnailUrl); 
+  //   }
+  
+  //   if (initialImageUrls?.length) {
+  //     setPreviewUrls(initialImageUrls);
+  //     form.setValue("images", initialImageUrls); 
+  //   }
+  // }, [initialThumbnailUrl, initialImageUrls]);
 
   const handleThumbnailChange = (file: File | null) => {
     if (file) {

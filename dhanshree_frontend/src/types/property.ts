@@ -116,10 +116,10 @@ export type PropertySortOption =
     purpose: string;
   
     address?: {
-      province: { provinceTitle: string } | null;
-      district: { districtTitle: string } | null;
-      municipality: { municipalityTitle: string } | null;
-      ward: { wardTitle: string } | null;
+      province: { provinceTitle: string ,id?:string} | null;
+      district: { districtTitle: string ,id?:string} | null;
+      municipality: { municipalityTitle: string ,id?:string} | null;
+      ward: { wardTitle: string,id?:string } | null;
     };
   
     images: {

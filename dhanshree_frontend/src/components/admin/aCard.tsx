@@ -19,7 +19,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { format } from 'date-fns';
-
+import Link from "next/link";
 
 
 
@@ -62,11 +62,9 @@ export type Property = {
 
 export default function AdminCard({
   property,
-  onEdit,
   onDelete,
 }: {
   property: Property;
-  onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
   function formatDateString(dateStr: string | undefined) {
@@ -151,9 +149,10 @@ export default function AdminCard({
             <h1 className="text-sm font-semibold">published on :{formatDateString(property.createdAt)}</h1>
 
             <div className="flex gap-3 items-start">
+              <Link href={`/admin/listings/editProperty/${property.id}`}>
               <button
-                onClick={() => onEdit(property.id)}
-                className="text-sky-600 hover:text-blue-800 p-1 sm:p-1.5 flex gap-2 items-center"
+                
+                className="text-sky-600 hover:text-blue-800 p-1 sm:p-1.5 flex gap-2 items-center cursor-pointer"
                 title="Edit"
                 aria-label="Edit property"
               >
@@ -163,6 +162,7 @@ export default function AdminCard({
                 />
                 Edit
               </button>
+              </Link>
               <button
                 onClick={() => onDelete(property.id)}
                 className="text-red-400 hover:text-red-800 p-1 sm:p-1.5 flex gap-2 items-center"
@@ -236,8 +236,8 @@ export default function AdminCard({
 
         <CardContent />
         <CardFooter className="flex justify-between gap-3">
+          <Link href={`/admin/listings/editproperty/${property.id}`}>
           <button
-            onClick={() => onEdit(property.id)}
             className="text-sky-600 hover:text-blue-800 p-1 sm:p-1.5 flex gap-2 items-center"
             title="Edit"
             aria-label="Edit property"
@@ -248,6 +248,7 @@ export default function AdminCard({
             />
             Edit
           </button>
+          </Link>
           <button
             onClick={() => onDelete(property.id)}
             className="text-red-400 hover:text-red-800 p-1 sm:p-1.5 flex gap-2 items-center"
