@@ -30,6 +30,6 @@ export class Booking extends Base {
   @ManyToOne(() => User, user => user.bookings)
   user: User
 
-  @ManyToOne(() => Property, property => property.bookings)
+  @ManyToOne(() => Property, property => property.bookings, {onDelete: 'CASCADE'})
   property: Property
 }

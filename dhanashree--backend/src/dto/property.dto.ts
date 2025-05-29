@@ -140,10 +140,13 @@ export class CreatePropertyDTO {
   @IsNumber()
   ward: number
 
+  @IsUUID()
+  thumbnailImageId: string
+
   @IsArray()
   @ArrayNotEmpty()
   @IsUUID('all', { each: true })
-  imageIds: string[]
+  normalImageIds: string[]
 }
 
 export class UpdatePropertyDTO {
@@ -187,8 +190,20 @@ export class UpdatePropertyDTO {
   @IsOptional()
   @IsNumber()
   ward?: number
+}
 
+export class UpdatePropertyImagesDTO {
+  @IsOptional()
+  @IsUUID()
+  thumbnailImageId?: string
+
+  @IsOptional()
   @IsArray()
   @IsUUID('all', { each: true })
-  imageIds: string[] // All image IDs (old + new)
+  normalImageIds?: string[]
+
+  @IsOptional()
+  @IsArray()
+  @IsUUID('all', { each: true })
+  deletedImageIds?: string[]
 }

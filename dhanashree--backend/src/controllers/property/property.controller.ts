@@ -9,9 +9,10 @@ class PropertyController {
     if (!adminId) return res.status(401).json({ message: 'Unauthorized: Admin ID missing' })
 
     const data = req.body
-    const imageIds: number[] = req.body.imageIds // expecting from frontend
+    const thumbnailImageId: string = req.body.thumbnailImageId
+    const normalImageIds: string[] = req.body.normalImageIds
 
-    await propertyService.create(adminId, data, imageIds)
+    await propertyService.create(adminId, data, thumbnailImageId, normalImageIds)
     res.status(StatusCodes.CREATED).json({ success: true, message: Message.created })
   }
 
@@ -54,9 +55,7 @@ class PropertyController {
     }
 
     const data = req.body
-    const imageIds: string[] = req.body.imageIds
-
-    await propertyService.update(propertyId, adminId, data, imageIds)
+    await propertyService.update(propertyId, adminId, data)
 
     res.status(StatusCodes.SUCCESS).json({
       success: true,

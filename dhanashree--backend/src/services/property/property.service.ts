@@ -15,69 +15,64 @@ import { PropertyDetails } from '../../types/express/property.type'
 class PropertyService {
   constructor(private readonly propertyRepository = AppDataSource.getRepository(Property)) {}
 
-  async create(adminId: string, data: CreatePropertyDTO, imageIds: number[]) {
-    // 1. Fetch admin
+  async create(adminId: string, data: CreatePropertyDTO, thumbnailImageId: string, normalImageIds: string[]) {
     const admin = await AppDataSource.getRepository(Admin).findOne({ where: { id: adminId } })
-    if (!admin) {
-      throw HttpException.notFound('Admin not found')
-    }
+    if (!admin) throw HttpException.notFound('Admin not found')
 
-    // 2. Check propertyCode uniqueness
     const existingProperty = await this.propertyRepository.findOne({ where: { propertyCode: data.propertyCode } })
-    if (existingProperty) {
-      throw HttpException.notFound(`Property with code ${data.propertyCode} already exists`)
+    if (existingProperty) throw HttpException.notFound(`Property with code ${data.propertyCode} already exists`)
+
+    if (normalImageIds.length < 3) {
+      throw HttpException.badRequest('At least 3 normal images are required.')
     }
 
-    return await AppDataSource.transaction(async (transactionalEntityManager) => {
-      // 3. Check if any image is already attached
-      const associatedImagesCount = await transactionalEntityManager
-        .createQueryBuilder(Image, 'image')
-        .where('image.id IN (:...imageIds)', { imageIds })
+    return await AppDataSource.transaction(async (manager) => {
+      const imageRepo = manager.getRepository(Image)
+
+      const allImageIds = [thumbnailImageId, ...normalImageIds]
+
+      const usedImagesCount = await imageRepo
+        .createQueryBuilder('image')
+        .where('image.id IN (:...ids)', { ids: allImageIds })
         .andWhere('image.property IS NOT NULL')
         .getCount()
 
-      if (associatedImagesCount > 0) {
-        throw HttpException.notFound('Some images are already associated with a property')
+      if (usedImagesCount > 0) {
+        throw HttpException.badRequest('One or more images are already linked to a property')
       }
 
-      // 4. Fetch images
-      const images = await transactionalEntityManager.findByIds(Image, imageIds)
-
-      if (images.length !== imageIds.length) {
-        throw HttpException.notFound('Some images not found')
+      const thumbnail = await imageRepo.findOne({ where: { id: thumbnailImageId } })
+      if (!thumbnail || thumbnail.type !== 'thumbnail') {
+        throw HttpException.badRequest('Invalid or missing thumbnail image')
       }
 
-      // ✅ 5. Enforce exactly one thumbnail
-      const thumbnailCount = images.filter((img) => img.type === 'thumbnail').length
-      if (thumbnailCount !== 1) {
-        throw HttpException.notFound('Exactly one thumbnail is required. Found: ' + thumbnailCount)
+      const normalImages = await imageRepo.findByIds(normalImageIds)
+      if (normalImages.length !== normalImageIds.length) {
+        throw HttpException.notFound('Some normal images were not found')
       }
 
-      // ✅ 6. Inline address creation (inside transaction)
-      const address = transactionalEntityManager.getRepository(Address).create({
+      const address = manager.getRepository(Address).create({
         province: { id: +data.province },
         district: { id: +data.district },
         municipality: { id: +data.municipality },
         ward: { id: +data.ward },
       })
 
-      const createdAddress = await transactionalEntityManager.save(Address, address)
+      const savedAddress = await manager.save(address)
 
-      // 7. Create property
-      const propertyData: Partial<Property> = {
+      const property = this.propertyRepository.create({
         propertyCode: data.propertyCode.toUpperCase(),
         price: data.price,
         type: data.type,
         status: data.status,
         purpose: data.purpose,
         details: data.details as any,
-        address: createdAddress,
+        address: savedAddress,
         admin,
-        images,
-      }
+        images: [thumbnail, ...normalImages],
+      })
 
-      const property = this.propertyRepository.create(propertyData)
-      return await transactionalEntityManager.save(property)
+      return await manager.save(property)
     })
   }
 
@@ -132,7 +127,7 @@ class PropertyService {
     }
 
     // ✅ Sorting
-    const sortBy = filters.sortBy === 'price' ? 'property.price' : 'property.createdAt' 
+    const sortBy = filters.sortBy === 'price' ? 'property.price' : 'property.createdAt'
     const order: 'ASC' | 'DESC' = filters.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'
 
     query.orderBy(sortBy, order)
@@ -180,7 +175,7 @@ class PropertyService {
 
   // src/services/property/property.service.ts
 
-  async update(propertyId: string, adminId: string, data: UpdatePropertyDTO, imageIds: string[]) {
+  async update(propertyId: string, adminId: string, data: UpdatePropertyDTO) {
     return await AppDataSource.transaction(async (manager) => {
       const property = await manager.findOne(Property, {
         where: { id: propertyId },
@@ -188,34 +183,6 @@ class PropertyService {
       })
 
       if (!property) throw HttpException.notFound('Property not found')
-
-      // ✅ Fetch & Validate new images
-      const images = await manager.findByIds(Image, imageIds)
-      if (images.length !== imageIds.length) {
-        throw HttpException.badRequest('Some images not found')
-      }
-
-      const thumbnailCount = images.filter((img) => img.type === 'thumbnail').length
-      const normalCount = images.filter((img) => img.type === 'normal').length
-
-      if (thumbnailCount !== 1) {
-        throw HttpException.badRequest('Exactly one thumbnail is required')
-      }
-      if (normalCount < 3) {
-        throw HttpException.badRequest('At least 3 normal images are required')
-      }
-
-      // ✅ Remove orphaned images
-      const oldImageIds = property.images.map((img) => img.id)
-      const toDelete = oldImageIds.filter((oldId) => !imageIds.includes(oldId))
-
-      if (toDelete.length > 0) {
-        const imagesToDelete = property.images.filter((img) => toDelete.includes(img.id))
-        for (const img of imagesToDelete) {
-          await cloudinaryService.deleteByUrl(img.url)
-        }
-        await manager.remove(imagesToDelete)
-      }
 
       // ✅ Update address if needed
       if (data.province || data.district || data.municipality || data.ward) {
@@ -275,10 +242,6 @@ class PropertyService {
 
         property.details = updatedDetails as PropertyDetails
       }
-
-      // ✅ Update images & address references
-      property.images = images
-      property.address = property.address
 
       return await manager.save(property)
     })

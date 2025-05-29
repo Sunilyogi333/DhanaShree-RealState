@@ -72,10 +72,10 @@ paths:
   patch:
     tags:
       - Image
-    summary: Update images for a property
+    summary: Update property images (Admin only)
     description: >
-      Replace the existing thumbnail and/or normal images of a property. Only accessible to users with the `ADMIN` role.
-      At least one of `thumbnail` or `images` must be provided. Old images will be deleted from Cloudinary.
+      Allows an admin to update images of a property. You can replace the thumbnail, add new normal images, and delete existing normal images.
+      **Note:** You must retain at least 3 normal images and cannot delete the thumbnail.
     security:
       - bearerAuth: []
     parameters:
@@ -85,33 +85,36 @@ paths:
         schema:
           type: string
           format: uuid
-        description: UUID of the property whose images are to be updated
+        description: The UUID of the property to update images for
     requestBody:
       required: true
       content:
-        multipart/form-data:
+        application/json:
           schema:
             type: object
             properties:
-              thumbnail:
+              thumbnailImageId:
                 type: string
-                format: binary
-                description: New thumbnail image (JPG/PNG)
-              images:
+                format: uuid
+                description: ID of the new thumbnail image (optional, replaces old one)
+                example: 'a1f3f22e-9b23-4f02-8c89-90e21d7d1234'
+              normalImageIds:
                 type: array
+                description: Array of new normal image IDs to add
                 items:
                   type: string
-                  format: binary
-                description: Array of new normal images (JPG/PNG)
-            required: []
-          encoding:
-            thumbnail:
-              contentType: image/jpeg, image/png
-            images:
-              contentType: image/jpeg, image/png
+                  format: uuid
+                example: ['c9e57c41-1fc4-4b25-9015-d22bdaf9a7ac', '5e55c244-d12c-4b5f-9406-31b7e5e0e999']
+              deletedImageIds:
+                type: array
+                description: Array of existing image IDs to delete (must be normal images)
+                items:
+                  type: string
+                  format: uuid
+                example: ['7f34b8e3-10b1-4f77-b99e-882ac31f4fdd']
     responses:
       '200':
-        description: Images updated successfully
+        description: Property images updated successfully
         content:
           application/json:
             schema:
@@ -123,25 +126,27 @@ paths:
                 message:
                   type: string
                   example: Images updated
-                images:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        format: uuid
-                        example: 'e3a1bc74-8f90-4d3a-b294-8a91dcfb71d6'
-                      url:
-                        type: string
-                        example: 'https://res.cloudinary.com/demo/image/upload/v12345678/image.jpg'
-                      type:
-                        type: string
-                        enum: [thumbnail, normal]
-                        example: normal
+                data:
+                  type: object
+                  properties:
+                    propertyId:
+                      type: string
+                      format: uuid
+                      example: '8a91cf2d-7390-4c4f-9125-2b8ec0f14a09'
+                    updatedImages:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          url:
+                            type: string
+                          type:
+                            type: string
+                            enum: [thumbnail, normal]
       '400':
         $ref: '#/components/responses/BadRequestResponse'
       '500':
         $ref: '#/components/responses/InternalServerErrorResponse'
-
-  

@@ -140,17 +140,21 @@ paths:
                 ward:
                   type: number
                   example: 12
-                imageIds:
+                thumbnailImageId:
+                  type: string
+                  format: uuid
+                  example: d5e1d464-g783-4f40-cbe0-ff79df644fce
+                normalImageIds:
                   type: array
+                  minItems: 3
                   items:
                     type: string
                     format: uuid
-                  minItems: 4
                   example:
                     - a2e8a191-f450-4e1c-b8b7-cd46bd312eab
                     - b3c9b282-e561-4d2f-b9c8-dd57bd422eac
                     - c4d0c373-f672-4e3f-bad9-ee68ce533ebd
-                    - d5e1d464-g783-4f40-cbe0-ff79df644fce
+
               required:
                 - propertyCode
                 - price
@@ -432,16 +436,6 @@ paths:
                 ward:
                   type: number
                   example: 12
-                imageIds:
-                  type: array
-                  items:
-                    type: string
-                    format: uuid
-                  example:
-                    - a2e8a191-f450-4e1c-b8b7-cd46bd312eab
-                    - b3c9b282-e561-4d2f-b9c8-dd57bd422eac
-                    - c4d0c373-f672-4e3f-bad9-ee68ce533ebd
-                    - d5e1d464-g783-4f40-cbe0-ff79df644fce
       responses:
         '200':
           $ref: '#/components/responses/SuccessResponse'

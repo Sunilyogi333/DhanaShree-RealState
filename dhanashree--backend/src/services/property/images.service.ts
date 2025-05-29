@@ -3,6 +3,7 @@ import { Property } from '../../entities/property/property.entity'
 import { Image } from '../../entities/images/image.entity'
 import cloudinaryService from '../cloudinary/cloudinary.service'
 import HttpException from '../../utils/HttpException'
+import { UpdatePropertyImagesDTO } from '../../dto/property.dto'
 
 class ImageService {
   private imageRepo = AppDataSource.getRepository(Image)
@@ -25,84 +26,68 @@ class ImageService {
     return await this.imageRepo.save(images)
   }
 
-  async updateImages(propertyId: string, files: { thumbnail?: Express.Multer.File; normal?: Express.Multer.File[] }) {
-    return await AppDataSource.transaction(async (manager) => {
-      const imageRepo = manager.getRepository(Image)
-      const propertyRepo = manager.getRepository(Property)
+  async updateImages(propertyId: string, data: UpdatePropertyImagesDTO) {
+    const { thumbnailImageId, normalImageIds = [], deletedImageIds = [] } = data
 
-      const property = await propertyRepo.findOne({
+    return await AppDataSource.transaction(async (manager) => {
+      const property = await manager.findOne(Property, {
         where: { id: propertyId },
         relations: ['images'],
       })
-
       if (!property) throw HttpException.notFound('Property not found')
 
-      const updatedImages: Image[] = []
+      const allImageIds = [...normalImageIds, ...(thumbnailImageId ? [thumbnailImageId] : [])]
+      const allImages = await manager.findByIds(Image, allImageIds)
 
-      // ✅ Update thumbnail
-      if (files.thumbnail) {
-        const oldThumbnail = property.images.find((img) => img.type === 'thumbnail')
-
-        // Upload new
-        const uploadedThumb = await cloudinaryService.uploadImageBuffer(
-          files.thumbnail.buffer,
-          files.thumbnail.originalname
-        )
-
-        // Remove old if exists
-        if (oldThumbnail) {
-          await cloudinaryService.deleteByUrl(oldThumbnail.url) // safe to do this after DB delete
-          await imageRepo.remove(oldThumbnail)
-        }
-
-        const newThumb = imageRepo.create({
-          url: uploadedThumb.secure_url,
-          type: 'thumbnail',
-          property,
-        })
-        updatedImages.push(newThumb)
+      if (allImages.length !== allImageIds.length) {
+        throw HttpException.badRequest('Some images not found')
       }
 
-      // ✅ Update normal images
-      if (files.normal && files.normal.length > 0) {
-        const oldNormals = property.images.filter((img) => img.type === 'normal')
+      const currentImages = property.images
 
-        // Upload new ones first
-        const newNormals: Image[] = []
-        for (const file of files.normal) {
-          const uploaded = await cloudinaryService.uploadImageBuffer(file.buffer, file.originalname)
-          const image = imageRepo.create({
-            url: uploaded.secure_url,
-            type: 'normal',
-            property,
-          })
-          newNormals.push(image)
-        }
-
-        // Remove old ones
-        for (const img of oldNormals) {
-          await cloudinaryService.deleteByUrl(img.url)
-        }
-        if (oldNormals.length > 0) {
-          await imageRepo.remove(oldNormals)
-        }
-
-        updatedImages.push(...newNormals)
+      // ✅ Prevent thumbnail deletion
+      const currentThumbnail = currentImages.find((img) => img.type === 'thumbnail')
+      if (currentThumbnail?.id && deletedImageIds.includes(currentThumbnail.id)) {
+        throw HttpException.badRequest('Cannot delete thumbnail image')
       }
 
-      // Save all new images
-      if (updatedImages.length > 0) {
-        await imageRepo.save(updatedImages)
+      // ✅ Add/Replace thumbnail
+      if (thumbnailImageId) {
+        const newThumb = allImages.find((img) => img.id === thumbnailImageId)
+        if (!newThumb) throw HttpException.notFound('Thumbnail image not found')
+        newThumb.type = 'thumbnail'
       }
 
-      return {
-        message: 'Images updated successfully',
-        images: updatedImages.map((img) => ({
-          id: img.id,
-          url: img.url,
-          type: img.type,
-        })),
+      // ✅ Attach new normal images
+      const newNormalImages = allImages.filter((img) => normalImageIds.includes(img.id))
+      newNormalImages.forEach((img) => (img.type = 'normal'))
+
+      // ✅ Remove deleted images (only normal ones)
+      const imagesToDelete = currentImages.filter((img) => deletedImageIds.includes(img.id) && img.type === 'normal')
+      const remainingNormalImages = currentImages
+        .filter((img) => img.type === 'normal' && !deletedImageIds.includes(img.id))
+        .concat(newNormalImages)
+
+      if (remainingNormalImages.length < 3) {
+        throw HttpException.badRequest('At least 3 normal images must remain after update')
       }
+
+      for (const img of imagesToDelete) {
+        await cloudinaryService.deleteByUrl(img.url)
+        await manager.remove(img)
+      }
+
+      // ✅ Final image list
+      const finalImages = currentImages
+        .filter((img) => !deletedImageIds.includes(img.id) && img.type !== 'normal')
+        .concat(newNormalImages)
+
+      if (thumbnailImageId && currentThumbnail?.id !== thumbnailImageId) {
+        finalImages.push(allImages.find((img) => img.id === thumbnailImageId)!)
+      }
+
+      property.images = finalImages
+      return await manager.save(property)
     })
   }
 }
