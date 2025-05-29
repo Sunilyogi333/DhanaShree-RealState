@@ -1,64 +1,72 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faRoad,  
+  faRoad,
   faBed,
   faBath,
   faRulerCombined,
   faCalendarAlt,
-  faStairs
+  faStairs,
+  faDollarSign,
+  faLocationDot,
+  faCouch,
+  faMountain,
 } from "@fortawesome/free-solid-svg-icons";
-function Overview() {
+import { useParams } from "next/navigation";
+import { fetchPropertyDetails } from "@/types/property";
 
+const iconMap = {
+  ruler: faRulerCombined,
+  dollar: faDollarSign,
+  bed: faBed,
+  bath: faBath,
+  road: faRoad,
+  calendar: faCalendarAlt,
+  stairs: faStairs,
+  location: faLocationDot,
+  couch: faCouch,
+  mountain: faMountain,
+};
 
+function Overview({ property ,isLoading,error}: { property: fetchPropertyDetails,isLoading: boolean,error: boolean   }) {
+  
+ 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-    const features = [
-        {
-          label: "Bedrooms",
-          value: "3",
-          icon: faBed,
-        },
-        {
-          label: "Bathroom ",
-          value: "4",
-          icon: faBath,
-        },
-        {
-          label: "Road Access",
-          value: "22ft",
-          icon: faRoad,
-        },
-        {
-          label: "Area",
-          value: "1200 sqft",
-          icon: faRulerCombined,
-        },
-      
-        {
-          label: "Year Built",
-          value: "2019",
-          icon: faCalendarAlt,
-        },
-        {
-          label: "Floor",
-          value: "2 story",
-          icon: faStairs,
-        },
-      ];
-      const propertyDetails = [
-        { label: "Property ID", value: "o1123" },
-        { label: "Property Face", value: "East" },
-        { label: "Year Built", value: "2015" },
-        { label: "Road", value: "22ft" },
-        { label: "Purpose", value: "Residential" },
-        { label: "Property Area", value: "2400 sqft" },
-        { label: "Built Up Area", value: "1800 sqft" },
-        { label: "Date Posted", value: "2025-04-28" },
-        { label: "Pricing", value: "Rs 3,23,23,000" },
-        { label: "Property status", value: "for sale" },
+  if (error) {
+    return <div>Error loading property details</div>;
+  }
 
+  if (!property || property.type !== "house") {
+    return <div>No property found</div>;
+  }
 
-      ];
+  const propertyDetails = [
+    { label: "Year Built", value: property.details.builtYear,icon: "calendar"},
+    {
+      label: "Road",
+      value: `${property.details.frontage.value}${property.details.frontage.unit}`,
+      icon: "road",
+    },
+    {
+      label: "Property Area",
+      value: `${property.details.landArea.value} ${property.details.landArea.unit}`,
+      icon: "mountain",
+    },
+    {
+      label: "Built Up Area",
+      value: `${property.details.builtInArea?.value} ${property.details.builtInArea?.unit}`,
+      icon: "mountain",
+    },
+    {
+      label: "Date Posted",
+      value: new Date(property.createdAt).toLocaleDateString(),
+      icon: "calendar",
+    },
+    { label: "Pricing", value: `Rs ${property.price.toLocaleString()}` ,icon: "dollar"},
+  ];
 
   return (
     <>
@@ -67,18 +75,18 @@ function Overview() {
           <div className="flex justify-between py-6">
             <h1 className="font-medium">Overview</h1>
             <h1 className="">
-              <span className="font-semibold">Property Id:</span>
-              [11112]
+              <span className="font-semibold">Property Id:</span>[
+              {property.propertyCode}]
             </h1>
           </div>
 
-          <div className="flex flex-wrap gap-6">
-            {features.map((item, index) => (
-              <div key={item.label} className="flex gap-3 items-center">
+          <div className="flex flex-wrap gap-10">
+            {propertyDetails.map((item, index) => (
+              <div key={index} className="flex gap-3 items-center">
                 <div className="flex flex-col gap-1 text-gray-500">
                   <div className="flex gap-3 items-center">
                     <FontAwesomeIcon
-                      icon={item.icon}
+                      icon={iconMap[item.icon as keyof typeof iconMap]}
                       style={{ color: "#74C0FC" }}
                     />
                     <p className="font-semibold text-black">{item.value}</p>
@@ -86,8 +94,7 @@ function Overview() {
                   <p className="text-sm">{item.label}</p>
                 </div>
 
-                {/* Add divider if not last item */}
-                {index < features.length - 1 && (
+                {index < property.details.facilities.length - 1 && (
                   <div className="h-10 border-r border-gray-300 mx-2"></div>
                 )}
               </div>
@@ -98,10 +105,7 @@ function Overview() {
         <div className="bg-white p-4 rounded-lg shadow">
           <h1 className="font-medium py-4">Description</h1>
           <p className="text-gray-500 font-light">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quidem,
-            odio velit ad non necessitatibus dolorum illum, excepturi deleniti
-            natus tempore atque suscipit, autem libero? Dicta, minima tempore.
-            Magni, temporibus officia.
+            {property.details.description.en}
           </p>
         </div>
 

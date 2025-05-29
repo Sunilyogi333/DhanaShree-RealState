@@ -1,5 +1,6 @@
 import React from 'react'
 
+
 function Innerform() {
   return (
     <div className="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow">

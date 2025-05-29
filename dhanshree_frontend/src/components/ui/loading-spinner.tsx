@@ -1,0 +1,4 @@
+// src/components/ui/loading-spinner.tsx
+export const LoadingSpinner = () => (
+    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+  );

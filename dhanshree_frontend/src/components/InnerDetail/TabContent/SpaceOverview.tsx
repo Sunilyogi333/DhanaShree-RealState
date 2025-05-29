@@ -6,27 +6,33 @@ import {
   faRulerCombined,
   faCalendarAlt,
   faArrowUpRightFromSquare,
-  faMapMarkerAlt
+  faMapMarkerAlt,
+  faRoad,
+  faS,
+  faStairs
 } from "@fortawesome/free-solid-svg-icons";
-export default function SpaceOverview() {
+export default function SpaceOverview({property, isLoading, error}: { property: any, isLoading: boolean, error: any }) {
     const features = [
-      { label: "Area", value: "5000 sqft", icon: faRulerCombined },
-      { label: "Type", value: "Commercial", icon: faBuilding },
-      { label: "Location", value: "Thamel", icon: faMapMarkerAlt },
-      { label: "Available From", value: "2025", icon: faCalendarAlt },
+      { label: "Area", value:`${property.details.landArea.value}${property.details.landArea.unit}`, icon: faRulerCombined },
+      { label: "Frontage", value:`${property.details.frontage.value}${property.details.frontage.unit}` , icon: faRoad },
+      { label: "Floor Number", value:property.details.floors, icon: faStairs },
+      { label: "Built Year", value: property.details.builtYear, icon: faCalendarAlt },
     ];
   
     const propertyDetails = [
-      { label: "Space ID", value: "SPC7788" },
-      { label: "Purpose", value: "Commercial" },
-      { label: "Floor", value: "Ground" },
-      { label: "Access Road", value: "24ft" },
-      { label: "Total Area", value: "5000 sqft" },
-      { label: "Rent/Month", value: "Rs 3,00,000" },
+      { label: "Space ID", value: `${property.propertyCode}` },
+      { label: "Facing", value: property.details.facing },
+      { label: "Purpose", value: property.purpose },
+      { label: "Floor", value: `${property.details.floors}` },
+      { label: "Access Road", value: `${property.details.frontage.value} ${property.details.frontage.unit}` },
+      { label: "Total Area", value: `${property.details.landArea.value} ${property.details.landArea.unit}` },
+      { label: "Rent/Month", value:  `Rs ${property.price.toLocaleString()}` },
       { label: "Date Listed", value: "2025-05-01" },
-      { label: "Status", value: "For Rent" },
+      { label: "Status", value: property.status ? "Available" : "Not Available" },
     ];
   
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading property details.</div>;
   return (
     <div className="flex flex-col gap-4">
       <div className="bg-white p-4 rounded-lg shadow">
