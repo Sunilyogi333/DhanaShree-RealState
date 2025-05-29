@@ -1,0 +1,163 @@
+tags:
+  - name: Request
+    description: Endpoints for property listing requests
+
+paths:
+  /request:
+    post:
+      summary: Submit a new property listing request
+      tags:
+        - Request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - fullName
+                - email
+                - phone
+                - date
+                - address
+              properties:
+                fullName:
+                  type: string
+                  example: 'Sunil Nath'
+                email:
+                  type: string
+                  format: email
+                  example: 'user@example.com'
+                phone:
+                  type: string
+                  example: '9812345678'
+                date:
+                  type: string
+                  format: date-time
+                  example: '2025-06-01T10:00:00Z'
+                message:
+                  type: string
+                  example: 'I want to list my home.'
+                address:
+                  type: string
+                  example: 'Baneshwor, Kathmandu, near XYZ School'
+      responses:
+        '201':
+          description: Request verification email sent
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+    get:
+      summary: Get all listing requests
+      tags:
+        - Request
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+          example: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, confirmed, cancelled, success]
+            example: confirmed
+        - name: email
+          in: query
+          schema:
+            type: string
+            format: email
+          example: user@example.com
+      responses:
+        '200':
+          description: List of request listings
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /request/verify:
+    get:
+      summary: Verify a request via token
+      tags:
+        - Request
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: JWT token received via email
+      responses:
+        '200':
+          description: Request verified successfully
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
+  /request/{id}:
+    get:
+      summary: Get request by ID (Admin only)
+      tags:
+        - Request
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Single request details
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+
+    patch:
+      summary: Update request status or date (Admin only)
+      tags:
+        - Request
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                  format: date-time
+                  example: '2025-06-15T10:30:00Z'
+                status:
+                  type: string
+                  enum: [pending, confirmed, cancelled, success]
+                  example: confirmed
+      responses:
+        '200':
+          description: Request updated
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'

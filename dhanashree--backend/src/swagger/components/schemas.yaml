@@ -237,3 +237,60 @@ components:
           $ref: '#/components/schemas/User'
         property:
           $ref: '#/components/schemas/Property'
+
+    Request:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        date:
+          type: string
+          format: date-time
+          example: '2025-06-01T10:00:00Z'
+        address:
+          type: string
+          example: 'Baneshwor, Kathmandu'
+        message:
+          type: string
+          example: 'I want to list my 3BHK house.'
+        status:
+          type: string
+          enum: [pending, confirmed, cancelled, success]
+          example: pending
+        isVerified:
+          type: boolean
+          example: false
+        lastEmailSentAt:
+          type: string
+          format: date-time
+        emailSentCount:
+          type: integer
+        adminConfirmedAt:
+          type: string
+          format: date-time
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+          example: 'Sunil Nath'
+        email:
+          type: string
+          format: email
+          example: 'user@example.com'
+        phone:
+          type: string
+          example: '9812345678'
