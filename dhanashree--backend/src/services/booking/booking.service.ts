@@ -72,7 +72,7 @@ class BookingService {
       }
 
       // ✅ Rate limiting for email
-      if (isToday(booking.lastEmailSentAt) && booking.emailSentCount >= 5) {
+      if (isToday(booking.lastEmailSentAt) && booking.emailSentCount >= 100) {
         throw HttpException.tooManyRequests('You’ve reached the email limit for today.')
       }
 
@@ -82,7 +82,7 @@ class BookingService {
 
       // ✅ Generate token and email
       const token = webTokenService.generateBookingToken({ bookingId: booking.id, email })
-      const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL}/verify-booking?token=${token}`
+      const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL_LOCAL}/verify-booking?token=${token}`
 
       const mailOptions = {
         from: EnvironmentConfiguration.MAIL_FROM,
@@ -157,7 +157,7 @@ class BookingService {
     if (!booking) throw HttpException.notFound('Booking not found')
     if (booking.isVerified) throw HttpException.badRequest('Booking already verified')
 
-    if (isToday(booking.lastEmailSentAt) && booking.emailSentCount >= 3) {
+    if (isToday(booking.lastEmailSentAt) && booking.emailSentCount >= 100) {
       throw HttpException.tooManyRequests('You’ve reached the resend limit for today.')
     }
 
@@ -166,7 +166,7 @@ class BookingService {
     await this.bookingRepo.save(booking)
 
     const token = webTokenService.generateBookingToken({ bookingId: booking.id, email })
-    const verifyUrl = `${process.env.FRONTEND_URL}/verify-booking?token=${token}`
+    const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL_LOCAL}/verify-booking?token=${token}`
 
     const mailOptions = {
       from: EnvironmentConfiguration.MAIL_FROM,

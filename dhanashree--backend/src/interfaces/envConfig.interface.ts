@@ -14,6 +14,7 @@ export interface IEnvironmentConfiguration {
   DATABASE_URL: string
 
   FRONTEND_URL: string
+  FRONTEND_URL_LOCAL: string
 
   ADMIN_EMAIL: string
   ADMIN_PASSWORD: string

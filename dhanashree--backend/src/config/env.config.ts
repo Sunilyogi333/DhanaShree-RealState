@@ -17,6 +17,7 @@ export const EnvironmentConfiguration: IEnvironmentConfiguration = {
   DATABASE_URL: process.env.DATABASE_URL ?? '',
 
   FRONTEND_URL: process.env.FRONTEND_URL ?? '',
+  FRONTEND_URL_LOCAL: process.env.FRONTEND_URL_LOCAL ?? '',
 
   ADMIN_EMAIL: process.env.ADMIN_EMAIL ?? '',
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? '',

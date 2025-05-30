@@ -47,7 +47,7 @@ class RequestService {
       })
 
       const token = webTokenService.generateBookingToken({ bookingId: request.id, email: userEmail })
-      const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL}/verify-request?token=${token}`
+      const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL_LOCAL}/verify-request?token=${token}`
 
       await manager.save(request)
 
