@@ -22,7 +22,7 @@ router.post(
 )
 
 router.patch(
-  '/image/:propertyId',
+  '/:propertyId',
   authentication(ROLE.ADMIN),
   catchAsync(imageController.updateImages.bind(imageController))
 )
