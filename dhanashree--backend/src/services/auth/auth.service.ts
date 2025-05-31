@@ -9,6 +9,7 @@ import BcryptService from '../../utils/bcrypt.utils'
 import { generateHtml } from '../../utils/mail.template'
 import webTokenService from '../../utils/webToken.service'
 import adminService from '../admin/admin.service'
+import { MultiLanguage } from '../../constants/global'
 
 interface decodedToken {
   userId: string
@@ -23,38 +24,30 @@ class AuthService {
   ) {}
 
   async login(data: Admin) {
-    try {
-      const admin = await this.adminRepo.findOne({
-        where: [{ email: data.email }],
-        select: ['id', 'email', 'password'],
-      })
-      if (!admin) throw HttpException.notFound('admin not found')
-      const isPasswordMatched = await BcryptService.compare(data.password, admin.password)
-      if (!isPasswordMatched) throw HttpException.notFound('wrong password')
-      const adminData = await adminService.getById(admin.id)
-      return {
-        id: adminData.id,
-        email: adminData.email,
-        role: adminData.role,
-      }
-    } catch (error: any) {
-      throw HttpException.notFound(error?.message)
+    const admin = await this.adminRepo.findOne({
+      where: [{ email: data.email }],
+      select: ['id', 'email', 'password'],
+    })
+    if (!admin) throw HttpException.notFound(Message.notFound)
+    const isPasswordMatched = await BcryptService.compare(data.password, admin.password)
+    if (!isPasswordMatched) throw HttpException.notFound(Message.invalidCredentials)
+    const adminData = await adminService.getById(admin.id)
+    return {
+      id: adminData.id,
+      email: adminData.email,
+      role: adminData.role,
     }
   }
 
   async logout(id: string) {
-    try {
-      const admin = await this.adminRepo.findOne({ where: { id: id } })
+    const admin = await this.adminRepo.findOne({ where: { id: id } })
 
-      if (!admin) throw HttpException.notFound('Admin not found')
+    if (!admin) throw HttpException.notFound(Message.notFound)
 
-      admin.refreshToken = null
-      await this.adminRepo.save(admin)
+    admin.refreshToken = null
+    await this.adminRepo.save(admin)
 
-      return { message: 'Logged out successfully' }
-    } catch (error: any) {
-      throw HttpException.badRequest(error?.message || 'Logout failed')
-    }
+    return { message: 'Logged out successfully' }
   }
 
   async verifyEmail(email: string): Promise<Admin> {
@@ -63,7 +56,7 @@ class AuthService {
     return admin
   }
 
-  async setToken(id: string, refreshToken: string): Promise<string> {
+  async setToken(id: string, refreshToken: string): Promise<MultiLanguage> {
     await this.adminRepo.update(id, { refreshToken })
     return Message.updated
   }
@@ -118,12 +111,12 @@ class AuthService {
     try {
       await this.mailService.sendMail(mailOptions)
     } catch (error) {
-      HttpException.internalServerError('Something went wrong')
+      HttpException.internalServerError(Message.server)
     }
     return 'Email sent successfully'
   }
 
-  async ResetPassword(data: ResetForgotPasswordInput): Promise<string> {
+  async ResetPassword(data: ResetForgotPasswordInput): Promise<MultiLanguage> {
     const decodeToken = (await webTokenService.decode(data?.token)) as decodedToken
     const admin = await this.adminRepo.findOne({
       where: {
@@ -140,17 +133,17 @@ class AuthService {
       const resp = await webTokenService.verify(data?.token, admin?.password)
       console.log('resp', resp)
     } catch (error) {
-      throw HttpException.unauthorized('Token is invalid or expired')
+      throw HttpException.unauthorized(Message.tokenExpire)
     }
     if (data?.email !== admin?.email) {
-      throw HttpException.forbidden('Email is not valid')
+      throw HttpException.forbidden(Message.unAuthorized)
     } else if (isSamePassword) {
-      throw HttpException.forbidden('Password can not be same as old password')
+      throw HttpException.forbidden(Message.passwordShouldMatch)
     } else if (data?.email === admin?.email) {
       admin.password = await BcryptService.hash(data?.password)
       await admin.save()
     } else {
-      throw HttpException.badRequest('Invalid email')
+      throw HttpException.badRequest(Message.badRequest)
     }
 
     return Message.updated

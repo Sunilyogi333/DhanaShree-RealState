@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { fromBuffer } from 'file-type'
 import HttpException from '../utils/HttpException'
+import { Message } from '../constants/message'
 
 export const validateImageBuffer = async (req: Request, res: Response, next: NextFunction) => {
   console.log('Validating image buffer...')
@@ -13,7 +14,7 @@ export const validateImageBuffer = async (req: Request, res: Response, next: Nex
     const allFiles = Object.values(files).flat()
 
     if (!allFiles.length) {
-      return next(HttpException.badRequest('No files uploaded.'))
+      return next(HttpException.badRequest(Message.noFileUploaded))
     }
 
     const allowedTypes = ['image/jpeg', 'image/png']
@@ -22,12 +23,12 @@ export const validateImageBuffer = async (req: Request, res: Response, next: Nex
       const type = await fromBuffer(file.buffer)
 
       if (!type || !allowedTypes.includes(type.mime)) {
-        return next(HttpException.badRequest('Invalid file type. Only JPEG/PNG allowed.'))
+        return next(HttpException.badRequest(Message.invalidFileType))
       }
     }
     next()
   } catch (error) {
     console.error('File validation error:', error)
-    return next(HttpException.internalServerError('Error validating uploaded files.'))
+    return next(HttpException.internalServerError(Message.server))
   }
 }

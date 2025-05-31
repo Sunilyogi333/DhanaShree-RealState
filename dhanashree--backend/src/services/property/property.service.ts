@@ -1,4 +1,3 @@
-// src/services/property.service.ts
 import { AppDataSource } from '../../config/database.config'
 import { Property } from '../../entities/property/property.entity'
 import Admin from '../../entities/admin/admin.entity'
@@ -11,19 +10,20 @@ import { getPagination, getPagingData } from '../../utils/pagination'
 import HttpException from '../../utils/HttpException'
 import { UnitEnum, Facing, Zoning, ApartmentType, FurnishingType } from '../../constants/enum/property'
 import { PropertyDetails } from '../../types/express/property.type'
+import { Message } from '../../constants/message'
 
 class PropertyService {
   constructor(private readonly propertyRepository = AppDataSource.getRepository(Property)) {}
 
   async create(adminId: string, data: CreatePropertyDTO, thumbnailImageId: string, normalImageIds: string[]) {
     const admin = await AppDataSource.getRepository(Admin).findOne({ where: { id: adminId } })
-    if (!admin) throw HttpException.notFound('Admin not found')
+    if (!admin) throw HttpException.notFound(Message.notFound)
 
     const existingProperty = await this.propertyRepository.findOne({ where: { propertyCode: data.propertyCode } })
-    if (existingProperty) throw HttpException.notFound(`Property with code ${data.propertyCode} already exists`)
+    if (existingProperty) throw HttpException.notFound(Message.propertyCodeAlreadyExists)
 
     if (normalImageIds.length < 3) {
-      throw HttpException.badRequest('At least 3 normal images are required.')
+      throw HttpException.badRequest(Message.atLeastThreeNormalImages)
     }
 
     return await AppDataSource.transaction(async (manager) => {
@@ -38,17 +38,17 @@ class PropertyService {
         .getCount()
 
       if (usedImagesCount > 0) {
-        throw HttpException.badRequest('One or more images are already linked to a property')
+        throw HttpException.badRequest(Message.invalidImageIds)
       }
 
       const thumbnail = await imageRepo.findOne({ where: { id: thumbnailImageId } })
       if (!thumbnail || thumbnail.type !== 'thumbnail') {
-        throw HttpException.badRequest('Invalid or missing thumbnail image')
+        throw HttpException.badRequest(Message.invalidImageIds)
       }
 
       const normalImages = await imageRepo.findByIds(normalImageIds)
       if (normalImages.length !== normalImageIds.length) {
-        throw HttpException.notFound('Some normal images were not found')
+        throw HttpException.notFound(Message.invalidImageIds)
       }
 
       const address = manager.getRepository(Address).create({
@@ -182,7 +182,7 @@ class PropertyService {
         relations: ['images', 'address'],
       })
 
-      if (!property) throw HttpException.notFound('Property not found')
+      if (!property) throw HttpException.notFound(Message.notFound)
 
       // ✅ Update address if needed
       if (data.province || data.district || data.municipality || data.ward) {
@@ -253,7 +253,7 @@ class PropertyService {
       where: { id: propertyId },
       relations: ['images'],
     })
-    if (!property) throw HttpException.notFound('Property not found')
+    if (!property) throw HttpException.notFound(Message.notFound)
 
     // Delete images from Cloudinary
     for (const image of property.images) {

@@ -1,4 +1,3 @@
-import { getNotFoundMessage } from '../constants/message'
 import { AppDataSource } from '../config/database.config'
 import { Address } from '../entities/address/address.entity'
 import { District } from '../entities/address/district.entity'
@@ -8,6 +7,7 @@ import { Ward } from '../entities/address/ward.entity'
 import { IAddressValidationResponse } from '../interfaces/global.interface'
 import HttpException from '../utils/HttpException'
 import { AddressInput } from '../dto/address.dto'
+import { Message, getNotFoundMessage } from '../constants/message'
 
 class AddressService {
   constructor(
@@ -38,7 +38,7 @@ class AddressService {
         id: districtID,
       },
     })
-    if (!district) throw HttpException.notFound('District not found')
+    if (!district) throw HttpException.notFound(getNotFoundMessage('district', 'जिल्ला'))
 
     return district
   }
@@ -69,7 +69,7 @@ class AddressService {
         id: wardID,
       },
     })
-    if (!ward) throw HttpException.notFound('Ward not found')
+    if (!ward) throw HttpException.notFound(getNotFoundMessage('ward', 'वडा'))
 
     return ward
   }
@@ -117,7 +117,7 @@ class AddressService {
   async create(data: AddressInput): Promise<Address> {
     const address = new Address()
     const addressData = await this.validate(data)
-    if (!addressData) throw HttpException.notFound(getNotFoundMessage('address'))
+    if (!addressData) throw HttpException.notFound(getNotFoundMessage('address', 'ठेगाना'))
 
     address.province = addressData.province
     address.district = addressData.district
@@ -131,7 +131,7 @@ class AddressService {
     const address = await this.addressRepository.findOne({
       where: { id: addressID },
     })
-    if (!addressData || !address) throw HttpException.notFound(getNotFoundMessage('address'))
+    if (!addressData || !address) throw HttpException.notFound(getNotFoundMessage('address', 'ठेगाना'))
 
     address.province = addressData.province
     address.district = addressData.district
@@ -145,7 +145,7 @@ class AddressService {
       where: { id },
     })
 
-    if (!address) throw HttpException.notFound(getNotFoundMessage('address'))
+    if (!address) throw HttpException.notFound(getNotFoundMessage('address', 'ठेगाना'))
 
     return await this.addressRepository.softRemove(address)
   }
@@ -154,7 +154,7 @@ class AddressService {
     const ward = await this.wardRepository.findOne({
       where: { id },
     })
-    if (!ward) throw HttpException.notFound('Ward not found')
+    if (!ward) throw HttpException.notFound(getNotFoundMessage('Ward', 'वडा'))
 
     return ward
   }
@@ -163,7 +163,7 @@ class AddressService {
     const district = await this.districtRepository.findOne({
       where: { id },
     })
-    if (!district) throw HttpException.notFound('District not found')
+    if (!district) throw HttpException.notFound(getNotFoundMessage('District', 'जिल्ला'))
 
     return district
   }

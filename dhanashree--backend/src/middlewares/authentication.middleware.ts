@@ -13,13 +13,13 @@ const authentication = (allowedRoles?: ROLE | ROLE[]) => {
     // console.log('Authorization:', authorization);
 
     if (!authorization) {
-      return next(HttpException.notFound('Authorization token not found'))
+      return next(HttpException.notFound(Message.notAuthorized))
     }
 
     const [mode, token] = authorization.trim().split(' ')
 
     if (!token || mode !== 'Bearer') {
-      return next(HttpException.badRequest('Invalid token format'))
+      return next(HttpException.badRequest(Message.invalidToken))
     }
 
     try {
@@ -33,13 +33,13 @@ const authentication = (allowedRoles?: ROLE | ROLE[]) => {
 
       // Check if the user's role is allowed
       if (allowedRoles && Array.isArray(allowedRoles) && !allowedRoles.includes(role)) {
-        return next(HttpException.unauthorized(Message.NOT_AUTHORIZED_MESSAGE))
+        return next(HttpException.unauthorized(Message.notAuthorized))
       }
 
       // Fetch user from the database
       const user = await AdminService.getById(id)
       if (!user) {
-        return next(HttpException.unauthorized('User not found or unauthorized'))
+        return next(HttpException.unauthorized(Message.notAuthorized))
       }
 
       // Attach user to request object
@@ -48,11 +48,11 @@ const authentication = (allowedRoles?: ROLE | ROLE[]) => {
       return next()
     } catch (err: any) {
       if (err.name === 'TokenExpiredError') {
-        return next(HttpException.unauthorized('Your token has expired. Please login again.'))
+        return next(HttpException.unauthorized(Message.tokenExpire))
       }
 
       console.error('Authentication Middleware Error:', err)
-      return next(HttpException.internalServerError('An error occurred during authentication'))
+      return next(HttpException.internalServerError(Message.server))
     }
   }
 }

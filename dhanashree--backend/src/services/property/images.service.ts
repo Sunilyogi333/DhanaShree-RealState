@@ -4,6 +4,7 @@ import { Image } from '../../entities/images/image.entity'
 import cloudinaryService from '../cloudinary/cloudinary.service'
 import HttpException from '../../utils/HttpException'
 import { UpdatePropertyImagesDTO } from '../../dto/property.dto'
+import { Message } from '../../constants/message'
 
 class ImageService {
   private imageRepo = AppDataSource.getRepository(Image)
@@ -34,13 +35,13 @@ class ImageService {
         where: { id: propertyId },
         relations: ['images'],
       })
-      if (!property) throw HttpException.notFound('Property not found')
+      if (!property) throw HttpException.notFound(Message.notFound)
 
       const allImageIds = [...normalImageIds, ...(thumbnailImageId ? [thumbnailImageId] : [])]
       const allImages = await manager.findByIds(Image, allImageIds)
 
       if (allImages.length !== allImageIds.length) {
-        throw HttpException.badRequest('Some images not found')
+        throw HttpException.badRequest(Message.invalidImageIds)
       }
 
       const currentImages = property.images
@@ -48,13 +49,13 @@ class ImageService {
       // ✅ Prevent thumbnail deletion
       const currentThumbnail = currentImages.find((img) => img.type === 'thumbnail')
       if (currentThumbnail?.id && deletedImageIds.includes(currentThumbnail.id)) {
-        throw HttpException.badRequest('Cannot delete thumbnail image')
+        throw HttpException.badRequest(Message.canNotDeleteThumbnail)
       }
 
       // ✅ Add/Replace thumbnail
       if (thumbnailImageId) {
         const newThumb = allImages.find((img) => img.id === thumbnailImageId)
-        if (!newThumb) throw HttpException.notFound('Thumbnail image not found')
+        if (!newThumb) throw HttpException.notFound(Message.notFound)
         newThumb.type = 'thumbnail'
       }
 
@@ -69,7 +70,7 @@ class ImageService {
         .concat(newNormalImages)
 
       if (remainingNormalImages.length < 3) {
-        throw HttpException.badRequest('At least 3 normal images must remain after update')
+        throw HttpException.badRequest(Message.atLeastThreeNormalImages)
       }
 
       for (const img of imagesToDelete) {

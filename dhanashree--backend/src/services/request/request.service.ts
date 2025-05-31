@@ -9,10 +9,10 @@ import { EnvironmentConfiguration } from '../../config/env.config'
 import { generateHtml } from '../../utils/mail.template'
 import { RequestStatus } from '../../constants/enum/request'
 import { getPagination, getPagingData } from '../../utils/pagination'
+import { Message } from '../../constants/message'
 
 class RequestService {
   private requestRepo = AppDataSource.getRepository(RequestListing)
-  private userRepo = AppDataSource.getRepository(User)
   private mailService = new EmailService()
 
   async create(data: CreateRequestDTO) {
@@ -32,7 +32,7 @@ class RequestService {
       })
 
       if (existing && existing.status !== RequestStatus.cancelled && existing.status !== RequestStatus.success) {
-        throw HttpException.badRequest('You already have a pending/confirmed request.')
+        throw HttpException.badRequest(Message.requestAlreadyExists)
       }
 
       const request = manager.create(RequestListing, {
@@ -91,7 +91,7 @@ class RequestService {
     const request = await this.requestRepo.findOne({ where: { id: payload.bookingId }, relations: ['user'] })
 
     if (!request || request.user.email !== payload.email) {
-      throw HttpException.unauthorized('Invalid token')
+      throw HttpException.unauthorized(Message.notAuthorized)
     }
 
     if (request.isVerified) return { success: true, message: 'Already verified' }
@@ -123,13 +123,13 @@ class RequestService {
 
   async getOne(id: string) {
     const req = await this.requestRepo.findOne({ where: { id }, relations: ['user'] })
-    if (!req) throw HttpException.notFound('Request not found')
+    if (!req) throw HttpException.notFound(Message.requestNotFound)
     return req
   }
 
   async update(id: string, data: UpdateRequestDTO) {
     const req = await this.requestRepo.findOne({ where: { id } })
-    if (!req) throw HttpException.notFound('Request not found')
+    if (!req) throw HttpException.notFound(Message.requestNotFound)
 
     if (data.date) req.date = new Date(data.date)
     if (data.status) {

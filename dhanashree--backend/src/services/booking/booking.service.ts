@@ -1,4 +1,3 @@
-// src/services/booking/booking.service.ts
 import { AppDataSource } from '../../config/database.config'
 import { EnvironmentConfiguration } from '../../config/env.config'
 import { Booking } from '../../entities/booking/booking.entity'
@@ -13,6 +12,7 @@ import { isToday } from '../../utils/date.utils'
 import { BookingStatus } from '../../constants/enum/booking'
 import { UpdateBookingDTO } from '../../dto/booking.dto'
 import { getPagination, getPagingData } from '../../utils/pagination'
+import { Message } from '../../constants/message'
 
 class BookingService {
   constructor(
@@ -26,7 +26,7 @@ class BookingService {
     const { fullName, email, phone, propertyId, date, message } = data
 
     const property = await this.propertyRepo.findOne({ where: { id: propertyId } })
-    if (!property) throw HttpException.notFound('Property not found')
+    if (!property) throw HttpException.notFound(Message.notFound)
 
     return await AppDataSource.transaction(async (manager) => {
       const userRepo = manager.getRepository(User)
@@ -53,7 +53,7 @@ class BookingService {
 
       // ✅ If latest booking is already verified and not cancelled, block
       if (existingBooking && existingBooking.status !== BookingStatus.cancelled && existingBooking.isVerified) {
-        throw HttpException.badRequest('You’ve already booked this property.')
+        throw HttpException.badRequest(Message.bookingAlreadyVerified)
       }
 
       // ✅ Reuse or create new booking
@@ -73,7 +73,7 @@ class BookingService {
 
       // ✅ Rate limiting for email
       if (isToday(booking.lastEmailSentAt) && booking.emailSentCount >= 100) {
-        throw HttpException.tooManyRequests('You’ve reached the email limit for today.')
+        throw HttpException.tooManyRequests(Message.bookingEmailLimitReached)
       }
 
       booking.lastEmailSentAt = new Date()
@@ -116,7 +116,7 @@ class BookingService {
       try {
         await this.mailService.sendMail(mailOptions)
       } catch (error) {
-        throw HttpException.internalServerError('Booking saved, but email sending failed.')
+        throw HttpException.internalServerError(Message.server)
       }
 
       return { success: true, message: 'Booking verification email sent' }
@@ -132,7 +132,7 @@ class BookingService {
     })
 
     if (!booking || booking.user.email !== payload.email) {
-      throw HttpException.unauthorized('Invalid token')
+      throw HttpException.unauthorized(Message.unAuthorized)
     }
 
     if (booking.isVerified) {
@@ -147,18 +147,18 @@ class BookingService {
 
   async resendVerificationEmail(propertyId: string, email: string) {
     const user = await this.userRepo.findOne({ where: { email } })
-    if (!user) throw HttpException.notFound('User not found')
+    if (!user) throw HttpException.notFound(Message.notFound)
 
     const booking = await this.bookingRepo.findOne({
       where: { user: { id: user.id }, property: { id: propertyId } },
       relations: ['user', 'property'],
     })
 
-    if (!booking) throw HttpException.notFound('Booking not found')
-    if (booking.isVerified) throw HttpException.badRequest('Booking already verified')
+    if (!booking) throw HttpException.notFound(Message.bookingNotFound)
+    if (booking.isVerified) throw HttpException.badRequest(Message.bookingAlreadyVerified)
 
     if (isToday(booking.lastEmailSentAt) && booking.emailSentCount >= 100) {
-      throw HttpException.tooManyRequests('You’ve reached the resend limit for today.')
+      throw HttpException.tooManyRequests(Message.bookingEmailLimitReached)
     }
 
     booking.lastEmailSentAt = new Date()
@@ -204,7 +204,7 @@ class BookingService {
 
   async updateBooking(bookingId: string, data: UpdateBookingDTO) {
     const booking = await this.bookingRepo.findOne({ where: { id: bookingId } })
-    if (!booking) throw HttpException.notFound('Booking not found')
+    if (!booking) throw HttpException.notFound(Message.bookingNotFound)
 
     if (data.date) booking.date = new Date(data.date)
     if (data.status) {
@@ -215,7 +215,7 @@ class BookingService {
     }
 
     await this.bookingRepo.save(booking)
-    return { success: true, message: 'Booking updated successfully' }
+    return { success: true, message: Message.updated }
   }
 
   async getAllBookings({
@@ -260,7 +260,7 @@ class BookingService {
     })
 
     if (!booking) {
-      throw HttpException.notFound('Booking not found')
+      throw HttpException.notFound(Message.bookingNotFound)
     }
 
     return booking

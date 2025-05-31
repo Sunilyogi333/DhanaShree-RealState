@@ -1,6 +1,7 @@
 import multer from 'multer';
 import { Request } from 'express';
 import HttpException from '../utils/HttpException';
+import { Message } from '../constants/message';
 
 // ---- Multer Config using Memory Storage ---- //
 const storage = multer.memoryStorage();
@@ -12,7 +13,7 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilt
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(HttpException.badRequest('Only JPEG, PNG, JPG images are allowed.'));
+    cb(HttpException.badRequest(Message.invalidFileType));
   }
 };
 

@@ -1,41 +1,42 @@
 import { StatusCodes } from '../constants/statusCodes'
+import { MultiLanguage } from '../constants/global'
 
 class HttpException extends Error {
   statusCode: number
   isOperational: boolean
+  localizedMessage: MultiLanguage 
 
-  constructor(message: string, statusCode: number = StatusCodes.INTERNAL_SERVER_ERROR) {
-    super(message) // Call the parent Error constructor
+  constructor(localizedMessage: MultiLanguage, statusCode: number = StatusCodes.INTERNAL_SERVER_ERROR) {
+    super(localizedMessage.en) // ✅ Error class needs a string, so use English as base
     this.statusCode = statusCode
-    this.isOperational = true // Mark as operational error by default
+    this.localizedMessage = localizedMessage
+    this.isOperational = true
 
-    // Customize the error stack trace to exclude the constructor itself
     Error.captureStackTrace(this, this.constructor)
   }
 
-  // Static methods for common error types
-  static notFound(message: string) {
+  static notFound(message: MultiLanguage) {
     return new HttpException(message, StatusCodes.NOT_FOUND)
   }
-  static badRequest(message: string) {
+  static badRequest(message: MultiLanguage) {
     return new HttpException(message, StatusCodes.BAD_REQUEST)
   }
-  static conflict(message: string) {
+  static conflict(message: MultiLanguage) {
     return new HttpException(message, StatusCodes.CONFLICT)
   }
-  static methodNotAllowed(message: string) {
+  static methodNotAllowed(message: MultiLanguage) {
     return new HttpException(message, StatusCodes.METHOD_NOT_ALLOWED)
   }
-  static unauthorized(message: string) {
+  static unauthorized(message: MultiLanguage) {
     return new HttpException(message, StatusCodes.UNAUTHORIZED)
   }
-  static forbidden(message: string) {
+  static forbidden(message: MultiLanguage) {
     return new HttpException(message, StatusCodes.FORBIDDEN)
   }
-  static tooManyRequests(message: string) {
-  return new HttpException(message, StatusCodes.TOO_MANY_REQUESTS)
+  static tooManyRequests(message: MultiLanguage) {
+    return new HttpException(message, StatusCodes.TOO_MANY_REQUESTS)
   }
-  static internalServerError(message: string) {
+  static internalServerError(message: MultiLanguage) {
     return new HttpException(message, StatusCodes.INTERNAL_SERVER_ERROR)
   }
 }
