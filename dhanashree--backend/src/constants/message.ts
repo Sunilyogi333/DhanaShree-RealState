@@ -1,3 +1,5 @@
+import { admin } from "./admin"
+
 export const Message = {
   passwordShouldStrong: {
     en: 'Use 8 or more characters with at least one uppercase letter, numbers & symbols',
@@ -146,6 +148,10 @@ export const Message = {
   requestNotFound: {
     en: 'Request not found',
     ne: 'अनुरोध फेला परेन',
+  },
+  requestVerificationEmailSent: {
+    en: 'Request verification email sent',
+    ne: 'अनुरोध प्रमाणीकरण ईमेल पठाइयो',
   },
   invalidImageIds: {
     en: 'Invalid image IDs provided',

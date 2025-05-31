@@ -13,6 +13,7 @@ import { BookingStatus } from '../../constants/enum/booking'
 import { UpdateBookingDTO } from '../../dto/booking.dto'
 import { getPagination, getPagingData } from '../../utils/pagination'
 import { Message } from '../../constants/message'
+import { getBookingVerificationTemplate } from '../../utils/templates/bookingVerification.template'
 
 class BookingService {
   constructor(
@@ -88,28 +89,7 @@ class BookingService {
         from: EnvironmentConfiguration.MAIL_FROM,
         text: 'Booking verification',
         to: email,
-        html: generateHtml(
-          user.fullName,
-          new Date().toLocaleString(),
-          `<p style="margin: 0; margin-top: 17px; font-weight: 500; letter-spacing: 0.56px;">
-          <p style="line-height: 2vh; text-align: center;">
-          Thank you for booking a property with us. To confirm your booking, please click the button below:
-          </p>
-          <p style="text-align: center;">
-          <a href="${verifyUrl}" style="cursor: pointer; text-decoration: none; padding: 10px 20px; background-color: #4CAF50; color: white; border-radius: 5px;">
-          Verify Booking
-          </a>
-          </p>
-          <p style="text-align: center;">
-          This link will expire in 24 hours for security reasons.
-          </p>
-          
-          <b>Note:</b>
-          <p style="font-size: 14px;">
-          If you did not make this booking, you can safely ignore this email.
-          </p>
-          </p>`
-        ),
+        html: generateHtml(user.fullName, new Date().toLocaleString(), getBookingVerificationTemplate(verifyUrl)),
         subject: 'Verify Your Booking',
       }
 
@@ -173,28 +153,7 @@ class BookingService {
       to: email,
       subject: 'Verify Your Booking',
       text: 'Booking verification',
-      html: generateHtml(
-        user.fullName,
-        new Date().toLocaleString(),
-        `<p style="margin: 0; margin-top: 17px; font-weight: 500; letter-spacing: 0.56px;">
-        <p style="line-height: 2vh; text-align: center;">
-          Thank you for booking a property with us. To confirm your booking, please click the button below:
-        </p>
-        <p style="text-align: center;">
-          <a href="${verifyUrl}" style="cursor: pointer; text-decoration: none; padding: 10px 20px; background-color: #4CAF50; color: white; border-radius: 5px;">
-            Verify Booking
-          </a>
-        </p>
-        <p style="text-align: center;">
-          This link will expire in 24 hours for security reasons.
-        </p>
-
-        <b>Note:</b>
-        <p style="font-size: 14px;">
-          If you did not make this booking, you can safely ignore this email.
-        </p>
-      </p>`
-      ),
+      html: generateHtml(user.fullName, new Date().toLocaleString(), getBookingVerificationTemplate(verifyUrl)),
     }
 
     await this.mailService.sendMail(mailOptions)

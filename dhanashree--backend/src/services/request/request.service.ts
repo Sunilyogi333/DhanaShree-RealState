@@ -10,6 +10,7 @@ import { generateHtml } from '../../utils/mail.template'
 import { RequestStatus } from '../../constants/enum/request'
 import { getPagination, getPagingData } from '../../utils/pagination'
 import { Message } from '../../constants/message'
+import { getRequestVerificationTemplate } from '../../utils/templates/requestVerificaton.template'
 
 class RequestService {
   private requestRepo = AppDataSource.getRepository(RequestListing)
@@ -59,24 +60,7 @@ class RequestService {
         html: generateHtml(
           user.fullName,
           new Date().toLocaleString(),
-          `<p style="margin: 0; margin-top: 17px; font-weight: 500; letter-spacing: 0.56px;">
-      <p style="line-height: 2vh; text-align: center;">
-        Thank you for submitting a property listing request. To confirm your request, please click the button below:
-      </p>
-      <p style="text-align: center;">
-        <a href="${verifyUrl}" style="cursor: pointer; text-decoration: none; padding: 10px 20px; background-color: #4CAF50; color: white; border-radius: 5px;">
-          Verify Request
-        </a>
-      </p>
-      <p style="text-align: center;">
-        This link will expire in 24 hours for security reasons.
-      </p>
-
-      <b>Note:</b>
-      <p style="font-size: 14px;">
-        If you did not make this request, you can safely ignore this email.
-      </p>
-    </p>`
+          getRequestVerificationTemplate(verifyUrl)
         ),
       }
 
@@ -120,6 +104,35 @@ class RequestService {
 
     return { requests, pagination }
   }
+  
+  async resendVerificationEmail(id: string) {
+    const request = await this.requestRepo.findOne({ where: { id }, relations: ['user'] })
+    if (!request) throw HttpException.notFound(Message.requestNotFound)
+    
+    if (request.isVerified) throw HttpException.badRequest(Message.requestAlreadyVerified)
+    if (request.emailSentCount >= 3) throw HttpException.badRequest(Message.requestEmailLimitReached)
+    if (request.lastEmailSentAt && new Date().getTime() - request.lastEmailSentAt.getTime() < 24 * 60 * 60 * 1000) {
+      throw HttpException.badRequest(Message.requestEmailLimitReached)
+    }
+    request.emailSentCount += 1
+    request.lastEmailSentAt = new Date()
+    await this.requestRepo.save(request)
+    const token = webTokenService.generateBookingToken({ bookingId: request.id, email: request.user.email })
+    const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL_LOCAL}/verify-request?token=${token}`
+    const mailOptions = {
+      from: EnvironmentConfiguration.MAIL_FROM,
+      to: request.user.email,
+      subject: 'Resend Request Verification',
+      text: 'Request verification',
+      html: generateHtml(
+        request.user.fullName,
+        new Date().toLocaleString(),
+        getRequestVerificationTemplate(verifyUrl)
+      ),
+    }
+    await this.mailService.sendMail(mailOptions)
+    return { success: true, message: Message.requestVerificationEmailSent }
+  }     
 
   async getOne(id: string) {
     const req = await this.requestRepo.findOne({ where: { id }, relations: ['user'] })
@@ -140,7 +153,7 @@ class RequestService {
     }
 
     await this.requestRepo.save(req)
-    return { success: true, message: 'Request updated' }
+    return { success: true, message: Message.updated }
   }
 }
 

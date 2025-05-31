@@ -173,8 +173,6 @@ class PropertyService {
     return property
   }
 
-  // src/services/property/property.service.ts
-
   async update(propertyId: string, adminId: string, data: UpdatePropertyDTO) {
     return await AppDataSource.transaction(async (manager) => {
       const property = await manager.findOne(Property, {
@@ -198,8 +196,22 @@ class PropertyService {
         await manager.save(Address, property.address)
       }
 
-      // ✅ Manually assign core fields
-      if (data.propertyCode) property.propertyCode = data.propertyCode.toUpperCase()
+      // Manually assign core fields
+      // Check for duplicate property code
+      if (data.propertyCode) {
+        const code = data.propertyCode.toUpperCase()
+
+        const existingPropertyWithCode = await manager.findOne(Property, {
+          where: { propertyCode: code },
+        })
+
+        // If a different property already has this code, throw error
+        if (existingPropertyWithCode && existingPropertyWithCode.id !== property.id) {
+          throw HttpException.badRequest(Message.propertyCodeAlreadyExists)
+        }
+
+        property.propertyCode = code
+      }
       if (data.price !== undefined) property.price = data.price
       if (data.type) property.type = data.type
       if (data.status) property.status = data.status

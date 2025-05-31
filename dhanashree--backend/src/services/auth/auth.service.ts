@@ -1,6 +1,6 @@
 import { AppDataSource } from '../../config/database.config'
 import { EnvironmentConfiguration } from '../../config/env.config'
-import { Message } from '../../constants/message'
+import { Message, getNotFoundMessage } from '../../constants/message'
 import { ResetForgotPasswordInput, UpdatePasswordDTO } from '../../dto/auth.dto'
 import Admin from '../../entities/admin/admin.entity'
 import EmailService from '../email/email.service'
@@ -28,7 +28,8 @@ class AuthService {
       where: [{ email: data.email }],
       select: ['id', 'email', 'password'],
     })
-    if (!admin) throw HttpException.notFound(Message.notFound)
+    //send admin and admin in nepali
+    if (!admin) throw HttpException.notFound(getNotFoundMessage('Admin','एडमिन'))
     const isPasswordMatched = await BcryptService.compare(data.password, admin.password)
     if (!isPasswordMatched) throw HttpException.notFound(Message.invalidCredentials)
     const adminData = await adminService.getById(admin.id)
