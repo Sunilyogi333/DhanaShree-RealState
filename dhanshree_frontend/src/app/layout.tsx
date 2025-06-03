@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import type { Metadata } from "next";
 import "./globals.css";
+import '@/lib/i18';
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -13,6 +14,8 @@ import { config } from '@fortawesome/fontawesome-svg-core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider } from 'react-redux';
 import { store } from '@/store/store';
+import I18nProvider from '@/components/I18nProvider';
+
 config.autoAddCss = false;
 
 
@@ -25,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body 
       >
+        <I18nProvider>
         <Provider store={store}>
         <QueryClientProvider client={queryClient}> 
         <Toaster 
@@ -39,7 +43,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {!isAdminRoute && <Footer />}
         </QueryClientProvider>
         </Provider>
+        </I18nProvider>
       </body>
     </html>
   );
-}
+};

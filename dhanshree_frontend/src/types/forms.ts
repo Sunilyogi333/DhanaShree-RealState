@@ -23,8 +23,10 @@ export const basePropertySchema = z.object({
   district: z.number().optional(),
   municipality: z.number().optional(),
   wardNo: z.number().optional(),
+
   images: z.array(z.instanceof(File)).min(4, "At least 4 images are required"),
   thumbnail: z.instanceof(File, { message: "Thumbnail is required" }),
+
   landArea: z.number().min(1, "Land area is required"),
   landAreaUnit: z.string().min(1, "Land area unit is required"),
   facing: z.string().min(1, "Facing is required"),
@@ -36,6 +38,13 @@ export const basePropertySchema = z.object({
   descriptionNp: z.string().optional(),
   builtYearNep: z.string().optional(),
 });
+
+
+
+
+
+
+
 
 export type BasePropertyFormValues = z.infer<typeof basePropertySchema>;
 
@@ -58,12 +67,24 @@ export const houseFormSchema = basePropertySchema.extend({
   builtAreaNep: z.string().optional(),
 });
 
+export const editHouseFormSchema = houseFormSchema.omit({
+  images: true,
+  thumbnail: true,
+});
+
+export type EditHouseFormValues = z.infer<typeof editHouseFormSchema>;
+
 export type HouseFormValues = z.infer<typeof houseFormSchema>;
 // Land form schema
 export const landFormSchema = basePropertySchema.extend({
-  // type: z.literal(PropertyType.LAND),
   zoning: z.enum(["residential", "commercial", "agricultural", "mixed"]),
 });
+
+export const editLandFormSchema = landFormSchema.omit({
+  images: true,
+  thumbnail: true,
+});
+export type EditLandFormValues = z.infer<typeof editLandFormSchema>;
 
 export type LandFormValues = z.infer<typeof landFormSchema>;
 
@@ -93,11 +114,24 @@ export const apartmentFormSchema = basePropertySchema.extend({
 
 export type ApartmentFormValues = z.infer<typeof apartmentFormSchema>;
 
+export const editApartmentFormSchema = apartmentFormSchema.omit({
+  images: true,
+  thumbnail: true,
+});
+
+export type EditApartmentFormValues = z.infer<typeof editApartmentFormSchema>;  
+
 export const flatFormSchema = apartmentFormSchema
 
 
 export type FlatFormValues = z.infer<typeof flatFormSchema>;
 
+export const editFlatFormSchema = flatFormSchema.omit({
+  images: true,
+  thumbnail: true,
+});
+
+export type EditFlatFormValues = z.infer<typeof editFlatFormSchema>;
 
 export const spaceFormSchema = basePropertySchema.extend({
   type: z.string().min(1, "Type is required"),
@@ -117,7 +151,13 @@ export const spaceFormSchema = basePropertySchema.extend({
   ceilingHeight: z.number().min(1, "Ceiling height must be at least 1 foot"),
 });
 
+export const editSpaceFormSchema = spaceFormSchema.omit({
+  images: true,
+  thumbnail: true,
+});
+
 export type SpaceFormValues = z.infer<typeof spaceFormSchema>;
+export type EditSpaceFormValues = z.infer<typeof editSpaceFormSchema>;
 
 // Form field configuration
 export interface FormFieldConfig {

@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
- 
+import { useTranslation } from 'react-i18next';
 
 
  
@@ -35,7 +35,7 @@ const FormSchema = z.object({
   })
 
 function Filter() {
-
+  const { t } = useTranslation();
   const districts = [
     "Achham", "Arghakhanchi", "Baglung", "Baitadi", "Bajhang", "Bajura", "Banke",
     "Bara", "Bardiya", "Bhaktapur", "Bhojpur", "Chitwan", "Dadeldhura", "Dailekh",
@@ -48,7 +48,7 @@ function Filter() {
     "Ramechhap", "Rasuwa", "Rautahat", "Rolpa", "Rukum East", "Rukum West",
     "Rupandehi", "Salyan", "Sankhuwasabha", "Saptari", "Sarlahi", "Sindhuli",
     "Sindhupalchok", "Siraha", "Solukhumbu", "Sunsari", "Surkhet", "Syangja",
-    "Tanahun", "Taplejung", "Terhathum", "Udayapur"
+    "Tanahun", "Taplejung", "Terhathum", "Udayapur" 
   ];
   
     const form = useForm<z.infer<typeof FormSchema>>({
@@ -73,8 +73,8 @@ function Filter() {
 px-10 py-5
 ">
   <TabsList>
-    <TabsTrigger value="Sale">For Sale</TabsTrigger>
-    <TabsTrigger value="Rent">For Rent</TabsTrigger>
+    <TabsTrigger value="Sale">{t('forSale')}</TabsTrigger>
+    <TabsTrigger value="Rent">{t('forRent')}</TabsTrigger>
   </TabsList>
   <TabsContent value="Sale" className='flex flex-col space-x-2 lg:flex-row  '>
   <Form {...form}>
@@ -88,15 +88,15 @@ px-10 py-5
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger className='bg-white border border-white lg:w-[200px] w-full rounded-none' >
-                    <SelectValue placeholder="Type" />
+                    <SelectValue placeholder={t('type')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className="z-999">
-                  <SelectItem value="m@example.com">Apartment</SelectItem>
-                  <SelectItem value="m@google.com">Spaces</SelectItem>
-                  <SelectItem value="Houses">Houses</SelectItem>
-                  <SelectItem value="Land">Land</SelectItem>
-                  <SelectItem value="Flats">Flats</SelectItem>
+                  <SelectItem value="apartment">{t('apartment')}</SelectItem>
+                  <SelectItem value="spaces">{t('spaces')}</SelectItem>
+                  <SelectItem value="houses">{t('houses')}</SelectItem>
+                  <SelectItem value="land">{t('land')}</SelectItem>
+                  <SelectItem value="flats">{t('flats')}</SelectItem>
 
                 </SelectContent>
               </Select>
@@ -114,13 +114,13 @@ px-10 py-5
               <Select onValueChange={field.onChange} defaultValue={field.value}>
   <FormControl>
     <SelectTrigger className='bg-white border border-white lg:w-[200px] w-full rounded-none'>
-      <SelectValue placeholder="Location" />
+      <SelectValue placeholder={t('location')} />
     </SelectTrigger>
   </FormControl>
   <SelectContent className="z-999 h-30 ">
     {districts.map((district) => (
       <SelectItem key={district} value={district}>
-        {district}
+        {t(district)}
       </SelectItem>
     ))}
   </SelectContent>
@@ -139,17 +139,17 @@ px-10 py-5
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger className='bg-white border border-white lg:w-[200px] w-full rounded-none'>
-                    <SelectValue placeholder="price" />
+                    <SelectValue placeholder={t('price')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className="z-999">
-                  <SelectItem value="m@example.com">Less than 1 crore</SelectItem>
-                  <SelectItem value="m@google.com">1 crore to 2 crores</SelectItem>
-                  <SelectItem value="m@support.com">2 crores to 3 crores</SelectItem>
-                  <SelectItem value="3cr">3 crores to 4 crores</SelectItem>
-                  <SelectItem value="4cr">4 crores to 6 crores</SelectItem>
-                  <SelectItem value="5cr">6 crores to 10 crores</SelectItem>
-                  <SelectItem value="above">Above 10 crores</SelectItem>
+                  <SelectItem value="m@example.com">{t('lessThan1Crore')}</SelectItem>
+                  <SelectItem value="m@google.com">{t('1CroreTo2Crores')}</SelectItem>
+                  <SelectItem value="m@support.com">{t('2CroresTo3Crores')}</SelectItem>
+                  <SelectItem value="3cr">{t('3CroresTo4Crores')}</SelectItem>
+                  <SelectItem value="4cr">{t('4CroresTo6Crores')}</SelectItem>
+                  <SelectItem value="5cr">{t('6CroresTo10Crores')}</SelectItem>
+                  <SelectItem value="above">{t('above10Crores')}</SelectItem>
                 </SelectContent>
               </Select>
            
@@ -157,7 +157,7 @@ px-10 py-5
             </FormItem>
           )}
         />
-        <Button type="submit" className='bg-sky-700 '>Submit</Button>
+        <Button type="submit" className='bg-sky-700 '>{t('submit')}</Button>
       </form>
     </Form>
     </TabsContent>
@@ -173,16 +173,16 @@ px-10 py-5
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger className='bg-white border border-white lg:w-[200px] w-full rounded-none' >
-                    <SelectValue placeholder="Type" />
+                    <SelectValue placeholder={t('type')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className="z-999">
                 <SelectContent className="z-999">
-                  <SelectItem value="m@example.com">Apartment</SelectItem>
-                  <SelectItem value="m@google.com">Spaces</SelectItem>
-                  <SelectItem value="Houses">Houses</SelectItem>
-                  <SelectItem value="Land">Land</SelectItem>
-                  <SelectItem value="Flats">Flats</SelectItem>
+                  <SelectItem value="Apartment">{t('apartment')}</SelectItem>
+                  <SelectItem value="Spaces">{t('spaces')}</SelectItem>
+                  <SelectItem value="Houses">{t('houses')}</SelectItem>
+                  <SelectItem value="Land">{t('land')}</SelectItem>
+                  <SelectItem value="Flats">{t('flats')}</SelectItem>
 
                 </SelectContent>
                 </SelectContent>
@@ -201,7 +201,7 @@ px-10 py-5
               <Select onValueChange={field.onChange} defaultValue={field.value}>
   <FormControl>
     <SelectTrigger className='bg-white border border-white lg:w-[200px] w-full rounded-none'>
-      <SelectValue placeholder="Location" />
+        <SelectValue placeholder={t('location')} />
     </SelectTrigger>
   </FormControl>
   <SelectContent className="z-999 h-30 ">
@@ -226,17 +226,17 @@ px-10 py-5
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger className='bg-white border border-white lg:w-[200px] w-full rounded-none'>
-                    <SelectValue placeholder="price" />
+                    <SelectValue placeholder={t('price')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className="z-999">
-                <SelectItem value="m@example.com">Less than 1 crore</SelectItem>
-                  <SelectItem value="m@google.com">1 crore to 2 crores</SelectItem>
-                  <SelectItem value="m@support.com">2 crores to 3 crores</SelectItem>
-                  <SelectItem value="3cr">3 crores to 4 crores</SelectItem>
-                  <SelectItem value="4cr">4 crores to 6 crores</SelectItem>
-                  <SelectItem value="5cr">6 crores to 10 crores</SelectItem>
-                  <SelectItem value="above">Above 10 crores</SelectItem>
+                <SelectItem value="1cr">{t('lessThan1Crore')}</SelectItem>
+                  <SelectItem value="2cr">{t('1CroreTo2Crores')}</SelectItem>
+                  <SelectItem value="3cr">{t('2CroresTo3Crores')}</SelectItem>
+                  <SelectItem value="4cr">{t('3CroresTo4Crores')}</SelectItem>
+                  <SelectItem value="5cr">{t('4CroresTo6Crores')}</SelectItem>
+                  <SelectItem value="6cr">{t('6CroresTo10Crores')}</SelectItem>
+                  <SelectItem value="above">{t('above10Crores')}</SelectItem>
                 </SelectContent>
               </Select>
            
@@ -244,7 +244,7 @@ px-10 py-5
             </FormItem>
           )}
         />
-        <Button type="submit" className='bg-sky-700 '>Submit</Button>
+        <Button type="submit" className='bg-sky-700 '>{t('submit')}</Button>
       </form>
     </Form>
   </TabsContent>

@@ -1,8 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { FieldErrors, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { flatFormSchema, FlatFormValues, FormFieldConfig } from "@/types/forms";
+import { flatFormSchema, FlatFormValues, FormFieldConfig, editFlatFormSchema, EditFlatFormValues } from "@/types/forms";
 import { useCreateProperty } from "@/hooks/useCreateProperty";
 import {
   flatGeneralFields,
@@ -27,7 +27,8 @@ import { uploadImages } from "@/utils/uploadImages ";
 import { toast } from "sonner";
 import { transformApartmentForm } from "@/utils/transformApartmentForm";
 import { transformFlatForm } from "@/utils/transformFlatForm";
-
+import { useUpdateProperty } from "@/hooks/useUpdateProperty";
+import PropertyImageUpdate from "./PropertyImageUpdate";
 const defaultValues: Partial<FlatFormValues> = {
   propertyCode: "",
   type:"flat",
@@ -74,25 +75,50 @@ const defaultValues: Partial<FlatFormValues> = {
 
 };
 
-export default function FlatForm() {
-  const form = useForm<FlatFormValues>({
-    resolver: zodResolver(flatFormSchema),
-    defaultValues,
+export default function FlatForm({
+  values,
+  edit,
+  initialImages,
+  propertyId,
+}: {
+  values?: Partial<FlatFormValues>;
+  edit?: boolean;
+  initialImages?: {
+    url: string;
+    type: "thumbnail" | "normal";
+    id: string;
+    propertyId?: string;
+  }[];
+  propertyId?: string;
+}) {
+  const mergedDefaultValues = {
+    ...defaultValues,
+    ...values,
+  };
+
+  const form = useForm<FlatFormValues | EditFlatFormValues>({
+    resolver: zodResolver(edit ? editFlatFormSchema : flatFormSchema),
+    defaultValues: mergedDefaultValues,
   });
-
-  const { createProperty, isLoading } = useCreateProperty();
+  const { createProperty, isLoading } = useCreateProperty();  
+  const { updateProperty, isUpdating } = useUpdateProperty();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const canSubmitRef = useRef<() => boolean>(() => true);
   const onInvalid = (errors: FieldErrors<FlatFormValues>) => {
     console.log("errors are ", errors);
     toast.error("please Fix all errors and try again ");
   };
 
-  const onSubmit = async (values: FlatFormValues) => {
+  const onSubmit = async (values: FlatFormValues | EditFlatFormValues) => {
     try {
+      const canSubmit = canSubmitRef.current();
+      if (!canSubmit) return;
       setIsSubmitting(true);
-      const thumbnailFile = values.thumbnail;
-      const imageFiles = values.images;
+      let imageIds: string[] = [];
+
+      if (!edit) {
+        const thumbnailFile = (values as FlatFormValues).thumbnail;
+        const imageFiles = (values as FlatFormValues).images;
 
       const formData = new FormData();
       if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
@@ -103,11 +129,17 @@ export default function FlatForm() {
         throw new Error("Image upload failed");
       }
 
-      const imageIds = imageRes.images.map((img: { id: string }) => img.id);
-      const payload = transformFlatForm(values);
-      payload.imageIds = imageIds;
-      console.log("payload for the create property ", payload);
-      createProperty(payload);
+      imageIds = imageRes.images.map((img: { id: string }) => img.id);
+      }
+
+      const payload = transformFlatForm(values as FlatFormValues, imageIds, edit);
+      console.log("payload for the create or updating property ", payload);
+
+      if (!edit) {
+        createProperty(payload);
+      } else if (propertyId) {
+        updateProperty(propertyId, payload);
+      }
       setIsSubmitting(false);
     } catch (error) { 
       console.error("Submit failed:", error);
@@ -195,22 +227,32 @@ export default function FlatForm() {
               <h3 className="text-lg font-semibold mb-4 text-center">
                 Property Images
               </h3>
-              <PropertyImageUpload form={form} />
+              {edit && initialImages && propertyId ? (
+                <PropertyImageUpdate
+                  initialImages={initialImages}
+                  propertyId={propertyId}
+                  canSubmitRef={canSubmitRef}
+                />
+              ) : (
+                <PropertyImageUpload form={form} />
+              )}
               <div className="flex justify-center">
                 <Button
                   type="submit"
                   className={`w-1/3 hover:bg-blue-500 border border-blue-500 hover:text-white text-blue-500 bg-transparent cursor-pointer ${
                     isSubmitting ? "bg-blue-500 text-white" : ""
                   }`}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isUpdating}
                 >
-                  {isSubmitting ? (
+                  {isSubmitting || isUpdating ? (
                     <>
                       <div className="flex items-center gap-2">
                         <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                        <span>Submitting...</span>
+                        <span>{edit ? "Updating..." : "Submitting..."}</span>
                       </div>
                     </>
+                  ) : edit ? (
+                    "Update"
                   ) : (
                     "Submit"
                   )}

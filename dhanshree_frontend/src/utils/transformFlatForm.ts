@@ -10,7 +10,7 @@ export interface TransformedFlatFormData {
   district: number | null;
   municipality: number | null;
   ward: number | null;
-  imageIds: string[];
+  imageIds?: string[] | null;
   details: {
     bathrooms: number;
     bedrooms: number;
@@ -45,9 +45,10 @@ export interface TransformedFlatFormData {
 
 export const transformFlatForm = (
   data: FlatFormValues,
-  uploadedImageIds: string[] = []
+  uploadedImageIds: string[] = [],
+  edit: boolean = false
 ): TransformedFlatFormData => {
-  return {
+  const baseData: TransformedFlatFormData = {
     propertyCode: data.propertyCode,
     price: Number(data.askingPrice),
     type: "flat", 
@@ -89,4 +90,9 @@ export const transformFlatForm = (
       furnishing: data.furnished,
     },
   };
+  if (!edit) {
+    baseData.imageIds = uploadedImageIds ?? [];
+  }
+
+  return baseData;
 };

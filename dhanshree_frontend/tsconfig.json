@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -22,6 +23,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/(auth)/forgotPassword", "src/components/admin/Sidebar/Sidebar.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/(auth)/forgotPassword", "src/components/admin/Sidebar/Sidebar.ts", "next-i18next.config.js"],
   "exclude": ["node_modules"]
 }
