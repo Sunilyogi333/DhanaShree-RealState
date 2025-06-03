@@ -20,8 +20,10 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { fetchPropertyDetails } from "@/types/property";
+import { useTranslation } from "react-i18next";
 
 function Cardfm({ property }: { property: fetchPropertyDetails }) {
+  const { t } = useTranslation();
   return (
     <Link href={`/List/${property.type}/${property.id}`}>
       <Card className="lg:w-[400px] h-[550px] w-full shadow-xl relative pt-0 group cursor-pointer gap-4">
@@ -49,25 +51,25 @@ function Cardfm({ property }: { property: fetchPropertyDetails }) {
               </span>
             </div>
             <h1 className="font-semibold text-lg">
-              {property.type} for {property.purpose} in{" "}
+              {property.type} {t("for")} {property.purpose} {t("in")}
               <span className="text-sky-500">Rs {property.price}</span>
             </h1>
           </CardTitle>
           <CardDescription className="flex flex-col space-y-2 mt-2 ">
             <div className="flex items-center gap-2">
               <FontAwesomeIcon icon={faLocationDot} />
-              Location: {property.address?.municipality?.municipalityTitle},
+              {t("location")}: {property.address?.municipality?.municipalityTitle},
               {property.address?.district?.districtTitle},
               {property.address?.province?.provinceTitle}
             </div>
             <div className="flex items-center gap-2">
               <FontAwesomeIcon icon={faRoad} style={{ color: "#74C0FC" }} />
-              Road: {property.details.frontage.value}{" "}
+              {t("road")}: {property.details.frontage.value}{" "}
               {property.details.frontage.unit}
             </div>
             <div className="flex items-center gap-2">
               <FontAwesomeIcon icon={faHouse} style={{ color: "#74C0FC" }} />
-              Area: {property.details.landArea.value}{" "}
+              {t("area")}: {property.details.landArea.value}{" "}
               {property.details.landArea.unit}
             </div>
           </CardDescription>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState,useRef } from "react";
 import { FieldErrors, useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { houseFormSchema, HouseFormValues } from "@/types/forms";
@@ -27,6 +27,11 @@ import { Button } from "@/components/ui/button";
 import { uploadImages } from "@/utils/uploadImages ";
 import { toast } from "sonner";
 import { z } from "zod";
+import PropertyImageUpdate from "./PropertyImageUpdate";
+import { editHouseFormSchema, EditHouseFormValues } from "@/types/forms";
+import { useUpdateProperty } from "@/hooks/useUpdateProperty";
+
+
 
 const defaultValues: Partial<HouseFormValues> = {
   propertyCode: "",
@@ -85,27 +90,42 @@ const defaultValues: Partial<HouseFormValues> = {
   wardNo: 1,
 };
 
-export default function HouseForm ( { values ,initialImages}: { values?: Partial<HouseFormValues>,initialImages?: {url?:string,type:string,id:string}[] }) {
-  console.log("values in the house form ", values,initialImages);
-  
+export default function HouseForm({
+  values,
+  edit,
+  initialImages,
+  propertyId,
+}: {
+  values?: Partial<HouseFormValues>;
+  edit?: boolean;
+  initialImages?: {
+    url: string;
+    type: "thumbnail" | "normal";
+    id: string;
+    propertyId?: string;
+  }[];
+  propertyId?: string;
+}) {
   const mergedDefaultValues = {
     ...defaultValues,
-    ...values, 
+    ...values,
   };
 
-console.log("merged default values in the house form ", mergedDefaultValues);
+  console.log("merged default values in the house form ", mergedDefaultValues);
 
-const thumbnail = initialImages?.find((img) => img.type === "thumbnail")?.url || "";
-const normalImages = initialImages
-  ?.filter((img) => img.type === "normal")
-  .map((img) => img.url);
+  // const thumbnail = initialImages?.find((img) => img.type === "thumbnail")?.url || "";
+  // const normalImages = initialImages
+  //   ?.filter((img) => img.type === "normal")
+  //   .map((img) => img.url);
 
-  const form = useForm<HouseFormValues>({
-    resolver: zodResolver(houseFormSchema),
-    defaultValues:mergedDefaultValues,
+  const form = useForm<HouseFormValues | EditHouseFormValues>({
+    resolver: zodResolver(edit ? editHouseFormSchema : houseFormSchema),
+    defaultValues: mergedDefaultValues,
   });
 
+  const canSubmitRef = useRef<() => boolean>(() => true);
   const { createProperty, isLoading } = useCreateProperty();
+  const { updateProperty, isUpdating } = useUpdateProperty();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onInvalid = (errors: FieldErrors<HouseFormValues>) => {
@@ -113,29 +133,46 @@ const normalImages = initialImages
     toast.error("please Fix all errors and try again ");
   };
 
-  const onSubmit = async (values: HouseFormValues) => {
+  const onSubmit = async (values: HouseFormValues | EditHouseFormValues) => {
     try {
+      
+      const canSubmit = canSubmitRef.current();
+      if (!canSubmit) return;
+
       setIsSubmitting(true);
-      const thumbnailFile = values.thumbnail;
-      const imageFiles = values.images;
+      let imageIds: string[] = [];
 
-      const formData = new FormData();
-      if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
-      imageFiles?.forEach((img) => formData.append("images", img));
+      if (!edit) {
+        const thumbnailFile = (values as HouseFormValues).thumbnail;
+        const imageFiles = (values as HouseFormValues).images;
 
-      const imageRes = await uploadImages(formData);
-      if (!imageRes.success) {
-        throw new Error("Image upload failed");
+        const formData = new FormData();
+        if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
+        imageFiles?.forEach((img) => formData.append("images", img));
+
+        const imageRes = await uploadImages(formData);
+        if (!imageRes.success) {
+          throw new Error("Image upload failed");
+        }
+        imageIds = imageRes.images.map((img: any) => img.id);
       }
 
-      const imageIds = imageRes.images.map((img: any) => img.id);
-      const payload = transformHouseForm(values);
-      payload.imageIds = imageIds;
-      console.log("payload for the create property ", payload);
-      createProperty(payload);
+      const payload = transformHouseForm(
+        values as HouseFormValues,
+        imageIds,
+        edit
+      );
+      console.log("payload for the create or updating property ", payload);
+
+      if (!edit) {
+        createProperty(payload);
+      } else if (propertyId) {
+        updateProperty(propertyId, payload);
+      }
+
       setIsSubmitting(false);
     } catch (error) {
-      console.error("Submit failed:", error);
+      console.log("Submit failed:", error);
       setIsSubmitting(false);
     }
   };
@@ -231,28 +268,38 @@ const normalImages = initialImages
                 <PropertyFormFields form={form} fields={detailNepaliFields} />
               </div>
             </div>
+
             <div className="space-y-4">
               <h3 className="text-lg font-semibold mb-4 text-center">
                 Property Images
               </h3>
-              <PropertyImageUpload form={form} 
-                // initialImageUrls={normalImages}
-               initialThumbnailUrl={thumbnail}/>
+              {edit && initialImages && propertyId ? (
+                <PropertyImageUpdate
+                  initialImages={initialImages}
+                  propertyId={propertyId}
+                  canSubmitRef={canSubmitRef}
+                />
+              ) : (
+                <PropertyImageUpload form={form} />
+              )}
+
               <div className="flex justify-center">
                 <Button
                   type="submit"
                   className={`w-1/3 hover:bg-blue-500 border  border-blue-500 hover:text-white text-blue-500 bg-transparent cursor-pointer ${
                     isSubmitting ? "bg-blue-500 text-white" : ""
                   }`}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isUpdating}
                 >
-                  {isSubmitting ? (
+                  {isSubmitting || isUpdating ? (
                     <>
                       <div className="flex items-center gap-2">
                         <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                        <span>Submitting...</span>
+                        <span>{edit ? "Updating..." : "Submitting..."}</span>
                       </div>
                     </>
+                  ) : edit ? (
+                    "Update"
                   ) : (
                     "Submit"
                   )}

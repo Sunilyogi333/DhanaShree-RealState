@@ -11,7 +11,7 @@ export interface TransformedHouseFormData {
   district: number | null;
   municipality: number | null;
   ward: number | null;
-  imageIds: string[];
+  imageIds?: string[] | null;
   details: {
     bedrooms: number;
     kitchens: number;
@@ -43,52 +43,54 @@ export interface TransformedHouseFormData {
 }
 
 export const transformHouseForm = (
-  data:HouseFormValues, uploadedImageIds:string[]=[]
+  data: HouseFormValues,
+  uploadedImageIds?: string[],
+  edit = false
 ): TransformedHouseFormData => {
-  return {
+  const baseData: TransformedHouseFormData = {
     price: Number(data.askingPrice),
     propertyCode: data.propertyCode,
-    type: "house", // or "house" if hardcoded
-    status: data.status, // "exclusive", or use data.status if dynamic
+    type: "house",
+    status: data.status,
     purpose: data.propertyPurpose,
     province: data.province ?? null,
     district: data.district ?? null,
     municipality: data.municipality ?? null,
     ward: data.wardNo ?? null,
-    imageIds: uploadedImageIds,
     details: {
       bedrooms: data.bedrooms,
       kitchens: data.kitchens,
       floors: data.floors,
       livingRooms: data.livingRooms,
       parking: data.parkingSpaces,
-      totalFloors: data.floors, // assuming same as `floors`
-
+      totalFloors: data.floors,
       builtYear: data.builtYear ? Number(data.builtYear) : null,
-
       facilities: data.facilities ?? [],
       facing: data.facing,
       furnishing: data.furnished,
-
       builtInArea: {
         unit: data.builtAreaUnit,
         value: Number(data.builtArea),
       },
-
       landArea: {
         unit: data.landAreaUnit,
         value: Number(data.landArea),
       },
-
       frontage: {
         unit: data.frontageUnit,
         value: Number(data.frontage),
       },
-
       description: {
         en: data.description,
         np: data.descriptionNp ?? "",
       },
     },
   };
+
+  if (!edit) {
+    baseData.imageIds = uploadedImageIds ?? [];
+  }
+
+  return baseData;
 };
+

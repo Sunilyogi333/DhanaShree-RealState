@@ -13,6 +13,13 @@ type CreatePropertyData =
   | TransformedFlatFormData
   | TransformedSpaceFormData;
 
+type UpdatePropertyData =
+  | TransformedHouseFormData
+  | TransformedLandFormData
+  | TransformedApartmentFormData
+  | TransformedFlatFormData
+  | TransformedSpaceFormData;
+
 export const createProperty = async (data: CreatePropertyData) => {
   try {
     console.log("final data before sending to the backend ", data);
@@ -24,9 +31,9 @@ export const createProperty = async (data: CreatePropertyData) => {
   }
 };
 
-export const updateProperty = async (id: string, data: CreatePropertyData) => {
+export const updateProperty = async (id: string, data:any) => {
   try {
-    console.log("final data before sending to the backend ", data);
+    console.log("final data before sending to the backend with id", id, data);
     const response = await $axios.patch(`/property/${id}`, data);
     return response.data;
   } catch (error) {
@@ -34,3 +41,4 @@ export const updateProperty = async (id: string, data: CreatePropertyData) => {
     throw new Error((error as string) || "Failed to update property");
   }
 }
+

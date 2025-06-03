@@ -35,11 +35,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-
+import { PropertyLocationFields } from "./admin/Properties/Form/PropertyLocationFields"
+import { FilterLocationFields } from "./Filter/FilterLocationFields"
 const items = [
   { id: "Homes", label: "Homes" },
   { id: "Lands", label: "Lands" },
   { id: "Appartments", label: "Appartments" },
+  { id: "Flats", label: "Flats" },
+  { id: "Spaces", label: "Spaces" },
 ] as const
 
 // --- First schema: for code filter ---
@@ -50,22 +53,19 @@ const CodeFormSchema = z.object({
 })
 
 // --- Second schema: for checkbox and price range ---
-const FilterFormSchema = z.object({
-  items: z
-    .array(z.string())
-    .refine((val) => val.length > 0, {
-      message: "Please select at least one property type.",
-    }),
-  price: z.number().min(1000).max(10000),
-  type: z
-    .string({
-      required_error: "Please select an email to display.",
-    })
-    .email(),
-     location: z.string({
-    required_error: "Please select a location.",
-  }),
-})
+const FilterFormSchema = z
+  .object({
+    items: z
+      .array(z.string())
+      .refine((val) => val.length > 0, {
+        message: "At least one item must be selected",
+      }),
+    price: z.number().min(1000).max(10000),
+    type: z.string(),
+    district: z.number(),
+    municipality: z.number(),
+  })
+  .partial();
 
 function Listfilter() {
   // Code Form
@@ -83,8 +83,8 @@ const filterForm = useForm<z.infer<typeof FilterFormSchema>>({
     items: [],
     price: 5000,
     type: "", 
-        location: "", 
-
+    district: 1, 
+    municipality: 1, 
   },
 })
 
@@ -95,7 +95,7 @@ const filterForm = useForm<z.infer<typeof FilterFormSchema>>({
   const onFilterSubmit = (data: z.infer<typeof FilterFormSchema>) => {
     console.log("Other filters data:", data)
   }
-  const [showFilters, setShowFilters] = useState(false); // State to toggle filter visibility
+  const [showFilters, setShowFilters] = useState(false); 
 
   const toggleFilters = () => setShowFilters(!showFilters);
 
@@ -365,9 +365,11 @@ const filterForm = useForm<z.infer<typeof FilterFormSchema>>({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="m@example.com">Featured</SelectItem>
-                      <SelectItem value="m@google.com">Exclusive</SelectItem>
-                      <SelectItem value="m@support.com">Free</SelectItem>
+                      <SelectItem value="exclusive">Exclusive</SelectItem>
+                      <SelectItem value="featured">Featured</SelectItem>
+                      <SelectItem value="emerging">Emerging</SelectItem>
+                      <SelectItem value="latest">Latest</SelectItem>
+                      <SelectItem value="sold">Sold</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -376,7 +378,7 @@ const filterForm = useForm<z.infer<typeof FilterFormSchema>>({
             />
 
             {/* Location Select */}
-            <FormField
+            {/* <FormField
               control={filterForm.control}
               name="location"
               render={({ field }) => (
@@ -397,7 +399,9 @@ const filterForm = useForm<z.infer<typeof FilterFormSchema>>({
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
+            <FilterLocationFields form={filterForm}/>
+            {/* <PropertyLocationFields form={filterForm}/> */}
 
             <Button type="submit" className="bg-green-600">Apply Filters</Button>
           </form>

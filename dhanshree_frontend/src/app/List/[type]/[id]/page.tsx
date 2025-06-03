@@ -20,6 +20,7 @@ import { AppDispatch, RootState } from "@/store/store";
 import { fetchPropertyById } from "@/store/slices/propertyDetailsSlice";
 import { fetchPropertyDetails } from "@/types/property";
 
+
 function PropertyDetailsPage() {
   const params = useParams();
   const { type, id } = params;
@@ -27,6 +28,7 @@ function PropertyDetailsPage() {
   const { selectedPost, isLoading, error } = useSelector((state: RootState) => state.propertyDetails);
 
   console.log("id is",id);
+ 
   useEffect(() => {
     dispatch(fetchPropertyById(id as string));
   }, [dispatch, id]);
@@ -95,7 +97,7 @@ if(error){
 
         <div className="flex flex-col lg:flex-row gap-8 py-20 px-4">
           <InnerTab property={selectedPost as fetchPropertyDetails} isLoading={isLoading} error={error} />
-          <Innerform />
+          <Innerform  propertyId={selectedPost.id}/>
         </div>
       </section>
     </> 

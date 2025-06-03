@@ -1,8 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { FieldErrors, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { landFormSchema, LandFormValues } from "@/types/forms";
+import { landFormSchema, LandFormValues, EditLandFormValues, editLandFormSchema } from "@/types/forms";
 import { useCreateProperty } from "@/hooks/useCreateProperty";
 import {
   generalFields,
@@ -29,7 +29,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { transformLandForm } from "@/utils/transformLandForm";
 import { uploadImages } from "@/utils/uploadImages ";
-
+import { useUpdateProperty } from "@/hooks/useUpdateProperty";
+import PropertyImageUpdate from "./PropertyImageUpdate";
 
 
 const defaultValues: Partial<LandFormValues> = {
@@ -60,13 +61,38 @@ const defaultValues: Partial<LandFormValues> = {
   zoning: "residential",
 };
 
-export default function LandForm() {
-  const form = useForm<LandFormValues>({
-    resolver: zodResolver(landFormSchema),
-    defaultValues,
+
+export default function LandForm({
+  values,
+  edit,
+  initialImages,
+  propertyId,
+}: {
+  values?: Partial<LandFormValues>;
+  edit?: boolean;
+  initialImages?: {
+    url: string;
+    type: "thumbnail" | "normal";
+    id: string;
+    propertyId?: string;
+  }[];
+  propertyId?: string;
+}) 
+{
+  const mergedDefaultValues = {
+    ...defaultValues,
+    ...values,
+  };
+
+  const form = useForm<LandFormValues | EditLandFormValues>({
+    resolver: zodResolver(edit ? editLandFormSchema : landFormSchema),
+    defaultValues: mergedDefaultValues, 
   });
 
+  const canSubmitRef = useRef<() => boolean>(() => true);
+
   const { createProperty, isLoading } = useCreateProperty();
+  const { updateProperty, isUpdating } = useUpdateProperty();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onInvalid = (errors: FieldErrors<LandFormValues>) => {
@@ -74,29 +100,46 @@ export default function LandForm() {
     toast.error("please Fix all errors and try again ");
   };
 
-  const onSubmit = async (values: LandFormValues) => {
+  const onSubmit = async (values: LandFormValues| EditLandFormValues) => {
     try {
+      
+      const canSubmit = canSubmitRef.current();
+      if (!canSubmit) return;
+
       setIsSubmitting(true);
-      const thumbnailFile = values.thumbnail;
-      const imageFiles = values.images;
+      let imageIds: string[] = [];
 
-      const formData = new FormData();
-      if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
-      imageFiles?.forEach((img: File) => formData.append("images", img));
+      if (!edit) {
+        const thumbnailFile = (values as LandFormValues).thumbnail;
+        const imageFiles = (values as LandFormValues).images;
 
-      const imageRes = await uploadImages(formData);
-      console.log("imageRes are ", imageRes);
-      if (!imageRes.success) {
-        throw new Error("Image upload failed");
+        const formData = new FormData();
+        if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
+        imageFiles?.forEach((img) => formData.append("images", img));
+
+        const imageRes = await uploadImages(formData);
+        if (!imageRes.success) {
+          throw new Error("Image upload failed");
+        }
+        imageIds = imageRes.images.map((img: any) => img.id);
       }
 
-      const imageIds = imageRes.images.map((img: { id: string }) => img.id);
-      const payload = transformLandForm(values, imageIds);
-      console.log("payload for the create property ", payload);
-      createProperty(payload);
+      const payload = transformLandForm(
+        values as LandFormValues,
+        imageIds,
+        edit
+      );
+      console.log("payload for the create or updating property ", payload);
+
+      if (!edit) {
+        createProperty(payload);
+      } else if (propertyId) {
+        updateProperty(propertyId, payload);
+      }
+
       setIsSubmitting(false);
     } catch (error) {
-      console.error("Submit failed:", error);
+      console.log("Submit failed:", error);
       setIsSubmitting(false);
     }
   };
@@ -184,22 +227,32 @@ export default function LandForm() {
               <h3 className="text-lg font-semibold mb-4 text-center">
                 Property Images
               </h3>
-              <PropertyImageUpload form={form} />
-              <div className="flex justify-center">
+              {edit && initialImages && propertyId ? (
+                <PropertyImageUpdate
+                  initialImages={initialImages}
+                  propertyId={propertyId}
+                  canSubmitRef={canSubmitRef}
+                />
+              ) : (
+                <PropertyImageUpload form={form} />
+              )}        
+                   <div className="flex justify-center">
                 <Button
                   type="submit"
                   className={`w-1/3 hover:bg-blue-500 border border-blue-500 hover:text-white text-blue-500 bg-transparent cursor-pointer ${
-                    isSubmitting ? "bg-blue-500 text-white" : ""
+                    isSubmitting || isUpdating ? "bg-blue-500 text-white" : ""
                   }`}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isUpdating}
                 >
-                  {isSubmitting ? (
+                  {isSubmitting || isUpdating ? (
                     <>
                       <div className="flex items-center gap-2">
                         <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                        <span>Submitting...</span>
+                        <span>{edit ? "Updating..." : "Submitting..."}</span>
                       </div>
                     </>
+                  ) : edit ? (
+                    "Update"
                   ) : (
                     "Submit"
                   )}

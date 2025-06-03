@@ -32,7 +32,7 @@ const Gallery: React.FC<GalleryProps> = ({ images }) => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {/* Featured Image */}
       <div
-        className="w-full h-[420px] rounded-lg overflow-hidden cursor-pointer md:col-span-2 lg:col-span-2"
+        className="w-full h-[520px] rounded-lg overflow-hidden cursor-pointer md:col-span-2 lg:col-span-2"
         onClick={() => openLightbox(images.indexOf(selectedImg))}
       >
         <Image
@@ -64,7 +64,7 @@ const Gallery: React.FC<GalleryProps> = ({ images }) => {
                 width={300}
                 height={200}
                 className={clsx(
-                  "h-32 w-full object-cover rounded-md cursor-pointer transition-transform",
+                  "h-40 w-full object-cover rounded-md cursor-pointer transition-transform",
                   selectedImg === img && "ring-4 ring-blue-400"
                 )}
               />
