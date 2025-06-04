@@ -19,14 +19,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { fetchPropertyById } from "@/store/slices/propertyDetailsSlice";
 import { fetchPropertyDetails } from "@/types/property";
-
+import { useTranslation } from "react-i18next";
 
 function PropertyDetailsPage() {
   const params = useParams();
   const { type, id } = params;
   const dispatch = useDispatch<AppDispatch>();
   const { selectedPost, isLoading, error } = useSelector((state: RootState) => state.propertyDetails);
-
+  const { t } = useTranslation();
   console.log("id is",id);
  
   useEffect(() => {
@@ -77,18 +77,18 @@ if(error){
           <div className="flex justify-between items-center">
             <div className="flex flex-col gap-2">
               <h1 className="text-3xl font-medium">
-                Property Code: [{selectedPost?.propertyCode}]
+                {t('propertyCode')}: [{selectedPost?.propertyCode}]
               </h1>
             </div>
             <h1 className="text-3xl font-bold text-sky-700">
-              Rs{" "}
+              {t('rs')}{" "}
               {selectedPost?.price}
             </h1>
           </div>
         </div>
         <div className="flex justify-start items-center gap-2 text-gray-500 my-10">
           <FontAwesomeIcon icon={faLocationDot} />
-          Location:
+         {t('location')}: 
           {selectedPost?.address?.municipality?.municipalityTitle},
           {selectedPost?.address?.district?.districtTitle},
           {selectedPost?.address?.province?.provinceTitle}

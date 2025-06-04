@@ -44,13 +44,14 @@ const items = [
   { id: "Flats", label: "Flats" },
   { id: "Spaces", label: "Spaces" },
 ] as const
-
+import { useTranslation } from "react-i18next"
 // --- First schema: for code filter ---
 const CodeFormSchema = z.object({
   code: z.string().min(2, {
     message: "Property code must be at least 2 characters.",
   }),
 })
+
 
 // --- Second schema: for checkbox and price range ---
 const FilterFormSchema = z
@@ -96,14 +97,14 @@ const filterForm = useForm<z.infer<typeof FilterFormSchema>>({
     console.log("Other filters data:", data)
   }
   const [showFilters, setShowFilters] = useState(false); 
-
+const { t } = useTranslation();
   const toggleFilters = () => setShowFilters(!showFilters);
 
   return(
     <div className="flex flex-col space-y-8 relative">
       {/* Code Filter */}
       <div className="p-10 w-full shadow-2xl rounded-xl">
-        <h1 className="text-lg font-bold text-sky-700">Search By Code</h1>
+        <h1 className="text-lg font-bold text-sky-700">{t("searchByCode")}</h1>
         <Form {...codeForm}>
           <form onSubmit={codeForm.handleSubmit(onCodeSubmit)} className="space-y-6 py-6">
             

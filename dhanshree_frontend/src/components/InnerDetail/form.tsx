@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import $axios from "@/lib/axios.instance"; 
-
+import { useTranslation } from "react-i18next";
 type BookingFormValues = {
   fullName: string;
   email: string;  
@@ -41,6 +41,7 @@ console.log("Property ID:", propertyId);
   const bookingMutation = useMutation({
     mutationFn: async (data: BookingFormValues) => {
       const response = await $axios.post("/booking", data);
+      
       return response.data; 
     },
     onSuccess: (data) => {
@@ -59,10 +60,10 @@ console.log("Property ID:", propertyId);
     console.log("Booking data:", data);
     bookingMutation.mutate(data);
   };
-
+  const { t } = useTranslation();
   return (
     <div className="w-full lg:w-1/3 bg-white p-6 rounded-lg shadow ">
-      <h3 className="text-xl font-semibold mb-4 text-sky-500">Book This Property</h3>
+      <h3 className="text-xl font-semibold mb-4 text-sky-500">{t("bookThisProperty")}</h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col pt-10  items-start gap-10 text-sky-400 ">
           <FormField
@@ -71,7 +72,7 @@ console.log("Property ID:", propertyId);
             
             render={({ field }) => (
               <FormItem className="w-4/5">
-                <FormLabel>Your Name</FormLabel>
+                <FormLabel>{t("yourName")}</FormLabel>
                 <FormControl>
                   <Input placeholder="Enter your name" {...field} />
                 </FormControl>
@@ -85,7 +86,7 @@ console.log("Property ID:", propertyId);
             name="email"
             render={({ field }) => (
               <FormItem className="w-4/5">
-                <FormLabel>Your Email</FormLabel>
+                <FormLabel>{t("yourEmail")}</FormLabel>
                 <FormControl>
                   <Input type="email" placeholder="Enter your email" {...field} />
                 </FormControl>
@@ -99,7 +100,7 @@ console.log("Property ID:", propertyId);
             name="phone"
             render={({ field }) => (
               <FormItem className="w-4/5">
-                <FormLabel>Phone Number</FormLabel>
+                <FormLabel>{t("phoneNumber")}</FormLabel>
                 <FormControl>
                   <Input type="tel" placeholder="Enter your phone number" {...field} />
                 </FormControl>
@@ -113,7 +114,7 @@ console.log("Property ID:", propertyId);
             name="date"
             render={({ field }) => (
               <FormItem  className="w-4/5" >
-                <FormLabel>Booking Date</FormLabel>
+                <FormLabel>{t("bookingDate") }</FormLabel>
                 <FormControl >
                   <Input type="date" {...field} />
                 </FormControl>
@@ -127,7 +128,7 @@ console.log("Property ID:", propertyId);
             name="message"
             render={({ field }) => (
               <FormItem className="w-4/5">
-                <FormLabel>Message</FormLabel>
+                <FormLabel>{t("message")}</FormLabel>
                 <FormControl>
                   <Textarea placeholder="Write your message here..." rows={3} {...field} />
                 </FormControl>

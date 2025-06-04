@@ -19,7 +19,7 @@ import { loginSchema, type LoginFormValues } from "@/validation/authSchema";
 import Image from "next/image";
 import $axios from "@/lib/axios.instance";
 import Link from "next/link";
-
+import { useTranslation } from "react-i18next";
 export default function LoginPage() {
   const [cooldown, setCooldown] = useState(0);
 
@@ -34,7 +34,7 @@ export default function LoginPage() {
       password: "",
     },
   });
-
+  const { t } = useTranslation();
   // Watch form values for debouncing
   const formValues = form.watch();
   const debouncedValues = useDebounce(formValues, 500);
@@ -105,9 +105,9 @@ export default function LoginPage() {
         {/* Right Form Section */}
         <div className="w-1/2 flex flex-col items-start gap-10 py-20 pe-7">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900">Admin Login</h2>
+            <h2 className="text-3xl font-bold text-gray-900">{t("loginAsAdmin")}</h2>
             <p className="mt-2 text-sm text-gray-600">
-              Enter your credentials to access the admin panel
+             {t("enterCredentials")}
             </p>
           </div>
 
@@ -139,7 +139,7 @@ export default function LoginPage() {
                     href="/forgotPassword"
                     className="text-blue-500 hover:cursor-pointer"
                   >
-                    Forgot Password
+                    {t("forgotPassword")}
                   </Link>
                 </div>
 
@@ -156,7 +156,7 @@ export default function LoginPage() {
                         <span>Signing in...</span>
                       </div>
                     ) : (
-                      "Sign in"
+                      `${t("signIn")}`
                     )}
                   </Button>
                 </div>

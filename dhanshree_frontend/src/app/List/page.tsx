@@ -23,7 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { fetchProperty } from "@/store/slices/propertyDetailsSlice";
 import { Skeleton } from "@/components/ui/skeleton";
-
+import { useTranslation } from "react-i18next";
 function Page() {
   const { posts, isLoading, error, pagination } = useSelector(
     (state: RootState) => state.property
@@ -55,6 +55,7 @@ function Page() {
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
+  const { t } = useTranslation();
 
   return (
     <>
@@ -82,16 +83,16 @@ function Page() {
             </BreadcrumbList>
           </Breadcrumb>
 
-          <h1 className="text-3xl font-bold">Available Properties</h1>
+          <h1 className="text-3xl font-bold">{t('availableProperties')}</h1>
 
           <div className="flex justify-between py-12">
             {isLoading ? (
               <Skeleton className="w-50 h-5" />
             ) : (
-              <p> {pagination.total} properties</p>
+              <p> {pagination.total} {t('properties')}</p>
             )}
             <div className="flex gap-2 items-center">
-              <p>Sort By:</p>
+              <p>{t('sortBy')}</p>
               <Select onValueChange={(value) => setSortOrder(value)}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Default order" />
@@ -99,13 +100,13 @@ function Page() {
                 <SelectContent>
                   <SelectGroup>
                     <SelectItem value="highToLow">
-                      Price - High to Low
+                      {t('priceHighToLow')}
                     </SelectItem>
                     <SelectItem value="lowToHigh">
-                      Price - Low to High
+                      {t('priceLowToHigh')}
                     </SelectItem>
-                    <SelectItem value="newToOld">Date - New to Old</SelectItem>
-                    <SelectItem value="oldToNew">Date - Old to New</SelectItem>
+                    <SelectItem value="newToOld">{t("dateNewToOld")}</SelectItem>
+                    <SelectItem value="oldToNew">{t("dateOldToNew")}</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -144,7 +145,7 @@ function Page() {
                   : "bg-white text-gray-700 hover:bg-blue-500 hover:text-white border-gray-300"
               }`}
             >
-              Previous
+              {t('previous')}
             </button>
 
             {/* Page Numbers */}
@@ -172,7 +173,7 @@ function Page() {
                   : "bg-white text-gray-700 hover:bg-blue-500 hover:text-white border-gray-300"
               }`}
             >
-              Next
+            {t('next')}
             </button>
           </div>
           )}
