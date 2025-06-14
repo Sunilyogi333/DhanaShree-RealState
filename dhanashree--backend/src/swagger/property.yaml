@@ -207,9 +207,14 @@ paths:
         - name: type
           in: query
           schema:
-            type: string
-            enum: [land, house, apartment, flat, space]
+            type: array
+            items:
+              type: string
+              enum: [land, house, apartment, flat, space]
           required: false
+          style: form
+          explode: false
+          example: land,house
         - name: status
           in: query
           schema:

@@ -1,37 +1,35 @@
-import { admin } from "./admin"
-
 export const Message = {
-  passwordShouldStrong: {
-    en: 'Use 8 or more characters with at least one uppercase letter, numbers & symbols',
-    ne: '८ वा बढी क्यारेक्टरहरू प्रयोग गर्नुहोस्, कम्तीमा एउटा ठुलो अक्षर, अंक र चिन्ह सहित',
+  created: {
+    en: 'Created successfully',
+    ne: 'सफलतापूर्वक सिर्जना गरियो',
   },
-  passwordShouldMatch: {
-    en: 'Both password needs to be same',
-    ne: 'दुवै पासवर्ड उस्तै हुनुपर्छ',
-  },
-  validPhoneNumber: {
-    en: 'Phone number should be valid',
-    ne: 'फोन नम्बर मान्य हुनुपर्छ',
-  },
-  notFound: {
-    en: 'Not found',
-    ne: 'फेला परेन',
+  fetched: {
+    en: 'Fetched successfully',
+    ne: 'सफलतापूर्वक ल्याइयो',
   },
   updated: {
     en: 'Updated successfully',
     ne: 'सफलतापूर्वक अद्यावधिक गरियो',
   },
-  created: {
-    en: 'Created successfully',
-    ne: 'सफलतापूर्वक सिर्जना गरियो',
-  },
   deleted: {
     en: 'Deleted successfully',
     ne: 'सफलतापूर्वक हटाइयो',
   },
-  invalidCredentials: {
-    en: 'Invalid credentials',
-    ne: 'अवैध प्रमाणहरू',
+  notFound: {
+    en: 'Not found',
+    ne: 'फेला परेन',
+  },
+  verified: {
+    en: 'Verified successfully',
+    ne: 'सफलतापूर्वक प्रमाणित भयो',
+  },
+  alreadyVerified: {
+    en: 'Already verified',
+    ne: 'पहिले नै प्रमाणित गरिएको छ',
+  },
+  badRequest: {
+    en: 'Bad request',
+    ne: 'खराब अनुरोध',
   },
   loginSuccessfully: {
     en: 'Login successfully',
@@ -49,6 +47,30 @@ export const Message = {
     en: 'Admin refresh successfully',
     ne: 'एडमिन रिफ्रेश सफल भयो',
   },
+  passwordShouldStrong: {
+    en: 'Use 8 or more characters with at least one uppercase letter, numbers & symbols',
+    ne: '८ वा बढी क्यारेक्टरहरू प्रयोग गर्नुहोस्, कम्तीमा एउटा ठुलो अक्षर, अंक र चिन्ह सहित',
+  },
+  passwordShouldMatch: {
+    en: 'Both password needs to be same',
+    ne: 'दुवै पासवर्ड उस्तै हुनुपर्छ',
+  },
+  passwordResetEmailSent: {
+    en: 'Please check your email to reset your password.',
+    ne: 'कृपया आफ्नो पासवर्ड रिसेट गर्न इमेल जाँच गर्नुहोस्।',
+  },
+  passwordResetEmailResent: {
+    en: 'Password reset email resent. Please check your inbox.',
+    ne: 'पासवर्ड रिसेट इमेल पुन: पठाइयो। कृपया आफ्नो इनबक्स जाँच गर्नुहोस्।',
+  },
+  validPhoneNumber: {
+    en: 'Phone number should be valid',
+    ne: 'फोन नम्बर मान्य हुनुपर्छ',
+  },
+  invalidCredentials: {
+    en: 'Invalid credentials',
+    ne: 'अवैध प्रमाणहरू',
+  },
   invalidOTP: {
     en: 'Invalid OTP',
     ne: 'अवैध OTP',
@@ -56,10 +78,6 @@ export const Message = {
   OTPExpired: {
     en: 'OTP has expired',
     ne: 'OTP म्याद सकिएको छ',
-  },
-  accountVerified: {
-    en: 'Account verified successfully',
-    ne: 'खाता सफलतापूर्वक प्रमाणित भयो',
   },
   accountAlreadyVerified: {
     en: 'Account already verified',
@@ -81,7 +99,7 @@ export const Message = {
     en: 'Your password reset successfully',
     ne: 'तपाईंको पासवर्ड सफलतापूर्वक रिसेट गरियो',
   },
-  server: {
+  internalServerError: {
     en: 'Internal Server Error',
     ne: 'आन्तरिक सर्भर त्रुटि',
   },
@@ -101,57 +119,33 @@ export const Message = {
     en: 'Email or Password does not match',
     ne: 'ईमेल वा पासवर्ड मिलेन',
   },
-  notAuthorized: {
-    en: 'You are not authorized to access this resource',
-    ne: 'यो स्रोतमा पहुँच गर्न तपाईंलाई अनुमति छैन',
-  },
   tokenExpire: {
     en: 'Token expired',
     ne: 'टोकन म्याद सकिएको छ',
   },
-  emailSent: {
+  emailSentSuccessfully: {
     en: 'Email sent successfully',
     ne: 'ईमेल सफलतापूर्वक पठाइयो',
-  },
-  fetched: {
-    en: 'Fetched successfully',
-    ne: 'सफलतापूर्वक ल्याइयो',
-  },
-  badRequest: {
-    en: 'Bad request',
-    ne: 'खराब अनुरोध',
   },
   bookingAlreadyVerified: {
     en: 'Booking already verified',
     ne: 'बुकिंग पहिले नै प्रमाणित गरिएको छ',
   },
-  bookingEmailLimitReached: {
-    en: 'You’ve reached the resend limit for today.',
+  emailLimitReached: {
+    en: 'You have reached the resend limit for today.',
     ne: 'तपाईंले आजको लागि पुन: पठाउने सीमा पुग्नुभएको छ।',
   },
   bookingNotFound: {
     en: 'Booking not found',
     ne: 'बुकिंग फेला परेन',
   },
-  requestAlreadyExists: {
-    en: 'Request already exists',
-    ne: 'अनुरोध पहिले नै अवस्थित छ',
-  },
-  requestAlreadyVerified: {
-    en: 'Request already verified',
-    ne: 'अनुरोध पहिले नै प्रमाणित गरिएको छ',
-  },
-  requestEmailLimitReached: {
-    en: 'You’ve reached the resend limit for today.',
-    ne: 'तपाईंले आजको लागि पुन: पठाउने सीमा पुग्नुभएको छ।',
+  alreadyExists: {
+    en: 'already exists',
+    ne: 'पहिले नै अवस्थित छ',
   },
   requestNotFound: {
     en: 'Request not found',
     ne: 'अनुरोध फेला परेन',
-  },
-  requestVerificationEmailSent: {
-    en: 'Request verification email sent',
-    ne: 'अनुरोध प्रमाणीकरण ईमेल पठाइयो',
   },
   invalidImageIds: {
     en: 'Invalid image IDs provided',
@@ -164,6 +158,10 @@ export const Message = {
   atLeastThreeNormalImages: {
     en: 'At least 3 normal images must remain after update',
     ne: 'अद्यावधिक पछि कम्तीमा ३ सामान्य छविहरू रहनु पर्छ',
+  },
+  imagesUpdated: {
+    en: 'Images updated successfully',
+    ne: 'छविहरू सफलतापूर्वक अद्यावधिक गरियो',
   },
   propertyCodeAlreadyExists: {
     en: 'Property code already exists',
@@ -181,11 +179,34 @@ export const Message = {
     en: 'No file uploaded',
     ne: 'कुनै फाइल अपलोड गरिएको छैन',
   },
+  bookingVerificationEmailSent: {
+    en: 'Please check your email to verify your booking.',
+    ne: 'कृपया आफ्नो इमेल जाँच गरी बुकिंग प्रमाणित गर्नुहोस्।',
+  },
+  bookingVerificationEmailResent: {
+    en: 'Verification email resent. Please check your inbox.',
+    ne: 'प्रमाणीकरण इमेल पुन: पठाइयो। कृपया आफ्नो इनबक्स जाँच गर्नुहोस्।',
+  },
+  requestVerificationEmailSent: {
+    en: 'Please check your email to verify your request.',
+    ne: 'कृपया आफ्नो इमेल जाँच गरी अनुरोध प्रमाणित गर्नुहोस्।',
+  },
+  requestVerificationEmailResent: {
+    en: 'Verification email resent. Please check your inbox.',
+    ne: 'प्रमाणीकरण इमेल पुन: पठाइयो। कृपया आफ्नो इनबक्स जाँच गर्नुहोस्।',
+  },
 }
 
 export const getNotFoundMessage = (en: string, ne: string) => {
   return {
     en: `${en} not found`,
     ne: `${ne} फेला परेन`,
+  }
+}
+
+export const getAlreadyExistMessage = (en: string, ne: string) => {
+  return {
+    en: `${en} already exits`,
+    ne: `${ne} पहिले नै अवस्थित छ`,
   }
 }

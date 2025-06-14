@@ -41,7 +41,7 @@ if (error.localizedMessage) {
 } else if (typeof error.message === 'object' && 'en' in error.message && 'ne' in error.message) {
   message = error.message
 } else {
-  message = Message.server
+  message = Message.internalServerError
 }
 
 

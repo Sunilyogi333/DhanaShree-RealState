@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import imageService from '../../services/property/images.service'
 import { StatusCodes } from '../../constants/statusCodes'
 import { UpdatePropertyImagesDTO } from '../../dto/property.dto'
+import { Message } from '../../constants/message'
 
 class ImageController {
   async upload(req: Request, res: Response) {
@@ -13,6 +14,7 @@ class ImageController {
     return res.status(StatusCodes.CREATED).json({
       success: true,
       images: savedImages.map((img) => ({ id: img.id, url: img.url, type: img.type })),
+      message: Message.created,
     })
   }
 
@@ -21,7 +23,7 @@ class ImageController {
     const data: UpdatePropertyImagesDTO = req.body
 
     const result = await imageService.updateImages(propertyId, data)
-    return res.status(StatusCodes.SUCCESS).json({ success: true, message: 'Images updated successfully', data: result })
+    return res.status(StatusCodes.SUCCESS).json({ success: true, message: Message.updated, data: result })
   }
 }
 

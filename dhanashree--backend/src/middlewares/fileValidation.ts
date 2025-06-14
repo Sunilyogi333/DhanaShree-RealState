@@ -29,6 +29,6 @@ export const validateImageBuffer = async (req: Request, res: Response, next: Nex
     next()
   } catch (error) {
     console.error('File validation error:', error)
-    return next(HttpException.internalServerError(Message.server))
+    return next(HttpException.internalServerError(Message.internalServerError))
   }
 }

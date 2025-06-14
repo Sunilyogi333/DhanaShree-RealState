@@ -49,7 +49,7 @@ class AuthController {
     await authService.resetPasswordEmail(req.body.email)
     res.status(StatusCodes.SUCCESS).json({
       status: true,
-      message: Message.emailSent,
+      message: Message.passwordResetEmailSent,
     })
   }
 
@@ -65,7 +65,6 @@ class AuthController {
 
   async updatePassword(req: Request, res: Response) {
     const data = await authService.updatePassword(req.body, req.user?.id)
-    console.log(data, 'hellooooooooo')
     res.status(200).json({
       status: true,
       message: Message.updated,

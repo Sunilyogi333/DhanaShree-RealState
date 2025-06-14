@@ -11,6 +11,7 @@ import { RequestStatus } from '../../constants/enum/request'
 import { getPagination, getPagingData } from '../../utils/pagination'
 import { Message } from '../../constants/message'
 import { getRequestVerificationTemplate } from '../../utils/templates/requestVerificaton.template'
+import { isToday } from 'date-fns'
 
 class RequestService {
   private requestRepo = AppDataSource.getRepository(RequestListing)
@@ -18,72 +19,97 @@ class RequestService {
 
   async create(data: CreateRequestDTO) {
     const { fullName, email, phone, date, message, address } = data
-    const userEmail = email.toLowerCase()
 
     return await AppDataSource.transaction(async (manager) => {
-      let user = await manager.findOne(User, { where: { email: userEmail } })
+      let user = await manager.findOne(User, { where: { email } })
+
+      const lowerEmail = email.toLowerCase()
       if (!user) {
-        user = manager.create(User, { fullName, email: userEmail, phone })
+        user = manager.create(User, { fullName, email: lowerEmail, phone })
         await manager.save(user)
       }
 
-      const existing = await manager.findOne(RequestListing, {
+      const requestRepo = manager.getRepository(RequestListing)
+
+      // Get latest request
+      const existing = await requestRepo.findOne({
         where: { user },
         order: { createdAt: 'DESC' },
       })
 
-      if (existing && existing.status !== RequestStatus.cancelled && existing.status !== RequestStatus.success) {
-        throw HttpException.badRequest(Message.requestAlreadyExists)
+      // If already verified and not cancelled/success, block
+      if (
+        existing &&
+        existing.status !== RequestStatus.cancelled &&
+        existing.status !== RequestStatus.success &&
+        existing.isVerified
+      ) {
+        throw HttpException.badRequest(Message.alreadyVerified)
       }
 
-      const request = manager.create(RequestListing, {
-        user,
-        date,
-        message,
-        address,
-        isVerified: false,
-        status: RequestStatus.pending,
-        emailSentCount: 0,
-        lastEmailSentAt: new Date(),
-      })
+      // Reuse or create
+      let request = existing
 
-      const token = webTokenService.generateBookingToken({ bookingId: request.id, email: userEmail })
+      if (!request || request.status === RequestStatus.cancelled || request.status === RequestStatus.success) {
+        request = requestRepo.create({
+          user,
+          date,
+          message,
+          address,
+          isVerified: false,
+          status: RequestStatus.pending,
+          emailSentCount: 0,
+        })
+      }
+
+      // Rate limit resend
+      if (
+        request.lastEmailSentAt &&
+        isToday(request.lastEmailSentAt) &&
+        request.emailSentCount >= 10 // or any limit you prefer
+      ) {
+        throw HttpException.tooManyRequests(Message.emailLimitReached)
+      }
+
+      request.lastEmailSentAt = new Date()
+      request.emailSentCount += 1
+
+      const result = await requestRepo.save(request)
+
+      // Generate token + send email
+      const token = webTokenService.generateBookingToken({ bookingId: request.id, email: lowerEmail })
       const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL_LOCAL}/verify-request?token=${token}`
-
-      await manager.save(request)
 
       const mailOptions = {
         from: EnvironmentConfiguration.MAIL_FROM,
         to: email,
         subject: 'Verify Your Request',
         text: 'Request verification',
-        html: generateHtml(
-          user.fullName,
-          new Date().toLocaleString(),
-          getRequestVerificationTemplate(verifyUrl)
-        ),
+        html: generateHtml(user.fullName, new Date().toLocaleString(), getRequestVerificationTemplate(verifyUrl)),
       }
 
       await this.mailService.sendMail(mailOptions)
 
-      return { success: true, message: 'Request verification email sent' }
+      return result
     })
   }
 
   async verify(token: string) {
     const payload = webTokenService.verifyBookingToken(token)
-    const request = await this.requestRepo.findOne({ where: { id: payload.bookingId }, relations: ['user'] })
+    const request = await this.requestRepo.findOne({
+      where: { id: payload.bookingId },
+      relations: ['user'],
+    })
 
     if (!request || request.user.email !== payload.email) {
-      throw HttpException.unauthorized(Message.notAuthorized)
+      throw HttpException.unauthorized(Message.unAuthorized)
     }
 
-    if (request.isVerified) return { success: true, message: 'Already verified' }
+    if (request.isVerified) return { alreadyVerified: true, request }
 
     request.isVerified = true
-    await this.requestRepo.save(request)
-
-    return { success: true, message: 'Request verified successfully' }
+    const result = await this.requestRepo.save(request)
+    return { alreadyVerified: false, request: result }
   }
 
   async getAll({ status, page, size, email }: { status?: RequestStatus; page: number; size: number; email?: string }) {
@@ -104,15 +130,15 @@ class RequestService {
 
     return { requests, pagination }
   }
-  
+
   async resendVerificationEmail(id: string) {
     const request = await this.requestRepo.findOne({ where: { id }, relations: ['user'] })
     if (!request) throw HttpException.notFound(Message.requestNotFound)
-    
-    if (request.isVerified) throw HttpException.badRequest(Message.requestAlreadyVerified)
-    if (request.emailSentCount >= 3) throw HttpException.badRequest(Message.requestEmailLimitReached)
+
+    if (request.isVerified) throw HttpException.badRequest(Message.alreadyVerified)
+    if (request.emailSentCount >= 3) throw HttpException.badRequest(Message.emailLimitReached)
     if (request.lastEmailSentAt && new Date().getTime() - request.lastEmailSentAt.getTime() < 24 * 60 * 60 * 1000) {
-      throw HttpException.badRequest(Message.requestEmailLimitReached)
+      throw HttpException.badRequest(Message.emailLimitReached)
     }
     request.emailSentCount += 1
     request.lastEmailSentAt = new Date()
@@ -124,20 +150,19 @@ class RequestService {
       to: request.user.email,
       subject: 'Resend Request Verification',
       text: 'Request verification',
-      html: generateHtml(
-        request.user.fullName,
-        new Date().toLocaleString(),
-        getRequestVerificationTemplate(verifyUrl)
-      ),
+      html: generateHtml(request.user.fullName, new Date().toLocaleString(), getRequestVerificationTemplate(verifyUrl)),
     }
     await this.mailService.sendMail(mailOptions)
-    return { success: true, message: Message.requestVerificationEmailSent }
-  }     
+    return {
+      requestId: request.id,
+      email: request.user.email,
+    }
+  }
 
   async getOne(id: string) {
-    const req = await this.requestRepo.findOne({ where: { id }, relations: ['user'] })
-    if (!req) throw HttpException.notFound(Message.requestNotFound)
-    return req
+    const request = await this.requestRepo.findOne({ where: { id }, relations: ['user'] })
+    if (!request) throw HttpException.notFound(Message.requestNotFound)
+    return request
   }
 
   async update(id: string, data: UpdateRequestDTO) {
@@ -152,8 +177,8 @@ class RequestService {
       }
     }
 
-    await this.requestRepo.save(req)
-    return { success: true, message: Message.updated }
+    const result = await this.requestRepo.save(req)
+    return result
   }
 }
 

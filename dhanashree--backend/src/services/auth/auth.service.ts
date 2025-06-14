@@ -112,7 +112,7 @@ class AuthService {
     try {
       await this.mailService.sendMail(mailOptions)
     } catch (error) {
-      HttpException.internalServerError(Message.server)
+      HttpException.internalServerError(Message.internalServerError)
     }
     return 'Email sent successfully'
   }

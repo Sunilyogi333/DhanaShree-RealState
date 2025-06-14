@@ -3,12 +3,10 @@ import { Property } from '../../entities/property/property.entity'
 import Admin from '../../entities/admin/admin.entity'
 import cloudinaryService from '../../services/cloudinary/cloudinary.service'
 import { Address } from '../../entities/address/address.entity'
-import addressService from '../../services/address.service'
 import { Image } from '../../entities/images/image.entity'
 import { CreatePropertyDTO, UpdatePropertyDTO } from '../../dto/property.dto'
 import { getPagination, getPagingData } from '../../utils/pagination'
 import HttpException from '../../utils/HttpException'
-import { UnitEnum, Facing, Zoning, ApartmentType, FurnishingType } from '../../constants/enum/property'
 import { PropertyDetails } from '../../types/express/property.type'
 import { Message } from '../../constants/message'
 
@@ -90,12 +88,12 @@ class PropertyService {
       .skip(offset)
       .take(limit)
 
-    // ✅ Default: exclude sold unless explicitly asked
+    // Default: exclude sold unless explicitly asked
     if (!filters.status) {
       query.andWhere('property.status != :sold', { sold: 'sold' })
     }
 
-    // ✅ Filters
+    // Filters
     if (filters.propertyCode) {
       query.andWhere('LOWER(property.propertyCode) = LOWER(:propertyCode)', {
         propertyCode: filters.propertyCode,
@@ -114,8 +112,8 @@ class PropertyService {
       query.andWhere('property.purpose = :purpose', { purpose: filters.purpose })
     }
 
-    if (filters.type) {
-      query.andWhere('property.type = :type', { type: filters.type })
+    if (filters.type && Array.isArray(filters.type) && filters.type.length > 0) {
+      query.andWhere('property.type IN (:...types)', { types: filters.type })
     }
 
     if (filters.district) {
@@ -126,7 +124,7 @@ class PropertyService {
       query.andWhere('municipality.id = :municipalityId', { municipalityId: filters.municipality })
     }
 
-    // ✅ Sorting
+    // Sorting
     const sortBy = filters.sortBy === 'price' ? 'property.price' : 'property.createdAt'
     const order: 'ASC' | 'DESC' = filters.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'
 
@@ -149,7 +147,7 @@ class PropertyService {
     })
 
     return {
-      properties: modifiedData,
+      results: modifiedData,
       pagination,
     }
   }
@@ -182,7 +180,7 @@ class PropertyService {
 
       if (!property) throw HttpException.notFound(Message.notFound)
 
-      // ✅ Update address if needed
+      // Update address if needed
       if (data.province || data.district || data.municipality || data.ward) {
         if (!property.address) {
           property.address = manager.create(Address, {})
@@ -260,7 +258,6 @@ class PropertyService {
   }
 
   async delete(propertyId: string) {
-    console.log('property herr ta', propertyId)
     const property = await this.propertyRepository.findOne({
       where: { id: propertyId },
       relations: ['images'],

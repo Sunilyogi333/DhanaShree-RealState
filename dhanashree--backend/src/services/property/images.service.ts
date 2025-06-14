@@ -46,24 +46,24 @@ class ImageService {
 
       const currentImages = property.images
 
-      // ✅ Prevent thumbnail deletion
+      // Prevent thumbnail deletion
       const currentThumbnail = currentImages.find((img) => img.type === 'thumbnail')
       if (currentThumbnail?.id && deletedImageIds.includes(currentThumbnail.id)) {
         throw HttpException.badRequest(Message.canNotDeleteThumbnail)
       }
 
-      // ✅ Add/Replace thumbnail
+      // Add/Replace thumbnail
       if (thumbnailImageId) {
         const newThumb = allImages.find((img) => img.id === thumbnailImageId)
         if (!newThumb) throw HttpException.notFound(Message.notFound)
         newThumb.type = 'thumbnail'
       }
 
-      // ✅ Attach new normal images
+      // Attach new normal images
       const newNormalImages = allImages.filter((img) => normalImageIds.includes(img.id))
       newNormalImages.forEach((img) => (img.type = 'normal'))
 
-      // ✅ Remove deleted images (only normal ones)
+      // Remove deleted images (only normal ones)
       const imagesToDelete = currentImages.filter((img) => deletedImageIds.includes(img.id) && img.type === 'normal')
       const remainingNormalImages = currentImages
         .filter((img) => img.type === 'normal' && !deletedImageIds.includes(img.id))
@@ -78,7 +78,7 @@ class ImageService {
         await manager.remove(img)
       }
 
-      // ✅ Final image list
+      // Final image list
       const finalImages = currentImages
         .filter((img) => !deletedImageIds.includes(img.id) && img.type !== 'normal')
         .concat(newNormalImages)

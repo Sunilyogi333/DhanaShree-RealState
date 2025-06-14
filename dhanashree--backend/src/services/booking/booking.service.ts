@@ -74,12 +74,13 @@ class BookingService {
 
       // ✅ Rate limiting for email
       if (isToday(booking.lastEmailSentAt) && booking.emailSentCount >= 100) {
-        throw HttpException.tooManyRequests(Message.bookingEmailLimitReached)
+        throw HttpException.tooManyRequests(Message.emailLimitReached)
       }
 
       booking.lastEmailSentAt = new Date()
       booking.emailSentCount += 1
-      await bookingRepo.save(booking)
+
+      const result = await bookingRepo.save(booking)
 
       // ✅ Generate token and email
       const token = webTokenService.generateBookingToken({ bookingId: booking.id, email })
@@ -96,10 +97,10 @@ class BookingService {
       try {
         await this.mailService.sendMail(mailOptions)
       } catch (error) {
-        throw HttpException.internalServerError(Message.server)
+        throw HttpException.internalServerError(Message.internalServerError)
       }
 
-      return { success: true, message: 'Booking verification email sent' }
+      return result
     })
   }
 
@@ -116,13 +117,13 @@ class BookingService {
     }
 
     if (booking.isVerified) {
-      return { success: true, message: 'Already verified' }
+      return { alreadyVerified: true, booking }
     }
 
     booking.isVerified = true
-    await this.bookingRepo.save(booking)
+    const result = await this.bookingRepo.save(booking)
 
-    return { success: true, message: 'Booking verified successfully' }
+    return { alreadyVerified: false, booking: result }
   }
 
   async resendVerificationEmail(propertyId: string, email: string) {
@@ -138,7 +139,7 @@ class BookingService {
     if (booking.isVerified) throw HttpException.badRequest(Message.bookingAlreadyVerified)
 
     if (isToday(booking.lastEmailSentAt) && booking.emailSentCount >= 100) {
-      throw HttpException.tooManyRequests(Message.bookingEmailLimitReached)
+      throw HttpException.tooManyRequests(Message.emailLimitReached)
     }
 
     booking.lastEmailSentAt = new Date()
@@ -158,7 +159,11 @@ class BookingService {
 
     await this.mailService.sendMail(mailOptions)
 
-    return { success: true, message: 'Verification email resent' }
+    return {
+      bookingId: booking.id,
+      propertyId: booking.property.id,
+      email: booking.user.email,
+    }
   }
 
   async updateBooking(bookingId: string, data: UpdateBookingDTO) {
@@ -173,8 +178,8 @@ class BookingService {
       }
     }
 
-    await this.bookingRepo.save(booking)
-    return { success: true, message: Message.updated }
+    const result = await this.bookingRepo.save(booking)
+    return result
   }
 
   async getAllBookings({
@@ -209,7 +214,7 @@ class BookingService {
     const [bookings, total] = await query.getManyAndCount()
     const pagination = getPagingData(total, page, size)
 
-    return { bookings, pagination }
+    return { results: bookings, pagination }
   }
 
   async getOne(bookingId: string) {
