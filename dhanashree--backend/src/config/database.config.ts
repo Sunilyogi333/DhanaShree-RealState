@@ -6,7 +6,7 @@ export const AppDataSource = new DataSource({
   url: EnvironmentConfiguration.DATABASE_URL,
   entities: [__dirname + '/../entities/*/**.entity{.ts,.js}'],
   migrations: ['src/migration/**/*.ts'],
-  synchronize: true,
+  synchronize: false,
   logging: false,
   dropSchema: false,
   ssl: {
