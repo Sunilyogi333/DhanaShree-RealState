@@ -88,8 +88,8 @@ function InnerTab({ property, isLoading, error }: InnerTabProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-8">
           {propertyInteriorDetails.map((item, index) => (
             <div key={index} className="grid grid-cols-2">
-              <p className="text-gray-400 text-right pr-2">{item.label}</p>
-              <p className="text-left">{item.value}</p>
+              <p className="text-gray-400  pr-2">{item.label}</p>
+              <p className="">{item.value}</p>
             </div>
           ))}
         </div>

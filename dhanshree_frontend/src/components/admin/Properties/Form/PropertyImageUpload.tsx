@@ -14,7 +14,7 @@ import { Camera, X } from "lucide-react";
 interface PropertyImageUploadProps {
   form: UseFormReturn<any>;
   initialThumbnailUrl?: string;
-  initialImageUrls?:{}[];
+  initialImageUrls?: {}[];
 }
 
 export const PropertyImageUpload: React.FC<PropertyImageUploadProps> = ({
@@ -22,20 +22,18 @@ export const PropertyImageUpload: React.FC<PropertyImageUploadProps> = ({
   initialThumbnailUrl,
   initialImageUrls = [],
 }) => {
-
-  
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
 
   // useEffect(() => {
   //   if (initialThumbnailUrl) {
   //     setThumbnailUrl(initialThumbnailUrl);
-  //     form.setValue("thumbnail", initialThumbnailUrl); 
+  //     form.setValue("thumbnail", initialThumbnailUrl);
   //   }
-  
+
   //   if (initialImageUrls?.length) {
   //     setPreviewUrls(initialImageUrls);
-  //     form.setValue("images", initialImageUrls); 
+  //     form.setValue("images", initialImageUrls);
   //   }
   // }, [initialThumbnailUrl, initialImageUrls]);
 
@@ -51,23 +49,23 @@ export const PropertyImageUpload: React.FC<PropertyImageUploadProps> = ({
     setThumbnailUrl(null);
   };
 
-    const handleImageChange = (files: FileList | null) => {
-      if (files) {
-        const newImages = Array.from(files);
-        const existingImages = form.getValues("images") || [];
-        const updatedImages = [...existingImages, ...newImages];
-        
-        console.log("Files added:", newImages.length);
-        console.log("Total files now:", updatedImages.length);
-        
-        form.setValue("images", updatedImages, { shouldValidate: true })
-        // form.setValue("images", [...form.getValues("images"), ...newImages]);
-        setPreviewUrls([
-          ...previewUrls,
-          ...newImages.map((file) => URL.createObjectURL(file)),
-        ]);
-      }
-    };
+  const handleImageChange = (files: FileList | null) => {
+    if (files) {
+      const newImages = Array.from(files);
+      const existingImages = form.getValues("images") || [];
+      const updatedImages = [...existingImages, ...newImages];
+
+      console.log("Files added:", newImages.length);
+      console.log("Total files now:", updatedImages.length);
+
+      form.setValue("images", updatedImages, { shouldValidate: true });
+      // form.setValue("images", [...form.getValues("images"), ...newImages]);
+      setPreviewUrls([
+        ...previewUrls,
+        ...newImages.map((file) => URL.createObjectURL(file)),
+      ]);
+    }
+  };
 
   const removeImage = (index: number) => {
     const updatedImages = [...form.getValues("images")];
@@ -80,10 +78,8 @@ export const PropertyImageUpload: React.FC<PropertyImageUploadProps> = ({
   };
 
   return (
-
     <div className="space-y-4">
-
-<FormField
+      <FormField
         control={form.control}
         name="thumbnail"
         render={({ field }) => (
@@ -103,7 +99,9 @@ export const PropertyImageUpload: React.FC<PropertyImageUploadProps> = ({
                       <span className="font-semibold">Click to upload</span> or
                       drag and drop
                     </p>
-                    <p className="text-xs text-gray-500">1 thumbnail (MAX. 5MB)</p>
+                    <p className="text-xs text-gray-500">
+                      1 thumbnail (MAX. 5MB)
+                    </p>
                   </div>
                   <Input
                     id="thumbnail-file"
@@ -112,7 +110,7 @@ export const PropertyImageUpload: React.FC<PropertyImageUploadProps> = ({
                     className="hidden"
                     onChange={(e) => {
                       const file = e.target.files?.[0] || null;
-                      // field.onChange(file); // ✅ Connect it to the form
+                      field.onChange(file); // Connect it to the form
                       handleThumbnailChange(file);
                     }}
                   />
@@ -121,12 +119,11 @@ export const PropertyImageUpload: React.FC<PropertyImageUploadProps> = ({
             </FormControl>
             <FormMessage />
 
-       
-          {thumbnailUrl && (
-            <div className="mt-4">
-              <h3 className="text-sm font-medium mb-2">Preview</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    <div className="relative group">
+            {thumbnailUrl && (
+              <div className="mt-4">
+                <h3 className="text-sm font-medium mb-2">Preview</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div className="relative group">
                     <img
                       src={thumbnailUrl}
                       alt="Thumbnail Preview"
@@ -140,80 +137,79 @@ export const PropertyImageUpload: React.FC<PropertyImageUploadProps> = ({
                       <X size={14} />
                     </button>
                   </div>
+                </div>
               </div>
-            </div>
-          )}
+            )}
           </FormItem>
         )}
       />
 
-
-    <FormField
-      control={form.control}
-      name="images"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel className="flex items-center gap-2">
-            <Camera size={16} /> Upload Images
-          </FormLabel>
-          <FormControl>
-            <div className="flex items-center justify-center w-full">
-              <label
-                htmlFor="dropzone-file"
-                className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-              >
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <Camera className="w-8 h-8 mb-3 text-gray-400" />
-                  <p className="mb-2 text-sm text-gray-500">
-                    <span className="font-semibold">Click to upload</span> or
-                    drag and drop
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    PNG, JPG, JPEG (MAX. 5MB each)
-                  </p>
-                </div>
-                <Input
-                  id="dropzone-file"
-                  type="file"
-                  multiple
-                  accept="image/png, image/jpeg, image/jpg"
-                  className="hidden"
-                  onChange={(e) => {
-                    // field.onChange(e.target.files); 
-                    handleImageChange(e.target.files); 
-                  }}
-                                  />
-              </label>
-            </div>
-          </FormControl>
-          <FormMessage />
-
-          {previewUrls.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-sm font-medium mb-2">Preview</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {previewUrls.map((url, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={url}
-                      alt={`Preview ${index}`}
-                      className="h-32 w-full object-cover rounded-md"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X size={14} />
-                    </button>
+      <FormField
+        control={form.control}
+        name="images"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex items-center gap-2">
+              <Camera size={16} /> Upload Images
+            </FormLabel>
+            <FormControl>
+              <div className="flex items-center justify-center w-full">
+                <label
+                  htmlFor="dropzone-file"
+                  className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                >
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Camera className="w-8 h-8 mb-3 text-gray-400" />
+                    <p className="mb-2 text-sm text-gray-500">
+                      <span className="font-semibold">Click to upload</span> or
+                      drag and drop
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      PNG, JPG, JPEG (MAX. 5MB each)
+                    </p>
                   </div>
-                ))}
+                  <Input
+                    id="dropzone-file"
+                    type="file"
+                    multiple
+                    accept="image/png, image/jpeg, image/jpg"
+                    className="hidden"
+                    onChange={(e) => {
+                      // field.onChange(e.target.files);
+                      handleImageChange(e.target.files);
+                    }}
+                  />
+                </label>
               </div>
-            </div>
-          )}
-        </FormItem>
-      )}
-    />
+            </FormControl>
+            <FormMessage />
+
+            {previewUrls.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-sm font-medium mb-2">Preview</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {previewUrls.map((url, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={url}
+                        alt={`Preview ${index}`}
+                        className="h-32 w-full object-cover rounded-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </FormItem>
+        )}
+      />
     </div>
   );
 };

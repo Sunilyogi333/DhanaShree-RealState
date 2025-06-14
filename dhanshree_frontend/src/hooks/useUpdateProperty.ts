@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { createProperty } from "../api/propertyApi";
+import { createProperty, updateProperty } from "../api/propertyApi";
 import { TransformedHouseFormData } from "@/utils/transformHouseForm ";
 import { TransformedLandFormData } from "@/utils/transformLandForm";
 import { TransformedApartmentFormData } from "@/utils/transformApartmentForm";
@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { TransformedFlatFormData } from "@/utils/transformFlatForm";
 import { TransformedSpaceFormData } from "@/utils/transformSpaceForm";
 
-type CreatePropertyData =
+type UpdatePropertyData =
   | TransformedHouseFormData
   | TransformedLandFormData
   | TransformedApartmentFormData
@@ -18,9 +18,10 @@ type CreatePropertyData =
 export const useUpdateProperty = () => {
   const router = useRouter();
   const mutation = useMutation({
-    mutationFn: (data: CreatePropertyData) => createProperty(data),
+    mutationFn: ({ id, data }: { id: string; data: UpdatePropertyData }) =>
+      updateProperty(id, data),
     onError: (error: any) => {
-      toast.error("Error creating property", {
+      toast.error("Error updating property", {
         description: error.response?.data.message,
       });
     },
@@ -35,7 +36,8 @@ export const useUpdateProperty = () => {
   });
 
   return {
-    createProperty: mutation.mutate,
-    isLoading: mutation.isPending,
+    updateProperty: (id: string, data: UpdatePropertyData) =>
+      mutation.mutate({ id, data }),
+    isUpdating: mutation.isPending,
   };
 };

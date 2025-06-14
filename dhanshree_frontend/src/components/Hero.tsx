@@ -7,6 +7,7 @@ import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { useTranslation } from 'react-i18next';
 
 const images = [
   { src: "/user/hero/hero_1.jpg", shape: "rounded-full" },
@@ -16,13 +17,15 @@ const images = [
 ];
 
 function Hero() {
+
+  const { t } = useTranslation();
   useEffect(() => {
     AOS.init({
       duration: 1000,
       once: true,
     });
   }, []);
-  const words = `  Explore the best properties in your area with us. Trusted by thousands of happy homeowners.`;
+  const words = t('exploreTheBestPropertiesInYourAreaWithUsTrustedByThousandsOfHappyHomeowners');
 
 
 
@@ -34,7 +37,7 @@ function Hero() {
           className="text-4xl md:text-5xl font-bold text-gray-800 leading-tight mb-4"
           data-aos="zoom-in"
         >
-          Find Your Dream Home
+          {t('findYourDreamHome')}
         </h1>
         <TextGenerateEffect
           duration={2}
@@ -48,7 +51,7 @@ function Hero() {
           href="/List"
           data-aos="fade-right"
         >
-          Get Started{" "}
+          {t('getStarted')}
           <FontAwesomeIcon
             icon={faArrowRightLong}
             style={{ color: "#FFFFFF" }}

@@ -1,7 +1,7 @@
 "use client";
 
 import AdminCard from "@/components/admin/aCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -9,7 +9,13 @@ import Link from "next/link";
 import Cardfm from "@/components/Card";
 import { useAxiosQuery } from "@/hooks/useAxiosQuery";
 import { Skeleton } from "@/components/ui/skeleton";
-
+import { useMutation } from "@tanstack/react-query";
+import $axios from "@/lib/axios.instance";
+import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { fetchProperty } from "@/store/slices/propertyDetailsSlice";
+import { fetchPropertyDetails } from "@/types/property";
 
 type Property = {
   propertyCode: string;
@@ -46,26 +52,50 @@ type Property = {
 };
 
 export default function AddProperty() {
-  const [page, setPage] = useState(1);
-  const pageSize = 4;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortOrder, setSortOrder] = useState("");
+  const itemsPerPage = 4;
 
-  const { data, isLoading, error } = useAxiosQuery<{
-    data: { properties: Property[] };
-  }>("/property", {
-    axiosConfig: {
-      params: {
-        page,
-        size: pageSize,
-      },
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+
+  const { posts, isLoading, error, pagination } = useSelector(
+    (state: RootState) => state.property
+  );
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(fetchProperty({ page: currentPage, size: itemsPerPage }));
+  }, [dispatch, currentPage, itemsPerPage]);
+
+  
+
+  const properties: fetchPropertyDetails[] = posts || [];
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+    const res= await $axios.delete(`/property/${id}`);
+    console.log(res)
+    return res.data.data
+    },
+    onSuccess: () => {
+      toast.success("Property deleted successfully!");
+      dispatch(fetchProperty({ page: currentPage, size: itemsPerPage }));
+    },
+    onError: (error: any) => {
+      const msg = error?.response?.data?.message || "Failed to delete property.";
+      toast.error(msg);
+    },
+    onSettled: () => {
+      setDeletingId(null);
     },
   });
 
-  const properties: Property[] = data?.data?.properties || [];
-
-
-
   const handleDelete = (id: string) => {
     console.log("Delete property:", id);
+    setDeletingId(id);
+    deleteMutation.mutate(id);
   };
 
   if (error) {
@@ -77,6 +107,10 @@ export default function AddProperty() {
       </div>
     );
   }
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   return (
     <>
@@ -112,27 +146,62 @@ export default function AddProperty() {
                 key={property.id}
                 property={property}
                 onDelete={handleDelete}
+                isDeleting={deletingId === property.id}
               />
             ))
           ) : (
             <div className="text-center text-gray-500">No properties found</div>
           )}
         </div>
-        <div className="flex justify-center mt-4">
-          <Button
-            onClick={() => setPage((prev) => prev - 1)}
-            disabled={page === 1}
-          >
-            Previous
-          </Button>
-          <Button
-            onClick={() => setPage((prev) => prev + 1)}
-            disabled={!properties || properties.length < pageSize}
-          >
-            Next
-          </Button>
-        </div>
+      
+        {isLoading ? (
+            <Skeleton className="w-50 h-5" />
+          ) : (
+            <div className="flex flex-wrap items-center justify-center gap-2 mt-10">
+              {/* Previous Button */}
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded border transition cursor-pointer ${
+                currentPage === 1
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-white text-gray-700 hover:bg-blue-500 hover:text-white border-gray-300"
+              }`}
+            >
+              Previous
+            </button>
+
+            {/* Page Numbers */}
+            {Array.from({ length: pagination.totalPages }, (_, index) => (
+              <button
+                key={index}
+                onClick={() => handlePageChange(index + 1)}
+                className={`px-4 py-2 rounded border transition cursor-pointer ${
+                  currentPage === index + 1
+                    ? "bg-blue-500 text-white border-blue-500"
+                    : "bg-white text-gray-700 hover:bg-blue-100 border-gray-300"
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+
+            {/* Next Button */}
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === pagination.totalPages}
+              className={`px-4 py-2 rounded border transition cursor-pointer ${
+                currentPage === pagination.totalPages
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-white text-gray-700 hover:bg-blue-500 hover:text-white border-gray-300"
+              }`}
+            >
+              Next
+            </button>
+          </div>
+          )}
       </div>
+      
     </>
   );
 }

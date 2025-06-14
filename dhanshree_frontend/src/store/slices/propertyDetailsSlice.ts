@@ -38,22 +38,29 @@ const detailInitialState: PropertyDetailsState = {
   isLoading: false,
   error: null,
 };
-export const fetchProperty = createAsyncThunk('property/fetchProperty', async ({ page = 1, size = 5 }: { page?: number; size?: number }) => {
-  const response = await $axios.get('/property', {
-    params: { page, size },
-  });
 
-  console.log("response in the thunk", response);
 
-  if (response.status !== 200) throw new Error('Failed to fetch posts');
-  return response.data.data; 
-});
+export const fetchProperty = createAsyncThunk(
+  'property/fetchProperty',
+  async (params: Record<string, any>) => {
+    const response = await $axios.get('/property', {
+      params,
+    });
+
+    console.log("response in the thunk", response);
+
+    if (response.status !== 200) throw new Error('Failed to fetch posts');
+    return response.data.data;
+  }
+);
 
 export const fetchPropertyById = createAsyncThunk('property/fetchPropertyById', async (propertyCode: string) => {
   const res = await $axios.get(`/property/${propertyCode}`);
   console.log("response in the thunk", res);
   return res.data.data;
 });
+
+
 
 const propertySlice = createSlice({
   name: "property",

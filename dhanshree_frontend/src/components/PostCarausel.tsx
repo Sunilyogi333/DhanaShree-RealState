@@ -19,13 +19,15 @@ import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
+
 
 export default function PostCarousel({title,description}: {title: string,description: string}) {
   
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
-  
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
 
   const { posts, isLoading, error } = useSelector(
@@ -57,14 +59,14 @@ export default function PostCarousel({title,description}: {title: string,descrip
   return (
     <div className="w-full flex flex-col gap-4 items-end">
 
-      {error? <p className="text-red-500 text-center w-full mt-10">Error fetching posts</p> :
+      {error? <p className="text-red-500 text-center w-full mt-10">{t('errorFetchingPosts')}</p> :
       (
         <>
       <div className="w-full flex justify-between mt-4 gap-2 pe-10">
       <div className="mx-auto max-w-2xl  text-center p-20 " data-aos="fade-up" >
-          <h2 className="text-base font-semibold text-sky-600">{description}</h2>
+          <h2 className="text-base font-semibold text-sky-600">{t(description)}</h2>
           <p className="mt-2 text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
-            {title}
+             {t(title)}
           </p>
    
 
@@ -118,7 +120,7 @@ export default function PostCarousel({title,description}: {title: string,descrip
       </Carousel>
 
       <Link href="/List" className="flex justify-end gap-3"> 
-          <Button variant="outline" className="bg-sky-700 text-white  px-2 py-3 hover:bg-sky-800 hover:text-white cursor-pointer">View All <FontAwesomeIcon icon={faArrowRightLong} /></Button>
+          <Button variant="outline" className="bg-sky-700 text-white  px-2 py-3 hover:bg-sky-800 hover:text-white cursor-pointer">{t('viewAll')} <FontAwesomeIcon icon={faArrowRightLong} /></Button>
       </Link>
       </>
       )}
