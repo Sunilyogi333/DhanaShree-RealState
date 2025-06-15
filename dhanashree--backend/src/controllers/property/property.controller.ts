@@ -24,7 +24,8 @@ class PropertyController {
 
     const filters: PropertyFilterOptions = {
       propertyCode: req.query.propertyCode as string,
-      price: req.query.price ? parseFloat(req.query.price as string) : undefined,
+      minPrice: req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined,
+      maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined,
       status: req.query.status as string,
       purpose: req.query.purpose as string,
       type: req.query.type
@@ -32,7 +33,6 @@ class PropertyController {
           ? (req.query.type as string[])
           : (req.query.type as string).split(',')
         : undefined,
-
       district: req.query.district ? parseInt(req.query.district as string) : undefined,
       municipality: req.query.municipality ? parseInt(req.query.municipality as string) : undefined,
       sortBy: req.query.sortBy as 'createdAt' | 'price',

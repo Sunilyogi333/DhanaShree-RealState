@@ -174,7 +174,7 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
-
+          
     get:
       summary: 'Get All Properties (Paginated & Filtered)'
       tags:
@@ -198,7 +198,13 @@ paths:
             type: string
           required: false
           example: 754CM3
-        - name: price
+        - name: minPrice
+          in: query
+          schema:
+            type: number
+          required: false
+          example: 1000000
+        - name: maxPrice
           in: query
           schema:
             type: number

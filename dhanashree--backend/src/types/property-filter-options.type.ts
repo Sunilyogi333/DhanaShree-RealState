@@ -1,6 +1,7 @@
 export interface PropertyFilterOptions {
   propertyCode?: string
-  price?: number
+  minPrice?: number
+  maxPrice?: number
   status?: string
   purpose?: string
   type?: string[]
