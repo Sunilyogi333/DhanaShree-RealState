@@ -9,6 +9,7 @@ import { getPagination, getPagingData } from '../../utils/pagination'
 import HttpException from '../../utils/HttpException'
 import { PropertyDetails } from '../../types/property.type'
 import { Message } from '../../constants/message'
+import { PropertyFilterOptions } from '../../types/property-filter-options.type'
 
 class PropertyService {
   constructor(private readonly propertyRepository = AppDataSource.getRepository(Property)) {}
@@ -64,7 +65,7 @@ class PropertyService {
         type: data.type,
         status: data.status,
         purpose: data.purpose,
-        details: data.details as any,
+        details: data.details as PropertyDetails,
         address: savedAddress,
         admin,
         images: [thumbnail, ...normalImages],
@@ -74,7 +75,7 @@ class PropertyService {
     })
   }
 
-  async getAll(page: number, size: number, filters: any) {
+  async getAll(page: number, size: number, filters: PropertyFilterOptions) {
     const { limit, offset } = getPagination(page, size)
 
     const query = this.propertyRepository

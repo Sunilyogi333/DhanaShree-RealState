@@ -3,6 +3,7 @@ import { StatusCodes } from '../../constants/statusCodes'
 import { Message } from '../../constants/message'
 import propertyService from '../../services/property/property.service'
 import HttpException from '../../utils/HttpException'
+import { PropertyFilterOptions } from '../../types/property-filter-options.type'
 
 class PropertyController {
   async create(req: Request, res: Response) {
@@ -21,16 +22,17 @@ class PropertyController {
     const page = parseInt(req.query.page as string) || 1
     const size = parseInt(req.query.size as string) || 10
 
-    const filters = {
+    const filters: PropertyFilterOptions = {
       propertyCode: req.query.propertyCode as string,
       price: req.query.price ? parseFloat(req.query.price as string) : undefined,
       status: req.query.status as string,
       purpose: req.query.purpose as string,
       type: req.query.type
         ? Array.isArray(req.query.type)
-          ? req.query.type
+          ? (req.query.type as string[])
           : (req.query.type as string).split(',')
         : undefined,
+
       district: req.query.district ? parseInt(req.query.district as string) : undefined,
       municipality: req.query.municipality ? parseInt(req.query.municipality as string) : undefined,
       sortBy: req.query.sortBy as 'createdAt' | 'price',
