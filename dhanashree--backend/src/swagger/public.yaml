@@ -1,0 +1,15 @@
+tags:
+  - name: 'Public'
+    description: 'Public-facing endpoints (no authentication required)'
+
+paths:
+  /public/dashboard:
+    get:
+      summary: 'Get public dashboard statistics'
+      tags:
+        - Public
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'

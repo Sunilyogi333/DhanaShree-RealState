@@ -10,7 +10,7 @@ const router: IRouter = Router()
 router.get('/me', authentication(ROLE.ADMIN), catchAsync(adminController.getMe.bind(adminController)))
 router.get(
   '/dashboard',
-  // authentication(ROLE.ADMIN),
+  authentication(ROLE.ADMIN),
   catchAsync(adminController.getDashboardStats.bind(adminController))
 )
 
