@@ -7,7 +7,7 @@ import { Image } from '../../entities/images/image.entity'
 import { CreatePropertyDTO, UpdatePropertyDTO } from '../../dto/property.dto'
 import { getPagination, getPagingData } from '../../utils/pagination'
 import HttpException from '../../utils/HttpException'
-import { PropertyDetails } from '../../types/express/property.type'
+import { PropertyDetails } from '../../types/property.type'
 import { Message } from '../../constants/message'
 
 class PropertyService {

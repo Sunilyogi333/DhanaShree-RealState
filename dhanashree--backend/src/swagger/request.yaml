@@ -106,6 +106,32 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 
+  /request/resend:
+    post:
+      summary: Resend verification email for a request
+      tags:
+        - Request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - requestId
+              properties:
+                requestId:
+                  type: string
+                  format: uuid
+                  example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+      responses:
+        '200':
+          description: Verification email resent
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+
   /request/{id}:
     get:
       summary: Get request by ID (Admin only)

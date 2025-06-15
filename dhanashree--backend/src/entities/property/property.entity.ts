@@ -4,7 +4,7 @@ import Admin from '../admin/admin.entity'
 import { Image } from '../images/image.entity'
 import { Address } from '../address/address.entity'
 import { Booking } from '../booking/booking.entity'
-import { PropertyDetails } from '../../types/express/property.type'
+import { PropertyDetails } from '../../types/property.type'
 import { PropertyStatus, PropertyType, Purpose } from '../../constants/enum/property'
 
 @Entity()
