@@ -142,8 +142,8 @@ class BookingService {
       throw HttpException.tooManyRequests(Message.emailLimitReached)
     }
 
-    booking.lastEmailSentAt = new Date()
     booking.emailSentCount += 1
+    booking.lastEmailSentAt = new Date()
     await this.bookingRepo.save(booking)
 
     const token = webTokenService.generateBookingToken({ bookingId: booking.id, email })

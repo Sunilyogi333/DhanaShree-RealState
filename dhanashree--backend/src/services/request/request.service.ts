@@ -11,7 +11,7 @@ import { RequestStatus } from '../../constants/enum/request'
 import { getPagination, getPagingData } from '../../utils/pagination'
 import { Message } from '../../constants/message'
 import { getRequestVerificationTemplate } from '../../utils/templates/requestVerificaton.template'
-import { isToday } from 'date-fns'
+import { isToday } from '../../utils/date.utils'
 
 class RequestService {
   private requestRepo = AppDataSource.getRepository(RequestListing)
@@ -66,7 +66,7 @@ class RequestService {
       if (
         request.lastEmailSentAt &&
         isToday(request.lastEmailSentAt) &&
-        request.emailSentCount >= 10 // or any limit you prefer
+        request.emailSentCount >= 100 // or any limit you prefer
       ) {
         throw HttpException.tooManyRequests(Message.emailLimitReached)
       }
@@ -136,9 +136,8 @@ class RequestService {
     if (!request) throw HttpException.notFound(Message.requestNotFound)
 
     if (request.isVerified) throw HttpException.badRequest(Message.alreadyVerified)
-    if (request.emailSentCount >= 3) throw HttpException.badRequest(Message.emailLimitReached)
-    if (request.lastEmailSentAt && new Date().getTime() - request.lastEmailSentAt.getTime() < 24 * 60 * 60 * 1000) {
-      throw HttpException.badRequest(Message.emailLimitReached)
+    if (isToday(request.lastEmailSentAt) && request.emailSentCount >= 100) {
+      throw HttpException.tooManyRequests(Message.emailLimitReached)
     }
     request.emailSentCount += 1
     request.lastEmailSentAt = new Date()
