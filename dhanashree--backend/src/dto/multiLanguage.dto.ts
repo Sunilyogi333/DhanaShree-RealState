@@ -8,5 +8,5 @@ export class MultiLanguageDTO {
 
   @IsString()
   @IsNotEmpty()
-  mm: string
+  ne: string
 }
