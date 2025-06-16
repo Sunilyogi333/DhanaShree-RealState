@@ -15,8 +15,10 @@
     "seed:ward": "ts-node-dev src/seeder/address.seed.ts -ward",
     "seed": "npm run seed:admin && npm run seed:province && npm run seed:district && npm run seed:municipality && npm run seed:ward",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "generate:migration": "npm run typeorm -- migration:generate -d src/config/database.config.ts",
-    "run:migration": "npm run typeorm -- migration:run -d src/config/database.config.ts"
+    "migration:create": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create -d ./src/config/database.config.ts",
+    "migration:generate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d ./src/config/database.config.ts",
+    "migration:up": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d ./src/config/database.config.ts",
+    "migration:down": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d ./src/config/database.config.ts"
   },
   "keywords": [],
   "author": "",
