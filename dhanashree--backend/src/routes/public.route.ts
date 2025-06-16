@@ -1,7 +1,7 @@
 import type { Router as IRouter } from 'express'
 import Router from 'express'
-import publicController from '../controllers/public/public.controller'
 import { catchAsync } from '../utils/catchAsync'
+import publicController from '../controllers/public/public.controller'
 
 const router: IRouter = Router()
 
