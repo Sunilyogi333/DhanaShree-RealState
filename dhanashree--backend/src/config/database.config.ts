@@ -5,7 +5,7 @@ export const AppDataSource = new DataSource({
   type: 'postgres',
   url: EnvironmentConfiguration.DATABASE_URL,
   entities: [__dirname + '/../entities/*/**.entity{.ts,.js}'],
-  migrations: ['src/migration/**/*.ts'],
+  migrations: ['src/migration/**/*.js'],
   synchronize: false,
   logging: false,
   dropSchema: false,
