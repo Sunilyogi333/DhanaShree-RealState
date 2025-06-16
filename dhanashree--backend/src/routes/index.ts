@@ -6,7 +6,7 @@ import AddressRoute from './address.route'
 import ImageRoute from './image.route'
 import BookingRoute from './booking.route'
 import RequestRoute from './request.route'
-import PublicRoute from './public.route'
+import PublicRoute from './overview.route'
 
 export interface Route {
   path: string

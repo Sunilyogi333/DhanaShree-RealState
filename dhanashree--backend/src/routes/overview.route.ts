@@ -1,10 +1,10 @@
 import type { Router as IRouter } from 'express'
 import Router from 'express'
 import { catchAsync } from '../utils/catchAsync'
-import PublicController from '../controllers/public/public.controller'
+import overviewController from '../controllers/overview/overview.controller'
 
 const router: IRouter = Router()
 
-router.get('/dashboard', catchAsync(PublicController.getDashboardStats.bind(PublicController)))
+router.get('/dashboard', catchAsync(overviewController.getDashboardStats.bind(overviewController)))
 
 export default router
