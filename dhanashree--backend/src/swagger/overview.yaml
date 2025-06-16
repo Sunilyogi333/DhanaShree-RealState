@@ -7,7 +7,7 @@ paths:
     get:
       summary: 'Get overview dashboard statistics'
       tags:
-        - Public
+        - Overview
       responses:
         '200':
           $ref: '#/components/responses/SuccessResponse'
