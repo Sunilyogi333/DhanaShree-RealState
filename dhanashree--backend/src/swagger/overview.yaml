@@ -1,11 +1,11 @@
 tags:
-  - name: 'Public'
-    description: 'Public-facing endpoints (no authentication required)'
+  - name: 'Overview'
+    description: 'Overview endpoints (no authentication required)'
 
 paths:
-  /public/dashboard:
+  /overview/dashboard:
     get:
-      summary: 'Get public dashboard statistics'
+      summary: 'Get overview dashboard statistics'
       tags:
         - Public
       responses:

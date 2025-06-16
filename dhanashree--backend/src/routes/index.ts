@@ -6,7 +6,7 @@ import AddressRoute from './address.route'
 import ImageRoute from './image.route'
 import BookingRoute from './booking.route'
 import RequestRoute from './request.route'
-import PublicRoute from './overview.route'
+import OverviewRoute from './overview.route'
 
 export interface Route {
   path: string
@@ -45,8 +45,8 @@ const routes: Route[] = [
     route: RequestRoute,
   },
   {
-    path: '/public',
-    route: PublicRoute,
+    path: '/overview',
+    route: OverviewRoute,
   },
 ]
 
