@@ -108,11 +108,11 @@ class PropertyService {
       })
     }
 
-    if (filters.minPrice !== undefined) {
+    if (filters.minPrice) {
       query.andWhere('property.price >= :minPrice', { minPrice: filters.minPrice })
     }
 
-    if (filters.maxPrice !== undefined) {
+    if (filters.maxPrice) {
       query.andWhere('property.price <= :maxPrice', { maxPrice: filters.maxPrice })
     }
 

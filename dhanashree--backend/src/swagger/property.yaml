@@ -213,15 +213,14 @@ paths:
           example: 5000000
         - name: type
           in: query
+          required: false
           schema:
             type: array
             items:
               type: string
               enum: [land, house, apartment, flat, space]
-          required: false
           style: form
-          explode: false
-          example: land,house
+          explode: true
         - name: status
           in: query
           schema:
