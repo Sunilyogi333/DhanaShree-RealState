@@ -41,19 +41,25 @@ class RequestController {
 
     const result = await requestService.getAll({ status, page, size, email })
 
-    return res.status(StatusCodes.SUCCESS).json({ success: true, data: result, message: Message.fetched })
+    return res
+      .status(StatusCodes.SUCCESS)
+      .json({ success: true, data: result, message: Message.fetched })
   }
 
   async getOne(req: Request, res: Response) {
     const id = req.params.id
     const result = await requestService.getOne(id)
-    return res.status(StatusCodes.SUCCESS).json({ success: true, data: result, message: Message.fetched })
+    return res
+      .status(StatusCodes.SUCCESS)
+      .json({ success: true, data: result, message: Message.fetched })
   }
 
   async update(req: Request, res: Response) {
     const id = req.params.id
     const result = await requestService.update(id, req.body)
-    return res.status(StatusCodes.SUCCESS).json({ success: true, data: result, message: Message.updated })
+    return res
+      .status(StatusCodes.SUCCESS)
+      .json({ success: true, data: result, message: Message.updated })
   }
 }
 

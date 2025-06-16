@@ -38,7 +38,18 @@ components:
           items:
             type: string
             enum:
-              [water supply, drainage, parking, elevator, security, gym, internet, electricity, swimming pool, garden]
+              [
+                water supply,
+                drainage,
+                parking,
+                elevator,
+                security,
+                gym,
+                internet,
+                electricity,
+                swimming pool,
+                garden,
+              ]
         floors:
           type: number
         frontage:

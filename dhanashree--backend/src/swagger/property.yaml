@@ -67,7 +67,8 @@ paths:
                           example: 'तीन कोठाको अपार्टमेन्ट'
                     facing:
                       type: string
-                      enum: [east, west, north, south, north east, north west, south east, south west]
+                      enum:
+                        [east, west, north, south, north east, north west, south east, south west]
                     facilities:
                       type: array
                       items:
@@ -174,7 +175,7 @@ paths:
           $ref: '#/components/responses/BadRequestResponse'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
-          
+
     get:
       summary: 'Get All Properties (Paginated & Filtered)'
       tags:
@@ -375,7 +376,8 @@ paths:
                           example: 'अद्यावधिक गरिएको तीन कोठाको अपार्टमेन्ट'
                     facing:
                       type: string
-                      enum: [east, west, north, south, north east, north west, south east, south west]
+                      enum:
+                        [east, west, north, south, north east, north west, south east, south west]
                     facilities:
                       type: array
                       items:

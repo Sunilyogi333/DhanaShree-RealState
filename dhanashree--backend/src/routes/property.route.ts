@@ -30,6 +30,10 @@ router.patch(
 )
 
 // Delete property
-router.delete('/:id', authentication([ROLE.ADMIN]), catchAsync(propertyController.delete.bind(propertyController)))
+router.delete(
+  '/:id',
+  authentication([ROLE.ADMIN]),
+  catchAsync(propertyController.delete.bind(propertyController))
+)
 
 export default router

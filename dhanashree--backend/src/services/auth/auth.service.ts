@@ -29,7 +29,7 @@ class AuthService {
       select: ['id', 'email', 'password'],
     })
     //send admin and admin in nepali
-    if (!admin) throw HttpException.notFound(getNotFoundMessage('Admin','एडमिन'))
+    if (!admin) throw HttpException.notFound(getNotFoundMessage('Admin', 'एडमिन'))
     const isPasswordMatched = await BcryptService.compare(data.password, admin.password)
     if (!isPasswordMatched) throw HttpException.notFound(Message.invalidCredentials)
     const adminData = await adminService.getById(admin.id)

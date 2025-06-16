@@ -2,7 +2,7 @@ import { admin } from '../constants/admin' //  import single admin object
 import { AppDataSource } from '../config/database.config'
 import Admin from '../entities/admin/admin.entity'
 import { IAdmin } from '../interfaces/admin.interface'
-import BcryptService  from '../utils/bcrypt.utils'
+import BcryptService from '../utils/bcrypt.utils'
 
 const AdminRepo = AppDataSource.getRepository(Admin)
 

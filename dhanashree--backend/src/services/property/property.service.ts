@@ -14,11 +14,18 @@ import { PropertyFilterOptions } from '../../types/property-filter-options.type'
 class PropertyService {
   constructor(private readonly propertyRepository = AppDataSource.getRepository(Property)) {}
 
-  async create(adminId: string, data: CreatePropertyDTO, thumbnailImageId: string, normalImageIds: string[]) {
+  async create(
+    adminId: string,
+    data: CreatePropertyDTO,
+    thumbnailImageId: string,
+    normalImageIds: string[]
+  ) {
     const admin = await AppDataSource.getRepository(Admin).findOne({ where: { id: adminId } })
     if (!admin) throw HttpException.notFound(Message.notFound)
 
-    const existingProperty = await this.propertyRepository.findOne({ where: { propertyCode: data.propertyCode } })
+    const existingProperty = await this.propertyRepository.findOne({
+      where: { propertyCode: data.propertyCode },
+    })
     if (existingProperty) throw HttpException.notFound(Message.propertyCodeAlreadyExists)
 
     if (normalImageIds.length < 3) {

@@ -1,10 +1,4 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  IsUUID,
-  NotEquals,
-} from 'class-validator'
+import { IsEmail, IsNotEmpty, IsString, IsUUID, NotEquals } from 'class-validator'
 
 export class AdminDTO {
   @IsNotEmpty()

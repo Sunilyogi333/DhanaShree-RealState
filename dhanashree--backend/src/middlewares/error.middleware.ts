@@ -32,18 +32,17 @@ const errorHandler = (error: any, req: Request, res: Response, next: NextFunctio
     })
   }
 
-const statusCode = error.isOperational ? error.statusCode : 500
+  const statusCode = error.isOperational ? error.statusCode : 500
 
-let message: MultiLanguage
+  let message: MultiLanguage
 
-if (error.localizedMessage) {
-  message = error.localizedMessage
-} else if (typeof error.message === 'object' && 'en' in error.message && 'ne' in error.message) {
-  message = error.message
-} else {
-  message = Message.internalServerError
-}
-
+  if (error.localizedMessage) {
+    message = error.localizedMessage
+  } else if (typeof error.message === 'object' && 'en' in error.message && 'ne' in error.message) {
+    message = error.message
+  } else {
+    message = Message.internalServerError
+  }
 
   const data = {
     success: false,

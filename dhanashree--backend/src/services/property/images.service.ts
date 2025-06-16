@@ -9,11 +9,17 @@ import { Message } from '../../constants/message'
 class ImageService {
   private imageRepo = AppDataSource.getRepository(Image)
 
-  async uploadAndSave(thumbnail?: Express.Multer.File, imageFiles: Express.Multer.File[] = []): Promise<Image[]> {
+  async uploadAndSave(
+    thumbnail?: Express.Multer.File,
+    imageFiles: Express.Multer.File[] = []
+  ): Promise<Image[]> {
     const images: Image[] = []
 
     if (thumbnail) {
-      const uploaded = await cloudinaryService.uploadImageBuffer(thumbnail.buffer, thumbnail.originalname)
+      const uploaded = await cloudinaryService.uploadImageBuffer(
+        thumbnail.buffer,
+        thumbnail.originalname
+      )
       const thumb = this.imageRepo.create({ url: uploaded.secure_url, type: 'thumbnail' })
       images.push(thumb)
     }
@@ -64,7 +70,9 @@ class ImageService {
       newNormalImages.forEach((img) => (img.type = 'normal'))
 
       // Remove deleted images (only normal ones)
-      const imagesToDelete = currentImages.filter((img) => deletedImageIds.includes(img.id) && img.type === 'normal')
+      const imagesToDelete = currentImages.filter(
+        (img) => deletedImageIds.includes(img.id) && img.type === 'normal'
+      )
       const remainingNormalImages = currentImages
         .filter((img) => img.type === 'normal' && !deletedImageIds.includes(img.id))
         .concat(newNormalImages)

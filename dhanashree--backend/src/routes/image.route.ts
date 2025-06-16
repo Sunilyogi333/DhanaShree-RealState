@@ -27,6 +27,4 @@ router.patch(
   catchAsync(imageController.updateImages.bind(imageController))
 )
 
-
-
 export default router

@@ -53,7 +53,11 @@ class BookingService {
         .getOne()
 
       // ✅ If latest booking is already verified and not cancelled, block
-      if (existingBooking && existingBooking.status !== BookingStatus.cancelled && existingBooking.isVerified) {
+      if (
+        existingBooking &&
+        existingBooking.status !== BookingStatus.cancelled &&
+        existingBooking.isVerified
+      ) {
         throw HttpException.badRequest(Message.bookingAlreadyVerified)
       }
 
@@ -90,7 +94,11 @@ class BookingService {
         from: EnvironmentConfiguration.MAIL_FROM,
         text: 'Booking verification',
         to: email,
-        html: generateHtml(user.fullName, new Date().toLocaleString(), getBookingVerificationTemplate(verifyUrl)),
+        html: generateHtml(
+          user.fullName,
+          new Date().toLocaleString(),
+          getBookingVerificationTemplate(verifyUrl)
+        ),
         subject: 'Verify Your Booking',
       }
 
@@ -154,7 +162,11 @@ class BookingService {
       to: email,
       subject: 'Verify Your Booking',
       text: 'Booking verification',
-      html: generateHtml(user.fullName, new Date().toLocaleString(), getBookingVerificationTemplate(verifyUrl)),
+      html: generateHtml(
+        user.fullName,
+        new Date().toLocaleString(),
+        getBookingVerificationTemplate(verifyUrl)
+      ),
     }
 
     await this.mailService.sendMail(mailOptions)

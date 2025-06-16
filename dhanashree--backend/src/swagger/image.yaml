@@ -104,7 +104,8 @@ paths:
                 items:
                   type: string
                   format: uuid
-                example: ['c9e57c41-1fc4-4b25-9015-d22bdaf9a7ac', '5e55c244-d12c-4b5f-9406-31b7e5e0e999']
+                example:
+                  ['c9e57c41-1fc4-4b25-9015-d22bdaf9a7ac', '5e55c244-d12c-4b5f-9406-31b7e5e0e999']
               deletedImageIds:
                 type: array
                 description: Array of existing image IDs to delete (must be normal images)

@@ -55,7 +55,8 @@ export const EnvironmentConfiguration: IEnvironmentConfiguration = {
   CLOUD_API_SECRET: process.env.CLOUD_API_SECRET ?? '',
 
   //Pagination Configuration
-  DEFAULT_PER_PAGE: process.env.DEFAULT_PER_PAGE !== undefined ? parseInt(process.env.DEFAULT_PER_PAGE) : 20,
+  DEFAULT_PER_PAGE:
+    process.env.DEFAULT_PER_PAGE !== undefined ? parseInt(process.env.DEFAULT_PER_PAGE) : 20,
 
   //salt rounds for hashing
   SALT_ROUNDS: process.env.SALT_ROUNDS !== undefined ? parseInt(process.env.SALT_ROUNDS) : 10,

@@ -4,9 +4,12 @@ import { MultiLanguage } from '../constants/global'
 class HttpException extends Error {
   statusCode: number
   isOperational: boolean
-  localizedMessage: MultiLanguage 
+  localizedMessage: MultiLanguage
 
-  constructor(localizedMessage: MultiLanguage, statusCode: number = StatusCodes.INTERNAL_SERVER_ERROR) {
+  constructor(
+    localizedMessage: MultiLanguage,
+    statusCode: number = StatusCodes.INTERNAL_SERVER_ERROR
+  ) {
     super(localizedMessage.en) // ✅ Error class needs a string, so use English as base
     this.statusCode = statusCode
     this.localizedMessage = localizedMessage

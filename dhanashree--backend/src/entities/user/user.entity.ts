@@ -1,10 +1,10 @@
 // property.entity.ts
-import { Entity, Column, OneToMany} from 'typeorm'
+import { Entity, Column, OneToMany } from 'typeorm'
 import Base from '../base/base.entity'
 import { Booking } from '../booking/booking.entity'
 
 @Entity()
-export class User  extends Base{
+export class User extends Base {
   @Column()
   fullName: string
 
@@ -14,6 +14,6 @@ export class User  extends Base{
   @Column()
   phone: string
 
-  @OneToMany(() => Booking, booking => booking.user)
+  @OneToMany(() => Booking, (booking) => booking.user)
   bookings: Booking[]
 }

@@ -51,7 +51,9 @@ class PropertyController {
   async getOne(req: Request, res: Response) {
     const propertyId = req.params.id
     const property = await propertyService.getOne(propertyId)
-    return res.status(StatusCodes.SUCCESS).json({ success: true, data: property, message: Message.fetched })
+    return res
+      .status(StatusCodes.SUCCESS)
+      .json({ success: true, data: property, message: Message.fetched })
   }
 
   async update(req: Request, res: Response) {

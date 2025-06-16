@@ -10,7 +10,13 @@ import {
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
-import { ApartmentType, Facing, PropertyStatus, PropertyType, Purpose } from '../constants/enum/property'
+import {
+  ApartmentType,
+  Facing,
+  PropertyStatus,
+  PropertyType,
+  Purpose,
+} from '../constants/enum/property'
 import { MultiLanguageDTO } from './multiLanguage.dto'
 import { Facilities, Zoning } from '../constants/enum/property'
 import { UnitEnum } from '../constants/enum/property'

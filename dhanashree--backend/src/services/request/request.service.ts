@@ -50,7 +50,11 @@ class RequestService {
       // Reuse or create
       let request = existing
 
-      if (!request || request.status === RequestStatus.cancelled || request.status === RequestStatus.success) {
+      if (
+        !request ||
+        request.status === RequestStatus.cancelled ||
+        request.status === RequestStatus.success
+      ) {
         request = requestRepo.create({
           user,
           date,
@@ -77,7 +81,10 @@ class RequestService {
       const result = await requestRepo.save(request)
 
       // Generate token + send email
-      const token = webTokenService.generateBookingToken({ bookingId: request.id, email: lowerEmail })
+      const token = webTokenService.generateBookingToken({
+        bookingId: request.id,
+        email: lowerEmail,
+      })
       const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL_LOCAL}/verify-request?token=${token}`
 
       const mailOptions = {
@@ -85,7 +92,11 @@ class RequestService {
         to: email,
         subject: 'Verify Your Request',
         text: 'Request verification',
-        html: generateHtml(user.fullName, new Date().toLocaleString(), getRequestVerificationTemplate(verifyUrl)),
+        html: generateHtml(
+          user.fullName,
+          new Date().toLocaleString(),
+          getRequestVerificationTemplate(verifyUrl)
+        ),
       }
 
       await this.mailService.sendMail(mailOptions)
@@ -112,7 +123,17 @@ class RequestService {
     return { alreadyVerified: false, request: result }
   }
 
-  async getAll({ status, page, size, email }: { status?: RequestStatus; page: number; size: number; email?: string }) {
+  async getAll({
+    status,
+    page,
+    size,
+    email,
+  }: {
+    status?: RequestStatus
+    page: number
+    size: number
+    email?: string
+  }) {
     const { limit, offset } = getPagination(page, size)
 
     const query = this.requestRepo
@@ -142,14 +163,21 @@ class RequestService {
     request.emailSentCount += 1
     request.lastEmailSentAt = new Date()
     await this.requestRepo.save(request)
-    const token = webTokenService.generateBookingToken({ bookingId: request.id, email: request.user.email })
+    const token = webTokenService.generateBookingToken({
+      bookingId: request.id,
+      email: request.user.email,
+    })
     const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL_LOCAL}/verify-request?token=${token}`
     const mailOptions = {
       from: EnvironmentConfiguration.MAIL_FROM,
       to: request.user.email,
       subject: 'Resend Request Verification',
       text: 'Request verification',
-      html: generateHtml(request.user.fullName, new Date().toLocaleString(), getRequestVerificationTemplate(verifyUrl)),
+      html: generateHtml(
+        request.user.fullName,
+        new Date().toLocaleString(),
+        getRequestVerificationTemplate(verifyUrl)
+      ),
     }
     await this.mailService.sendMail(mailOptions)
     return {

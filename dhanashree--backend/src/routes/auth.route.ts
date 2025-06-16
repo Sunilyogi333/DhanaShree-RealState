@@ -9,7 +9,10 @@ import { catchAsync } from '../utils/catchAsync'
 
 const router: IRouter = Router()
 
-router.post('/reset/password-reset-email', catchAsync(authController.sendPasswordResetEmail.bind(authController)))
+router.post(
+  '/reset/password-reset-email',
+  catchAsync(authController.sendPasswordResetEmail.bind(authController))
+)
 
 router.patch(
   '/reset/password-reset',
@@ -17,7 +20,11 @@ router.patch(
   catchAsync(authController.resetPassword.bind(authController))
 )
 
-router.post('/login', RequestValidator.validate(LoginDTO), catchAsync(authController.login.bind(authController)))
+router.post(
+  '/login',
+  RequestValidator.validate(LoginDTO),
+  catchAsync(authController.login.bind(authController))
+)
 
 router.patch(
   '/update-password',
@@ -26,6 +33,10 @@ router.patch(
   catchAsync(authController.updatePassword.bind(authController))
 )
 
-router.post('/logout', authentication(ROLE.ADMIN), catchAsync(authController.Logout.bind(authController)))
+router.post(
+  '/logout',
+  authentication(ROLE.ADMIN),
+  catchAsync(authController.Logout.bind(authController))
+)
 
 export default router

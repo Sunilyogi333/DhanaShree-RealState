@@ -31,4 +31,3 @@ export class UpdateBookingDTO {
   @IsEnum(BookingStatus)
   status?: BookingStatus
 }
-

@@ -27,9 +27,9 @@ export class Booking extends Base {
   @Column({ type: 'timestamp', nullable: true })
   lastEmailSentAt: Date
 
-  @ManyToOne(() => User, user => user.bookings)
+  @ManyToOne(() => User, (user) => user.bookings)
   user: User
 
-  @ManyToOne(() => Property, property => property.bookings, {onDelete: 'CASCADE'})
+  @ManyToOne(() => Property, (property) => property.bookings, { onDelete: 'CASCADE' })
   property: Property
 }

@@ -131,7 +131,8 @@ class AddressService {
     const address = await this.addressRepository.findOne({
       where: { id: addressID },
     })
-    if (!addressData || !address) throw HttpException.notFound(getNotFoundMessage('address', 'ठेगाना'))
+    if (!addressData || !address)
+      throw HttpException.notFound(getNotFoundMessage('address', 'ठेगाना'))
 
     address.province = addressData.province
     address.district = addressData.district

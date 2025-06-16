@@ -23,7 +23,9 @@ class ImageController {
     const data: UpdatePropertyImagesDTO = req.body
 
     const result = await imageService.updateImages(propertyId, data)
-    return res.status(StatusCodes.SUCCESS).json({ success: true, message: Message.updated, data: result })
+    return res
+      .status(StatusCodes.SUCCESS)
+      .json({ success: true, message: Message.updated, data: result })
   }
 }
 

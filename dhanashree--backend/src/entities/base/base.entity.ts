@@ -1,5 +1,12 @@
 import { fstat } from 'fs'
-import { BaseEntity, BeforeUpdate, Column, CreateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  BaseEntity,
+  BeforeUpdate,
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm'
 
 export default abstract class Base extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')

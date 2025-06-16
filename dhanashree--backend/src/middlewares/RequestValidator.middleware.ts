@@ -19,7 +19,7 @@ export default class RequestValidator {
   }
   static validate = <T extends object>(classInstance: ClassConstructor<T>) => {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const convertedObject = plainToClass(classInstance, req.body) 
+      const convertedObject = plainToClass(classInstance, req.body)
 
       let validationMessages: string[] = []
       const errors = await validate(convertedObject, {
@@ -31,7 +31,7 @@ export default class RequestValidator {
         next(
           HttpException.badRequest({
             en: validationMessages[0],
-            ne: validationMessages[0], 
+            ne: validationMessages[0],
           })
         )
       }

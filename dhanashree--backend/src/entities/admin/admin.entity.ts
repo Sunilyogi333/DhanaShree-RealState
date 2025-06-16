@@ -22,7 +22,7 @@ export default class Admin extends Base {
   phoneNumber: string
 
   @Column({ type: 'text', nullable: true })
-  refreshToken: string | null;
+  refreshToken: string | null
 
   @OneToMany(() => Property, (property) => property.admin)
   properties: Property[]
