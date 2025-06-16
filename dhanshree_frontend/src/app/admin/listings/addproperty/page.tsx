@@ -6,6 +6,7 @@ import { faFilter, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { houseDefaultValues } from "@/config/defaultValues";
+import { useTranslation } from "react-i18next";
 const ApartmentForm = dynamic(
   () => import("@/components/admin/Properties/Form/ApartmentForm"),
   {
@@ -62,7 +63,9 @@ function page() {
   const goBack = () => {
     setSelectedCategory(null);
   };
+  const { t } = useTranslation();
   return (
+
     <div className="max-w-4xl mx-auto mt-10 bg-white rounded-2xl shadow-md p-6 sm:p-8 md:p-10">
     {/* Header with back arrow */}
     <div className="flex items-center gap-3 mb-8">
@@ -73,7 +76,7 @@ function page() {
           size="lg"
         />
       </Link>
-      <h1 className="text-2xl font-bold text-gray-800">Add New Property</h1>
+      <h1 className="text-2xl font-bold text-gray-800">{t("addProperty")}</h1>
     </div>
   
     {/* Form or Category Selection */}
@@ -104,10 +107,10 @@ function page() {
     ) : (
       <>
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
-          Choose the Property Type
+         {t("selectPropertyType")}
         </h2>
         <p className="text-gray-600 mb-8">
-          Select a category below to proceed with the property form.
+         {t("selectTypeToProceed")}
         </p>
   
         {/* Category Selection Grid */}

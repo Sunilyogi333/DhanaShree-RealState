@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -12,19 +12,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Slider } from "@/components/ui/slider"
-import React, { useState } from "react"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
+import React, { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faFilter} from "@fortawesome/free-solid-svg-icons"
+} from "@/components/ui/select";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import {
   Sheet,
   SheetClose,
@@ -34,381 +34,417 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
-import { PropertyLocationFields } from "./admin/Properties/Form/PropertyLocationFields"
-import { FilterLocationFields } from "./Filter/FilterLocationFields"
+} from "@/components/ui/sheet";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslation } from "react-i18next";
+import { formatNumberByLanguage } from "@/utils/formatNumberByLanguage";
+import { FilterLocationFields } from "./Filter/FilterLocationFields";
+
 const items = [
-  { id: "Homes", label: "Homes" },
-  { id: "Lands", label: "Lands" },
-  { id: "Appartments", label: "Appartments" },
-  { id: "Flats", label: "Flats" },
-  { id: "Spaces", label: "Spaces" },
-] as const
+  { id: "land", label: "land" },
+  { id: "houses", label: "houses" },
+  { id: "apartment", label: "apartment" },
+  { id: "flats", label: "flats" },
+  { id: "spaces", label: "spaces" },
+] as const;
 
 // --- First schema: for code filter ---
 const CodeFormSchema = z.object({
-  code: z.string().min(2, {
+  propertyCode: z.string().min(2, {
     message: "Property code must be at least 2 characters.",
   }),
-})
+});
 
 // --- Second schema: for checkbox and price range ---
-const FilterFormSchema = z
-  .object({
-    items: z
-      .array(z.string())
-      .refine((val) => val.length > 0, {
-        message: "At least one item must be selected",
-      }),
-    price: z.number().min(1000).max(10000),
-    type: z.string(),
-    district: z.number(),
-    municipality: z.number(),
-  })
-  .partial();
+const FilterFormSchema = z.object({
+  type: z.array(z.string()).optional(),
+  minPrice: z.number().optional(),
+  maxPrice: z.number().optional(),
+  status: z.string().optional(),
+  district: z.number().optional(), // Changed to number
+  municipality: z.number().optional(), // Changed to number
+  purpose: z.enum(["sale", "rent"]).optional(),
+});
 
-function Listfilter() {
+interface ListfilterProps {
+  onFiltersChange?: (filters: any) => void;
+}
+
+function Listfilter({ onFiltersChange }: ListfilterProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { t, i18n } = useTranslation();
+  const [showFilters, setShowFilters] = useState(false);
+
   // Code Form
   const codeForm = useForm<z.infer<typeof CodeFormSchema>>({
     resolver: zodResolver(CodeFormSchema),
     defaultValues: {
-      code: "",
+      propertyCode: "",
     },
-  })
+  });
 
   // Filter Form
-const filterForm = useForm<z.infer<typeof FilterFormSchema>>({
-  resolver: zodResolver(FilterFormSchema),
-  defaultValues: {
-    items: [],
-    price: 5000,
-    type: "", 
-    district: 1, 
-    municipality: 1, 
-  },
-})
+  const filterForm = useForm<z.infer<typeof FilterFormSchema>>({
+    resolver: zodResolver(FilterFormSchema),
+    defaultValues: {
+      type: [],
+      minPrice: 1000,
+      maxPrice: 100000000,
+      status: "all",
+      district: undefined, // Use undefined for numbers
+      municipality: undefined, // Use undefined for numbers
+      purpose: "sale",
+    },
+  });
+
+  // Initialize form values from URL parameters
+  useEffect(() => {
+    const urlParams = {
+      propertyCode: searchParams.get("propertyCode") || "",
+      type: searchParams.get("type")?.split(",") || [],
+      minPrice: searchParams.get("minPrice")
+        ? parseInt(searchParams.get("minPrice")!)
+        : 1000,
+      maxPrice: searchParams.get("maxPrice")
+        ? parseInt(searchParams.get("maxPrice")!)
+        : 100000000,
+      status: searchParams.get("status") || "all",
+      district: searchParams.get("district")
+        ? parseInt(searchParams.get("district")!)
+        : undefined,
+      municipality: searchParams.get("municipality")
+        ? parseInt(searchParams.get("municipality")!)
+        : undefined,
+      purpose: (searchParams.get("purpose") as "sale" | "rent") || "sale",
+    };
+
+    // Set form values
+    codeForm.setValue("propertyCode", urlParams.propertyCode);
+    filterForm.reset({
+      type: urlParams.type,
+      minPrice: urlParams.minPrice,
+      maxPrice: urlParams.maxPrice,
+      status: urlParams.status,
+      district: urlParams.district,
+      municipality: urlParams.municipality,
+      purpose: urlParams.purpose,
+    });
+  }, [searchParams, codeForm, filterForm]);
 
   const onCodeSubmit = (data: z.infer<typeof CodeFormSchema>) => {
-    console.log("Code search data:", data)
-  }
+    console.log("Code search data:", data);
+
+    // Build query parameters for property code search
+    const queryParams = new URLSearchParams();
+    if (data.propertyCode) {
+      queryParams.append("propertyCode", data.propertyCode);
+    }
+
+    // Navigate to list page with property code
+    router.push(`/List?${queryParams.toString()}`);
+  };
 
   const onFilterSubmit = (data: z.infer<typeof FilterFormSchema>) => {
-    console.log("Other filters data:", data)
-  }
-  const [showFilters, setShowFilters] = useState(false); 
+    console.log("Filter data:", data);
+
+    // Build query parameters
+    const queryParams = new URLSearchParams();
+
+    // Add filter parameters
+    if (data.type && data.type.length > 0) {
+      queryParams.append("type", data.type.join(","));
+    }
+
+    // Handle minPrice and maxPrice separately - only add if not default values
+    if (data.minPrice && data.minPrice > 1000) {
+      queryParams.append("minPrice", data.minPrice.toString());
+    }
+    if (data.maxPrice && data.maxPrice < 100000000) {
+      queryParams.append("maxPrice", data.maxPrice.toString());
+    }
+
+    if (data.status && data.status !== "all") {
+      queryParams.append("status", data.status);
+    }
+
+    // Handle district and municipality as numbers
+    if (data.district && data.district !== undefined) {
+      queryParams.append("district", data.district.toString());
+    }
+    if (data.municipality && data.municipality !== undefined) {
+      queryParams.append("municipality", data.municipality.toString());
+    }
+
+    if (data.purpose && data.purpose !== "") {
+      queryParams.append("purpose", data.purpose);
+    }
+
+    console.log("Navigating with params:", queryParams.toString());
+
+    // Navigate to list page with filters
+    router.push(`/List?${queryParams.toString()}`);
+  };
+
+  const clearFilters = () => {
+    codeForm.reset();
+    filterForm.reset({
+      type: [],
+      minPrice: 1000,
+      maxPrice: 100000000,
+      status: "all",
+      district: undefined,
+      municipality: undefined,
+      purpose: "sale",
+    });
+
+    // Navigate to clean list page
+    router.push("/List");
+  };
 
   const toggleFilters = () => setShowFilters(!showFilters);
 
-  return(
+  // Helper function to format price for display
+  const formatPrice = (price: number) => {
+    if (price >= 10000000) {
+      return `${(price / 10000000).toFixed(1)} Cr`;
+    } else if (price >= 100000) {
+      return `${(price / 100000).toFixed(1)} L`;
+    } else if (price >= 1000) {
+      return `${(price / 1000).toFixed(0)}K`;
+    }
+    return formatNumberByLanguage(price, i18n.language);
+  };
+
+  const FilterContent = () => (
+    <Form {...filterForm}>
+      <form
+        onSubmit={filterForm.handleSubmit(onFilterSubmit)}
+        className="space-y-6"
+      >
+        {/* Purpose Selection */}
+        <FormField
+          control={filterForm.control}
+          name="purpose"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-md font-semibold text-green-700">
+                {t("purpose")}
+              </FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={t("selectPurpose")} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="sale">{t("sale")}</SelectItem>
+                  <SelectItem value="rent">{t("rent")}</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Property Type Checkboxes */}
+        <FormField
+          control={filterForm.control}
+          name="type"
+          render={() => (
+            <FormItem>
+              <FormLabel className="text-md font-semibold text-green-700">
+                {t("propertyType")}
+              </FormLabel>
+              <div className="grid grid-cols-2 gap-2">
+                {items.map((item) => (
+                  <FormField
+                    key={item.id}
+                    control={filterForm.control}
+                    name="type"
+                    render={({ field }) => {
+                      return (
+                        <FormItem
+                          key={item.id}
+                          className="flex flex-row items-start space-x-3 space-y-0"
+                        >
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value?.includes(item.id)}
+                              onCheckedChange={(checked) => {
+                                return checked
+                                  ? field.onChange([
+                                      ...(field.value || []),
+                                      item.id,
+                                    ])
+                                  : field.onChange(
+                                      field.value?.filter(
+                                        (val) => val !== item.id
+                                      )
+                                    );
+                              }}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-semibold text-sky-700">
+                            {t(item.id)}
+                          </FormLabel>
+                        </FormItem>
+                      );
+                    }}
+                  />
+                ))}
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Price Range Slider - Using separate fields but single slider component */}
+        <div className="space-y-4">
+          <FormLabel className="text-md font-semibold text-green-700">
+            {t("priceRange")}
+          </FormLabel>
+
+          <div className="flex justify-between text-sm text-muted-foreground mb-2">
+            <span>
+              {t("rs")} {formatPrice(filterForm.watch("minPrice") || 1000)}
+            </span>
+            <span>
+              {t("rs")} {formatPrice(filterForm.watch("maxPrice") || 100000000)}
+            </span>
+          </div>
+
+          <Slider
+            min={1000}
+            max={100000000}
+            step={100000}
+            value={[
+              filterForm.watch("minPrice") || 1000,
+              filterForm.watch("maxPrice") || 100000000,
+            ]}
+            onValueChange={(value) => {
+              filterForm.setValue("minPrice", value[0]);
+              filterForm.setValue("maxPrice", value[1]);
+            }}
+            className="w-full"
+          />
+
+          <div className="flex justify-between text-xs text-gray-500 px-1 pt-1">
+            <span>{t("rs")} 1K</span>
+            <span>{t("rs")} 10Cr</span>
+          </div>
+        </div>
+
+        {/* Property Status */}
+        <FormField
+          control={filterForm.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-md font-semibold text-green-700">
+                {t("propertyStatus")}
+              </FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={t("selectPropertyStatus")} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent className="w-full">
+                  <SelectItem value="all">{t("all")}</SelectItem>
+                  <SelectItem value="featured">{t("featured")}</SelectItem>
+                  <SelectItem value="exclusive">{t("exclusive")}</SelectItem>
+                  <SelectItem value="latest">{t("latest")}</SelectItem>
+                  <SelectItem value="emerging">{t("emerging")}</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Location Fields - Using FilterLocationFields component with number type */}
+        <div className="space-y-4">
+          <FilterLocationFields form={filterForm} fieldType="number" />
+        </div>
+
+        <div className="flex gap-2">
+          <Button type="submit" className="bg-green-600 flex-1">
+            {t("applyFilters")}
+          </Button>
+          <Button type="button" variant="outline" onClick={clearFilters}>
+            {t("clear")}
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+
+  return (
     <div className="flex flex-col space-y-8 relative">
       {/* Code Filter */}
-      <div className="p-10 w-full shadow-2xl rounded-xl">
-        <h1 className="text-lg font-bold text-sky-700">Search By Code</h1>
+      <div className="p-6 w-full shadow-lg rounded-xl bg-white">
+        <h1 className="text-lg font-bold text-sky-700 mb-4">
+          {t("searchByCode")}
+        </h1>
         <Form {...codeForm}>
-          <form onSubmit={codeForm.handleSubmit(onCodeSubmit)} className="space-y-6 py-6">
-            
+          <form
+            onSubmit={codeForm.handleSubmit(onCodeSubmit)}
+            className="space-y-4"
+          >
             <div className="flex gap-2">
-            <FormField
-              control={codeForm.control}
-              name="code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input placeholder="Enter the Property code" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="lg:hidden ">
-              
-      <Sheet>
-      <SheetTrigger asChild>
-        {/* <Button > */}
-        <FontAwesomeIcon icon={faFilter} style={{color: "#74C0FC"}} />
-                {/* </Button> */}
-      </SheetTrigger>
-      <SheetContent className="overflow-y-scroll">
-        <SheetHeader>
-          <SheetTitle className="text-lg font-bold text-sky-700 mb-4">Other Filters</SheetTitle>
-          {/* <SheetDescription>
-            Make changes to your profile here. Click save when you're done.
-          </SheetDescription> */}
-        </SheetHeader>
-        <div className={`p-10 w-full shadow-2xl rounded-xl ${showFilters || 'lg:block'}`}>
-        <Form {...filterForm}>
-          <form onSubmit={filterForm.handleSubmit(onFilterSubmit)} className="space-y-8">
-            {/* Checkbox Group */}
-            <FormField
-              control={filterForm.control}
-              name="items"
-              render={() => (
-                <FormItem>
-                  <FormLabel className="text-md font-semibold text-green-700">Property Type</FormLabel>
-                  {items.map((item) => (
-                    <FormField
-                      key={item.id}
-                      control={filterForm.control}
-                      name="items"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={item.id}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(item.id)}
-                                onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([...field.value, item.id])
-                                    : field.onChange(
-                                        field.value?.filter((val) => val !== item.id)
-                                      );
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="text-sm font-semibold text-sky-700">
-                              {item.label}
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  ))}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Slider */}
-            <FormField
-              control={filterForm.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-md font-semibold text-green-700">Price Range</FormLabel>
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>Rs {field.value}</span>
-                  </div>
-                  <Slider
-                    min={1000}
-                    max={10000}
-                    step={500}
-                    value={[field.value]}
-                    onValueChange={(val) => field.onChange(val[0])}
-                  />
-                  <div className="flex justify-between text-xs text-gray-500 px-1 pt-1">
-                    <span>Rs 1000</span>
-                    <span>Rs 10000</span>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Property Status */}
-            <FormField
-              control={filterForm.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-md font-semibold text-green-700">Property Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormField
+                control={codeForm.control}
+                name="propertyCode"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a property status" />
-                      </SelectTrigger>
+                      <Input placeholder={t("enterPropertyCode")} {...field} />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="m@example.com">Featured</SelectItem>
-                      <SelectItem value="m@google.com">Exclusive</SelectItem>
-                      <SelectItem value="m@support.com">Free</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Location Select */}
-            <FormField
-              control={filterForm.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-md font-semibold text-green-700">Select location</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a property location" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Kathmandu">Kathmandu</SelectItem>
-                      <SelectItem value="Lalitpur">Lalitpur</SelectItem>
-                      <SelectItem value="Bhaktapur">Bhaktapur</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Button type="submit" className="bg-green-600">Apply Filters</Button>
-          </form>
-        </Form>
-      </div>
-       
-      </SheetContent>
-    </Sheet>
-       
-      </div>
-
+              {/* Mobile Filter Toggle */}
+              <div className="lg:hidden">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="icon">
+                      <FontAwesomeIcon
+                        icon={faFilter}
+                        className="text-sky-600"
+                      />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent className="overflow-y-scroll">
+                    <SheetHeader>
+                      <SheetTitle className="text-lg font-bold text-sky-700">
+                        {t("filters")}
+                      </SheetTitle>
+                    </SheetHeader>
+                    <div className="py-4">
+                      <FilterContent />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
             </div>
-             {/* Filter Icon for Small Screens */}
-             
 
-      
-            <Button type="submit" className="bg-green-600">Search</Button>
-
+            <Button type="submit" className="w-full bg-sky-600">
+              {t("search")}
+            </Button>
           </form>
         </Form>
       </div>
 
-
-      {/* Other Filters */}
-      <div className={`p-10 w-full shadow-2xl rounded-xl hidden lg:block`}>
-        <h1 className="text-lg font-bold text-sky-700 mb-4">Other Filters</h1>
-        <Form {...filterForm}>
-          <form onSubmit={filterForm.handleSubmit(onFilterSubmit)} className="space-y-8">
-            {/* Checkbox Group */}
-            <FormField
-              control={filterForm.control}
-              name="items"
-              render={() => (
-                <FormItem>
-                  <FormLabel className="text-md font-semibold text-green-700">Property Type</FormLabel>
-                  {items.map((item) => (
-                    <FormField
-                      key={item.id}
-                      control={filterForm.control}
-                      name="items"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={item.id}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(item.id)}
-                                onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([...field.value, item.id])
-                                    : field.onChange(
-                                        field.value?.filter((val) => val !== item.id)
-                                      );
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="text-sm font-semibold text-sky-700">
-                              {item.label}
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  ))}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Slider */}
-            <FormField
-              control={filterForm.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-md font-semibold text-green-700">Price Range</FormLabel>
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>Rs {field.value}</span>
-                  </div>
-                  <Slider
-                    min={1000}
-                    max={10000}
-                    step={500}
-                    value={[field.value]}
-                    onValueChange={(val) => field.onChange(val[0])}
-                  />
-                  <div className="flex justify-between text-xs text-gray-500 px-1 pt-1">
-                    <span>Rs 1000</span>
-                    <span>Rs 10000</span>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Property Status */}
-            <FormField
-              control={filterForm.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-md font-semibold text-green-700">Property Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a property status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="exclusive">Exclusive</SelectItem>
-                      <SelectItem value="featured">Featured</SelectItem>
-                      <SelectItem value="emerging">Emerging</SelectItem>
-                      <SelectItem value="latest">Latest</SelectItem>
-                      <SelectItem value="sold">Sold</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Location Select */}
-            {/* <FormField
-              control={filterForm.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-md font-semibold text-green-700">Select location</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a property location" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Kathmandu">Kathmandu</SelectItem>
-                      <SelectItem value="Lalitpur">Lalitpur</SelectItem>
-                      <SelectItem value="Bhaktapur">Bhaktapur</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
-            <FilterLocationFields form={filterForm}/>
-            {/* <PropertyLocationFields form={filterForm}/> */}
-
-            <Button type="submit" className="bg-green-600">Apply Filters</Button>
-          </form>
-        </Form>
+      {/* Desktop Filters */}
+      <div className="hidden lg:block p-6 w-full shadow-lg rounded-xl bg-white">
+        <h1 className="text-lg font-bold text-sky-700 mb-4">{t("filters")}</h1>
+        <FilterContent />
       </div>
     </div>
-  )
+  );
 }
 
-export default Listfilter
+export default Listfilter;

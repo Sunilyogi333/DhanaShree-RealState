@@ -1,190 +1,272 @@
-'use client';
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import Link from 'next/link';
-import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react' 
-import { Button } from './ui/button';
-import Cookies from 'js-cookie';
+"use client";
+import {
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+} from "@headlessui/react";
+import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
+import { useTranslation } from "next-i18next";
+import { useRouter, usePathname } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { Button } from "./ui/button";
+import Cookies from "js-cookie";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
+
 
 const navigation = [
-  { name: 'home', href: '/', current: true },
-  { name: 'featured', href: '#', current: false },
-  { name: 'about', href: '#', current: false },
-  { name: 'tools', href: '#', current: false },
-]
+  { name: "home", href: "/" },
+  { name: "features", href: "/features" },
+  { name: "about", href: "/about" },  
+];
 
 function classNames(...classes: (string | false | null | undefined)[]): string {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
 function Navbar() {
-  const [lang, setLang] = useState('en');
-  const { t,i18n } = useTranslation();
+  const [lang, setLang] = useState("en");
+  const { t, i18n } = useTranslation();
   const router = useRouter();
+  const pathname = usePathname(); // Get current pathname
 
   const [ready, setReady] = useState(false);
+
   useEffect(() => {
-    const storedLang = Cookies.get('lang') || 'en';
+    const storedLang = Cookies.get("lang") || "en";
     i18n.changeLanguage(storedLang).then(() => {
       setLang(storedLang);
       setReady(true);
     });
   }, []);
-  
+
   if (!ready) return null;
-  
+
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
-    Cookies.set('lang', lng);
-    router.refresh(); // This will force re-evaluation of client components
-
+    Cookies.set("lang", lng);
+    router.refresh();
   };
+
+  // Function to check if nav item is current
+  const isCurrentPage = (href: string) => {
+    if (href === "/") {
+      return pathname === "/";
+    }
+    return pathname.startsWith(href);
+  };
+
   return (
     <>
-  {/* <Disclosure as="nav" className="bg-gradient-to-b from-sky-200 to-transparent"> */}
-  {/* <Disclosure as="nav" className="bg-transparent "> */}
-  <Disclosure as="nav" className="bg-sky-100 ">
-
-      <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-        <div className="relative flex h-16 items-center justify-between">
-          <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-            {/* Mobile menu button*/}
-            <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset">
-              <span className="absolute -inset-0.5" />
-              <span className="sr-only">{t('openMainMenu')}</span>
-              <Bars3Icon aria-hidden="true" className="block size-6 group-data-open:hidden" />
-              <XMarkIcon aria-hidden="true" className="hidden size-6 group-data-open:block" />
-            </DisclosureButton>
-          </div>
-          <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-            <div className="flex shrink-0 items-center">
-              <img
-                alt="Your Company"
-                src="/user/logo.png"
-                className="h-12 w-auto"
-              />
+      <Disclosure as="nav" className="bg-sky-100">
+        <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+          <div className="relative flex h-16 items-center justify-between">
+            <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+              {/* Mobile menu button*/}
+              <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset">
+                <span className="absolute -inset-0.5" />
+                <span className="sr-only">{t("openMainMenu")}</span>
+                <Bars3Icon
+                  aria-hidden="true"
+                  className="block size-6 group-data-open:hidden"
+                />
+                <XMarkIcon
+                  aria-hidden="true"
+                  className="hidden size-6 group-data-open:block"
+                />
+              </DisclosureButton>
             </div>
-            <div className="hidden sm:ml-6 sm:block">
+
+            <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+              <div className="flex shrink-0 items-center">
+                <Link href="/">
+                  <img
+                    alt="Your Company"
+                    src="/user/logo.png"
+                    className="h-12 w-auto cursor-pointer"
+                  />
+                </Link>
+              </div>
+
+              <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
-                {navigation.map((item) => (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    aria-current={item.current ? 'page' : undefined}
+  {navigation.map((item) => {
+    const isCurrent = isCurrentPage(item.href);
+    return (
+      <Link
+        key={item.name}
+        href={item.href}
+        className={classNames(
+          isCurrent
+            ? "bg-white text-blue-800 rounded-lg"
+            : "text-black hover:border-b-3 hover:border-sky-700 hover:bg-sky-50 rounded-lg transition-all duration-200",
+          "px-3 py-2 text-sm font-medium"
+        )}
+      >
+        {t(item.name)}
+      </Link>
+    );
+  })}
+
+  {/* Tools dropdown */}
+  <Menu as="div" className="relative">
+    <MenuButton
+      className={classNames(
+        isCurrentPage("/unitConverter") ||
+          isCurrentPage("/emiCalculator") ||
+          isCurrentPage("/dateConverter")
+          ? "bg-white text-blue-800 rounded-lg"
+          : "text-black hover:border-b-3 hover:border-sky-700 hover:bg-sky-50 rounded-lg",
+        "px-3 py-2 text-sm font-medium inline-flex items-center gap-1 transition-all duration-200"
+      )}
+    >
+      {t("tools")} <ChevronDownIcon className="w-4 h-4" />
+    </MenuButton>
+    <MenuItems className="absolute z-50 mt-2 w-48 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+      <MenuItem>
+        {({ active }) => (
+          <Link
+            href="/unitConverter"
+            className={classNames(
+              active ? "bg-gray-100" : "",
+              "block px-4 py-2 text-sm text-gray-700"
+            )}
+          >
+            Unit Converter
+          </Link>
+        )}
+      </MenuItem>
+      <MenuItem>
+        {({ active }) => (
+          <Link
+            href="/emiCalculator"
+            className={classNames(
+              active ? "bg-gray-100" : "",
+              "block px-4 py-2 text-sm text-gray-700"
+            )}
+          >
+            EMI Calculator
+          </Link>
+        )}
+      </MenuItem>
+      <MenuItem>
+        {({ active }) => (
+          <Link
+            href="/dateConverter"
+            className={classNames(
+              active ? "bg-gray-100" : "",
+              "block px-4 py-2 text-sm text-gray-700"
+            )}
+          >
+            Date Converter
+          </Link>
+        )}
+      </MenuItem>
+    </MenuItems>
+  </Menu>
+</div>
+
+              </div>
+            </div>
+
+            <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+              <div className="flex items-center gap-2">
+                <span>{t("language")}:</span>
+                <select
+                  onChange={(e) => {
+                    const selectedLang = e.target.value;
+                    setLang(selectedLang);
+                    changeLanguage(selectedLang);
+                  }}
+                  value={i18n.language}
+                  className="border border-gray-300 rounded px-2 py-1 text-sm"
+                >
+                  <option value="en">English</option>
+                  <option value="ne">नेपाली</option>
+                </select>
+              </div>
+
+              <Link href="/admin">
+                <Button
+                  variant="outline"
+                  className="cursor-pointer ml-3 border-sky-700 text-sky-700 hover:bg-sky-700 hover:text-white transition-all duration-300"
+                >
+                  {t("loginAsAdmin")}
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <DisclosurePanel className="sm:hidden">
+          <div className="space-y-1 px-2 pt-2 pb-3">
+            {navigation.map((item) => {
+              const isCurrent = isCurrentPage(item.href);
+              return (
+                <Link key={item.name} href={item.href}>
+                  <DisclosureButton
+                    as="div"
                     className={classNames(
-                      item.current ? 'bg-white text-blue-800 rounded-lg' : 'text-black hover:border-b-3 hover:border-sky-700',
-                      'px-3 py-2 text-sm font-medium',
+                      isCurrent
+                        ? "bg-blue-700 text-white"
+                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+                      "block rounded-md px-3 py-2 text-base font-medium cursor-pointer transition-all duration-200"
                     )}
                   >
-                    {/* {item.name} */}
                     {t(item.name)}
-                  </a>
-                ))}
-              </div>
-            </div>
+                  </DisclosureButton>
+                </Link>
+              );
+            })}
+            <Link href="/unitConverter  ">
+  <DisclosureButton
+    as="div"
+    className={classNames(
+      isCurrentPage("/unitConverter")
+        ? "bg-blue-700 text-white"
+        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+      "block rounded-md px-3 py-2 text-base font-medium cursor-pointer transition-all duration-200"
+    )}
+  >
+    {t("unitConverter")}
+  </DisclosureButton>
+</Link>
+<Link href="/emiCalculator">
+  <DisclosureButton
+    as="div"
+    className={classNames(
+      isCurrentPage("/emiCalculator")
+        ? "bg-blue-700 text-white"
+        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+      "block rounded-md px-3 py-2 text-base font-medium cursor-pointer transition-all duration-200"
+    )}
+  >
+    {t("emiCalculator")}
+  </DisclosureButton>
+</Link>
+<Link href="/dateConverter">
+  <DisclosureButton
+    as="div"
+    className={classNames(
+      isCurrentPage("/dateConverter")
+        ? "bg-blue-700 text-white"
+        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+      "block rounded-md px-3 py-2 text-base font-medium cursor-pointer transition-all duration-200"
+    )}
+  >
+    {t("dateConverter")}
+  </DisclosureButton>
+</Link>
+
           </div>
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-            <button
-              type="button"
-              className="relative rounded-full bg-sky-200 p-1 text-blue-800 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
-            >
-              <span className="absolute -inset-1.5" />
-              <span className="sr-only">{t('viewNotifications')}</span>
-              <BellIcon aria-hidden="true" className="size-6" />
-            </button>
-            <div className="flex items-center gap-2">
-        <span>{t('language')}:</span>
-          <select 
- onChange={(e) => {
-  const selectedLang = e.target.value;
-  setLang(selectedLang);
-  changeLanguage(selectedLang);
-}}      
-      value={i18n.language} 
-
-          >
-            <option value="en">English</option>
-            <option value="ne">नेपाली</option>
-          </select>
-      </div>
-
-            {/* Profile dropdown */}
-            {/* <Menu as="div" className="relative ml-3">
-              <div>
-                <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">Open user menu</span>
-                  <img
-                    alt=""
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                    className="size-8 rounded-full"
-                  />
-                </MenuButton>
-              </div>
-              <MenuItems
-                transition
-                className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
-              >
-                <MenuItem>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
-                  >
-                    Your Profile
-                  </a>
-                </MenuItem>
-                <MenuItem>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
-                  >
-                    Settings
-                  </a>
-                </MenuItem>
-                <MenuItem>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
-                  >
-                    Sign out
-                  </a>
-                </MenuItem>
-              </MenuItems>
-            </Menu> */}
-            <Link href="/admin">
-            <Button variant="outline" className=' cursor-pointer ml-3 border-sky-700 text-sky-700 hover:bg-sky-700 hover:text-white trasnsition-all duration-300'>
-              {t('loginAsAdmin')}
-            </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <DisclosurePanel className="sm:hidden">
-        <div className="space-y-1 px-2 pt-2 pb-3">
-          {navigation.map((item) => (
-            <DisclosureButton
-              key={item.name}
-              as="a"
-              href={item.href}
-              aria-current={item.current ? 'page' : undefined}
-              className={classNames(
-                item.current ? 'bg-blue-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                'block rounded-md px-3 py-2 text-base font-medium',
-              )}
-            >
-              {/* {item.name} */}
-               {t(item.name)}
-            </DisclosureButton>
-          ))}
-        </div>
-      </DisclosurePanel>
-    </Disclosure>
-
-  </>
-   )
+        </DisclosurePanel>
+      </Disclosure>
+    </>
+  );
 }
 
-export default Navbar
+export default Navbar;
