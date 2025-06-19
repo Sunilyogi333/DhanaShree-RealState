@@ -40,7 +40,7 @@ const categories: Category[] = [
   },
 ];
   return (
-    <section className="py-10 px-4 md:px-10 max-w-7xl mx-auto">
+    <section className="pt-30 px-4 md:px-10 max-w-7xl mx-auto">
       <h2 className="text-3xl font-bold text-center mb-8">{t("exploreByCategory")}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         {categories.map((category, index) => (
@@ -61,7 +61,7 @@ const categories: Category[] = [
 </div>
           </div>
         ))}
-      </div>
+      </div>  
     </section>
   );
 }

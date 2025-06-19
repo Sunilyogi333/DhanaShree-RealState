@@ -18,6 +18,9 @@ import {
 } from "@/components/ui/select";
 import { MapPin } from "lucide-react";
 import $axios from "@/lib/axios.instance";
+import { useTranslation } from "react-i18next";
+import { formatAddressByLanguage, getLocalizedLabel } from "@/utils/formatAddressByLanguage";
+
 
 interface FilterLocationFieldsProps {
   form: UseFormReturn<any>;
@@ -26,6 +29,7 @@ interface FilterLocationFieldsProps {
 export const FilterLocationFields: React.FC<FilterLocationFieldsProps> = ({
   form,
 }) => {
+  const { t ,i18n} = useTranslation();
   const [districtFields, setDistrictFields] = useState<
     { id: string; districtTitle: string }[]
   >([]);
@@ -39,6 +43,7 @@ export const FilterLocationFields: React.FC<FilterLocationFieldsProps> = ({
     const fetchDistricts = async () => {
       try {
         const res = await $axios.get("/address/district");
+        console.log("district data", res.data.data);
         setDistrictFields(res.data.data);
       } catch (error) {
         console.error("Failed to fetch districts:", error);
@@ -64,7 +69,7 @@ export const FilterLocationFields: React.FC<FilterLocationFieldsProps> = ({
   }, [selectedDistrict]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
       {/* District */}
       <FormField
         control={form.control}
@@ -73,7 +78,7 @@ export const FilterLocationFields: React.FC<FilterLocationFieldsProps> = ({
           <FormItem>
             <FormLabel className="flex items-center gap-2">
               <MapPin size={16} className="text-sky-500" />
-              District
+              {t("district")}
             </FormLabel>
             <FormControl>
               <Select
@@ -84,12 +89,12 @@ export const FilterLocationFields: React.FC<FilterLocationFieldsProps> = ({
                 value={field.value}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select District" />
+                  <SelectValue placeholder={t("selectDistrict")} />
                 </SelectTrigger>
                 <SelectContent>
                   {districtFields.map((option) => (
                     <SelectItem key={option.id} value={option.id}>
-                      {option.districtTitle}
+                      {getLocalizedLabel(option, i18n.language)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -108,7 +113,7 @@ export const FilterLocationFields: React.FC<FilterLocationFieldsProps> = ({
           <FormItem>
             <FormLabel className="flex items-center gap-2">
               <MapPin size={16} className="text-sky-500" />
-              Municipality
+              {t("municipality")}
             </FormLabel>
             <FormControl>
               <Select
@@ -117,12 +122,12 @@ export const FilterLocationFields: React.FC<FilterLocationFieldsProps> = ({
                 disabled={!selectedDistrict}
               >
                 <SelectTrigger className="w-full" disabled={!selectedDistrict}>
-                  <SelectValue placeholder="Select Municipality" />
+                  <SelectValue placeholder={t("selectMunicipality")} />
                 </SelectTrigger>
                 <SelectContent>
                   {municipalityFields.map((option) => (
                     <SelectItem key={option.id} value={option.id}>
-                      {option.municipalityTitle}
+                      {getLocalizedLabel(option, i18n.language)}
                     </SelectItem>
                   ))}
                 </SelectContent>

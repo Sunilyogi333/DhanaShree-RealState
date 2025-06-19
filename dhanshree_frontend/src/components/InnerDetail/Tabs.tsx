@@ -7,7 +7,7 @@ import ApartmentOverview from './TabContent/ApartmentOverview';
 import SpaceOverview from './TabContent/SpaceOverview';
 import FlatOverview from './TabContent/FlatOverview';
 import { fetchPropertyDetails } from '@/types/property';
-
+import { useTranslation } from 'react-i18next';
 interface InnerTabProps {
   property: fetchPropertyDetails;
   isLoading: boolean;
@@ -46,7 +46,7 @@ function InnerTab({ property, isLoading, error }: InnerTabProps) {
         return <div>No Overview Available</div>;
     }
   };
-
+  const { t } = useTranslation();
   return (
     <div className="w-full lg:w-2/3">
       {/* Anchor Links */}
@@ -55,7 +55,7 @@ function InnerTab({ property, isLoading, error }: InnerTabProps) {
           href="#overview"
           className="scroll-smooth pb-2 border-b-2 font-semibold text-gray-500 hover:border-blue-500 hover:text-blue-500"
         >
-          Overview
+         {t('overview')}
         </a>
         {property.type !== "land" && (
         <a
@@ -69,7 +69,7 @@ function InnerTab({ property, isLoading, error }: InnerTabProps) {
           href="#facilities"
           className="pb-2 border-b-2 font-semibold text-gray-500 hover:border-blue-500 hover:text-blue-500"
         >
-          Facilities
+          {t('facilities')}
         </a>
       </div>
 
@@ -117,7 +117,7 @@ function InnerTab({ property, isLoading, error }: InnerTabProps) {
         id="facilities"
         className="flex flex-col gap-5 bg-white p-4 rounded-lg shadow py-4 my-4"
       >
-        <h1 className="font-medium">Facilities</h1>
+        <h1 className="font-medium">{t('facilities')}</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
           {property.details.facilities.map((facility: string, index: number) => (
             <div key={index} className="flex items-center gap-2">

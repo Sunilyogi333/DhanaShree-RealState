@@ -10,7 +10,6 @@ export function middleware(request: NextRequest) {
   const isLoginPage = request.nextUrl.pathname === "/login";
   const isForgotPasswordPage = request.nextUrl.pathname === "/forgotPassword";
 
-  // Disable login protection for now
     if (isAdminRoute && !accessToken && !isLoginPage) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
