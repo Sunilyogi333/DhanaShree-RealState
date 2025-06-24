@@ -63,10 +63,10 @@ function page() {
       });
       router.push("/login");
     },
-    onError: (error: AxiosError<{ message: string }>) => {
+    onError: (error: AxiosError<{ message: { en: string } }>) => {
       console.log("error in the reset password", error);
       toast.error("Failed to reset password", {
-        description: error.response?.data?.message || "Something went wrong",
+        description: error.response?.data?.message?.en || "Something went wrong",
         classNames: {
           toast: "bg-red-600 text-white",
           title: "text-white",

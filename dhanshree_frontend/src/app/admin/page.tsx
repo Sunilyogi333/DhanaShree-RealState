@@ -6,6 +6,7 @@ function page() {
     
   return (
 <>
+This is the page
 </>
       )
 }

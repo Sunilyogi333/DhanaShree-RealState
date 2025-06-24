@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { fetchProperty } from "@/store/slices/propertyDetailsSlice";
 import { fetchPropertyDetails } from "@/types/property";
-
+import { useTranslation } from "react-i18next";
 type Property = {
   propertyCode: string;
   price: string;
@@ -57,7 +57,7 @@ export default function AddProperty() {
   const itemsPerPage = 4;
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
+  const { t } = useTranslation();
 
   const { posts, isLoading, error, pagination } = useSelector(
     (state: RootState) => state.property
@@ -84,7 +84,7 @@ export default function AddProperty() {
       dispatch(fetchProperty({ page: currentPage, size: itemsPerPage }));
     },
     onError: (error: any) => {
-      const msg = error?.response?.data?.message || "Failed to delete property.";
+      const msg = error?.response?.data?.message?.en || "Failed to delete property.";
       toast.error(msg);
     },
     onSettled: () => {
@@ -117,14 +117,14 @@ export default function AddProperty() {
       <div className="max-w-6xl mx-auto mt-10 bg-white rounded-2xl lg:shadow-md p-6 sm:p-5 md:p-10">
         <div className="flex lg:flex-row flex-col justify-between lg:px-10 py-10 ">
           <h1 className="text-2xl font-bold mb-6 text-gray-800 text-center">
-            My Listing
+            {t("myListings")}
           </h1>
           <div className="flex gap-2  items-start  justify-end lg:items-center   ">
             <Button className="border text-white bg-sky-600 hover:bg-sky-600 hover:cursor-pointer hover:shadow-lg">
-              <Link href="/admin/listings/addproperty">Add Property</Link>
+              <Link href="/admin/listings/addproperty">{t("addProperty")}</Link>
             </Button>
             <Button className="bg-transparent border border-sky-200 text-sky-600 hover:bg-white hover:shadow-lg hover:cursor-pointer">
-              Filter
+              {t("filter")}
               <FontAwesomeIcon icon={faFilter} style={{ color: "#74C0FC" }} />
             </Button>
           </div>
@@ -150,7 +150,7 @@ export default function AddProperty() {
               />
             ))
           ) : (
-            <div className="text-center text-gray-500">No properties found</div>
+            <div className="text-center text-gray-500">{t("noPropertiesFound")}</div>
           )}
         </div>
       
@@ -168,7 +168,7 @@ export default function AddProperty() {
                   : "bg-white text-gray-700 hover:bg-blue-500 hover:text-white border-gray-300"
               }`}
             >
-              Previous
+              {t("previous")}
             </button>
 
             {/* Page Numbers */}
@@ -196,7 +196,7 @@ export default function AddProperty() {
                   : "bg-white text-gray-700 hover:bg-blue-500 hover:text-white border-gray-300"
               }`}
             >
-              Next
+              {t("next")}
             </button>
           </div>
           )}

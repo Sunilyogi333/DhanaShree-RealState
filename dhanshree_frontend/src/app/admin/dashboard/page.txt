@@ -1,0 +1,38 @@
+{
+  "success": true,
+  "data": {
+    "totalUsers": 0,
+    "totalProperties": 0,
+    "bookingsThisMonth": 0,
+    "propertyByType": {
+      "land": 0,
+      "house": 0,
+      "apartment": 0,
+      "flat": 0,
+      "space": 0
+    }
+  },
+  "message": {
+    "en": "Fetched successfully",
+    "ne": "सफलतापूर्वक ल्याइयो"
+  }
+}
+
+
+get current admin info 
+{
+  "status": true,
+  "data": {
+    "id": "4200c5f5-c891-47be-90e9-faa1b0bdaefc",
+    "createdAt": "2025-06-23T16:41:18.767Z",
+    "email": "lmssuyog@gmail.com",
+    "password": "$2b$10$HgppvfzFY/ZxXsMeEjn3SuAzJJvZfvGgv53hc/XHNUvSagtmBA3.e",
+    "role": "admin",
+    "phoneNumber": null,
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQyMDBjNWY1LWM4OTEtNDdiZS05MGU5LWZhYTFiMGJkYWVmYyIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1MDczMjY3MiwiZXhwIjoxNzUzMzI0NjcyfQ.hYSpZiMQjizMBr_rf2jC1gStMT01VQ11K8FzaXnH-3w"
+  },
+  "message": {
+    "en": "Fetched successfully",
+    "ne": "सफलतापूर्वक ल्याइयो"
+  }
+}

@@ -1,14 +1,17 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { propertyReducer, propertyDetailsReducer } from "@/store/slices/propertyDetailsSlice";
-import languageReducer from "./slices/languageSlice";
 import bookingReducer from "./slices/bookingSlice";
+import requestReducer from "./slices/requestSlice";
+import {
+  propertyReducer,
+  propertyDetailsReducer,
+} from "./slices/propertyDetailsSlice";
 
 export const store = configureStore({
   reducer: {
+    booking: bookingReducer,
+    request: requestReducer,
     property: propertyReducer,
     propertyDetails: propertyDetailsReducer,
-    language: languageReducer,
-    booking: bookingReducer,
   },
 });
 

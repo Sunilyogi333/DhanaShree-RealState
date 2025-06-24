@@ -21,7 +21,7 @@ export const useCreateProperty = () => {
     mutationFn: (data: CreatePropertyData) => createProperty(data),
     onError: (error: any) => {
       toast.error("Error creating property", {
-        description: error.response?.data.message,
+        description: error.response?.data.message?.en || "An error occurred while creating the property.",
       });
     },
     onSuccess: (data) => {

@@ -5,6 +5,7 @@ import {
   BuildingOffice2Icon,
 } from '@heroicons/react/24/outline';
 
+
 const features = [
   {
     name: 'Verified Listings',
