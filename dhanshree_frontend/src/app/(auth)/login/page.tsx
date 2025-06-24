@@ -66,7 +66,7 @@ export default function LoginPage() {
     onError: (error: any) => {
       console.log("error", error);
       toast.error("Login failed", {
-        description: error.response.data.message,
+        description: error.response.data.message.en,
         classNames: {
           toast: "bg-red-600 text-white",
           title: "text-white",

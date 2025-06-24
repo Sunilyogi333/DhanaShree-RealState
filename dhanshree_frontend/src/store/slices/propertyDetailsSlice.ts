@@ -88,15 +88,17 @@ export const fetchProperty = createAsyncThunk(
 
     return {
       results: response.data.data.results || [],
-      pagination: {
-        ...response.data.data.pagination,
-        currentPage: params.page || 1,
-      } || {
-        total: 0,
-        totalPages: 0,
-        currentPage: params.page || 1,
-        perPage: params.size || 5,
-      },
+      pagination: response.data.data.pagination
+        ? {
+            ...response.data.data.pagination,
+            currentPage: params.page || 1,
+          }
+        : {
+            total: 0,
+            totalPages: 0,
+            currentPage: params.page || 1,
+            perPage: params.size || 5,
+          },
       requestParams: cleanParams,
     };
   }

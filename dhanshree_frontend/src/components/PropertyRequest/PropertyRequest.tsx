@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 
+
 type RequestFormValues = {
   fullName: string;
   email: string;
@@ -49,7 +50,7 @@ type RequestFormValues = {
 export default function PropertyRequest() {
   const [activeTab, setActiveTab] = useState("info");
   const dispatch = useDispatch<AppDispatch>();
-  const { t } = useTranslation();
+  const { t,i18n } = useTranslation();
   const {
     isLoading,
     lastRequestResponse,
@@ -91,7 +92,7 @@ export default function PropertyRequest() {
         .unwrap()
         .then((response) => {
           toast.success(
-            response?.message?.en || "Verification email resent successfully!"
+            response?.message?.[i18n.language]  || "Verification email resent successfully!"
           );
           dispatch(setResendTimer(30));
           startResendTimer();
@@ -116,7 +117,7 @@ export default function PropertyRequest() {
       .unwrap()
       .then((response) => {
         toast.success(
-          response?.message?.en || "Request submitted successfully!"
+          response?.message?.[i18n.language] || "Request submitted successfully!"
         );
         console.log("Request response:", response);
 

@@ -140,7 +140,6 @@ function UsersPage() {
   const currentData = activeTab === "bookings" ? bookings : requests;
   const currentPagination =
     activeTab === "bookings" ? bookingPagination : requestPagination;
-  const currentColumns = activeTab === "bookings" ? columns : requestColumns;
 
   return (
     <div className="max-w-6xl mx-auto mt-10 bg-white rounded-2xl lg:shadow-md p-6 sm:p-5 md:p-10">
@@ -178,16 +177,21 @@ function UsersPage() {
           </div>
         ) : (
           <>
-            <DataTable
-              columns={currentColumns}
-              data={currentData}
-              pagination={currentPagination ?? undefined}
-              onPageChange={
-                activeTab === "bookings"
-                  ? handleBookingPageChange
-                  : handleRequestPageChange
-              }
-            />
+            {activeTab === "bookings" ? (
+              <DataTable
+                columns={columns}
+                data={bookings}
+                pagination={bookingPagination ?? undefined}
+                onPageChange={handleBookingPageChange}
+              />
+            ) : (
+              <DataTable
+                columns={requestColumns}
+                data={requests}
+                pagination={requestPagination ?? undefined}
+                onPageChange={handleRequestPageChange}
+              />
+            )}
 
             {currentPagination && (
               <div className="text-sm text-gray-500 text-center">

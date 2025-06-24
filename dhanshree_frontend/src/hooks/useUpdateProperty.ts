@@ -22,7 +22,7 @@ export const useUpdateProperty = () => {
       updateProperty(id, data),
     onError: (error: any) => {
       toast.error("Error updating property", {
-        description: error.response?.data.message,
+        description: error.response?.data.message?.en || "An error occurred while updating the property.",
       });
     },
     onSuccess: (data) => {

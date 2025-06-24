@@ -173,10 +173,10 @@ const bookingSlice = createSlice({
   name: "booking",
   initialState,
   reducers: {
-    setFilters: (state, action) => {
+    setFilters: (state: BookingState, action) => {
       state.filters = { ...state.filters, ...action.payload };
     },
-    resetFilters: (state) => {
+    resetFilters: (state: BookingState) => {
       state.filters = {
         page: 1,
         size: 10,
@@ -184,16 +184,16 @@ const bookingSlice = createSlice({
         email: "",
       };
     },
-    setLastBookingResponse: (state, action) => {
+    setLastBookingResponse: (state: BookingState, action) => {
       state.lastBookingResponse = action.payload;
     },
-    setCanResend: (state, action) => {
+    setCanResend: (state: BookingState, action) => {
       state.canResend = action.payload;
     },
-    setResendTimer: (state, action) => {
+    setResendTimer: (state: BookingState, action) => {
       state.resendTimer = action.payload;
     },
-    resetBookingState: (state) => {
+    resetBookingState: (state: BookingState) => {
       state.lastBookingResponse = null;
       state.canResend = false;
       state.resendTimer = 0;

@@ -175,8 +175,9 @@ function Listfilter({ onFiltersChange }: ListfilterProps) {
     if (data.municipality && data.municipality !== undefined) {
       queryParams.append("municipality", data.municipality.toString());
     }
+    // if (data.purpose && data.purpose !== "") {
 
-    if (data.purpose && data.purpose !== "") {
+    if (data.purpose ) {
       queryParams.append("purpose", data.purpose);
     }
 
@@ -365,7 +366,9 @@ function Listfilter({ onFiltersChange }: ListfilterProps) {
 
         {/* Location Fields - Using FilterLocationFields component with number type */}
         <div className="space-y-4">
-          <FilterLocationFields form={filterForm} fieldType="number" />
+          {/* <FilterLocationFields form={filterForm} fieldType="number" /> */}
+          <FilterLocationFields form={filterForm} />
+
         </div>
 
         <div className="flex gap-2">
