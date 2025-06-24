@@ -88,7 +88,7 @@ class BookingService {
 
       // ✅ Generate token and email
       const token = webTokenService.generateBookingToken({ bookingId: booking.id, email })
-      const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL_LOCAL}/verify-booking?token=${token}`
+      const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL}/verify-booking?token=${token}`
 
       const mailOptions = {
         from: EnvironmentConfiguration.MAIL_FROM,
@@ -155,7 +155,7 @@ class BookingService {
     await this.bookingRepo.save(booking)
 
     const token = webTokenService.generateBookingToken({ bookingId: booking.id, email })
-    const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL_LOCAL}/verify-booking?token=${token}`
+    const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL}/verify-booking?token=${token}`
 
     const mailOptions = {
       from: EnvironmentConfiguration.MAIL_FROM,

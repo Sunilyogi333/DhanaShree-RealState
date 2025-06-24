@@ -85,7 +85,7 @@ class RequestService {
         bookingId: request.id,
         email: lowerEmail,
       })
-      const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL_LOCAL}/verify-request?token=${token}`
+      const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL}/verify-request?token=${token}`
 
       const mailOptions = {
         from: EnvironmentConfiguration.MAIL_FROM,
@@ -167,7 +167,7 @@ class RequestService {
       bookingId: request.id,
       email: request.user.email,
     })
-    const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL_LOCAL}/verify-request?token=${token}`
+    const verifyUrl = `${EnvironmentConfiguration.FRONTEND_URL}/verify-request?token=${token}`
     const mailOptions = {
       from: EnvironmentConfiguration.MAIL_FROM,
       to: request.user.email,
