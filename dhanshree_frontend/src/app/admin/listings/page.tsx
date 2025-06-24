@@ -84,7 +84,7 @@ export default function AddProperty() {
       dispatch(fetchProperty({ page: currentPage, size: itemsPerPage }));
     },
     onError: (error: any) => {
-      const msg = error?.response?.data?.message || "Failed to delete property.";
+      const msg = error?.response?.data?.message?.en || "Failed to delete property.";
       toast.error(msg);
     },
     onSettled: () => {

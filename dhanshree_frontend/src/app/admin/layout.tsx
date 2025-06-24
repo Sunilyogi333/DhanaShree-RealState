@@ -13,9 +13,9 @@ export default function AdminLayout({
   const [queryClient] = useState(() => new QueryClient());
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
+   
     <QueryClientProvider client={queryClient}>
       <div className="relative flex h-screen overflow-hidden">
-        {/* Sidebar */}
         <Sidebar
           isOpen={sidebarOpen}
           toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
@@ -23,6 +23,7 @@ export default function AdminLayout({
 
         {/* Main content area */}
         <div className="flex flex-col flex-1 w-full overflow-hidden">
+          
           {/* Top Navbar */}
           <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 

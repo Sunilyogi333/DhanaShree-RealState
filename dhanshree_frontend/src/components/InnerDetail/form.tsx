@@ -40,7 +40,7 @@ type BookingFormValues = {
 function Innerform({ propertyId }: { propertyId: string }) {
   console.log("Property ID:", propertyId);
   const dispatch = useDispatch<AppDispatch>();
-  const { t } = useTranslation();
+  const { t ,i18n} = useTranslation();
   const { lastBookingResponse, isResending, canResend, resendTimer } =
     useSelector((state: RootState) => state.booking);
 
@@ -61,7 +61,7 @@ function Innerform({ propertyId }: { propertyId: string }) {
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success(data?.message?.en || "Booking successful!");
+      toast.success(data?.message?.[i18n.language] || "Booking successful!");
       console.log("Booking response:", data);
 
       // Store the booking response in Redux
@@ -75,7 +75,7 @@ function Innerform({ propertyId }: { propertyId: string }) {
     },
     onError: (error: any) => {
       console.log("Booking error:", error);
-      const message = error?.response?.data?.message || "Something went wrong!";
+      const message = error?.response?.data?.message?.[i18n.language] || "Something went wrong!";
       toast.error(message);
     },
   });
@@ -102,7 +102,7 @@ function Innerform({ propertyId }: { propertyId: string }) {
         .unwrap()
         .then((response) => {
           toast.success(
-            response?.message?.en || "Verification email resent successfully!"
+            response?.message?.[i18n.language]  || "Verification email resent successfully!"
           );
           // Start timer again after successful resend
           dispatch(setResendTimer(30));
