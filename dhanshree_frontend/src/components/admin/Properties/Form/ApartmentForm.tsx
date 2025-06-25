@@ -124,25 +124,35 @@ export default function ApartmentForm({
       const canSubmit = canSubmitRef.current();
       if (!canSubmit) return;
       setIsSubmitting(true);
-      let imageIds: string[] = [];
+  let imageIds: string[] = [];
+           let thumbnailIds: string | null = null;
+     
+     
+           if (!edit) {
+         const thumbnailFile = (values as ApartmentFormValues).thumbnail;
+                 const imageFiles = (values as ApartmentFormValues).images;
 
-      if (!edit) {
-        const thumbnailFile = (values as ApartmentFormValues).thumbnail;
-        const imageFiles = (values as ApartmentFormValues).images;
+                 const formData = new FormData();
+                 const thumbnailData = new FormData();
+         
+                 if (thumbnailFile){
+         
+                   console.log("thumbnail file is ", thumbnailFile);
+                   thumbnailData.append("thumbnail", thumbnailFile);
+         
+                 } 
+                 imageFiles?.forEach((img) => formData.append("images", img));
+                 const thumbnailImage =await uploadImages(thumbnailData);
+                 const imageRes = await uploadImages(formData);
+                 console.log("imageRes and the thumbnail res is", imageRes,thumbnailImage);
+                 if (!imageRes.success || !thumbnailImage.success) {
+                   throw new Error("Image upload failed");
+                 }
+                 imageIds = imageRes.images.map((img: any) => img.id);
+                 thumbnailIds = thumbnailImage.images[0]?.id ?? null;
+           }
 
-      const formData = new FormData();
-      if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
-      imageFiles?.forEach((img: File) => formData.append("images", img));
-
-      const imageRes = await uploadImages(formData);
-      if (!imageRes.success) {
-        throw new Error("Image upload failed");
-      }
-
-      imageIds = imageRes.images.map((img: { id: string }) => img.id);
-      }
-
-      const payload = transformApartmentForm(values as ApartmentFormValues, imageIds, edit);
+      const payload = transformApartmentForm(values as ApartmentFormValues, imageIds, edit, thumbnailIds);
       console.log("payload for the create or updating property ", payload);
 
       if (!edit) {

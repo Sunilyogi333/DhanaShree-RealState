@@ -11,7 +11,8 @@ export interface TransformedHouseFormData {
   district: number | null;
   municipality: number | null;
   ward: number | null;
-  imageIds?: string[] | null;
+  thumbnailImageId?: string | null;
+  normalImageIds?: string[] | null;
   details: {
     bedrooms: number;
     kitchens: number;
@@ -45,6 +46,7 @@ export interface TransformedHouseFormData {
 export const transformHouseForm = (
   data: HouseFormValues,
   uploadedImageIds?: string[],
+  thumbnailImageId?: string | null,
   edit = false
 ): TransformedHouseFormData => {
   const baseData: TransformedHouseFormData = {
@@ -88,7 +90,8 @@ export const transformHouseForm = (
   };
 
   if (!edit) {
-    baseData.imageIds = uploadedImageIds ?? [];
+    baseData.normalImageIds = uploadedImageIds ?? [];
+    baseData.thumbnailImageId = thumbnailImageId ?? null;
   }
 
   return baseData;
