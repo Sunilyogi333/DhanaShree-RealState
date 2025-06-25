@@ -10,8 +10,9 @@ export interface TransformedLandFormData {
   district: number | null;
   municipality: number | null;
   ward: number | null;
-  imageIds?: string[];
-  details: {
+ thumbnailImageId?: string | null;
+  normalImageIds?: string[] | null; 
+   details: {
     zoning: string;
     builtYear: number | null;
     facilities: string[];
@@ -34,7 +35,8 @@ export interface TransformedLandFormData {
 export const transformLandForm = (
   data: LandFormValues,
   uploadedImageIds?: string[],
-  edit = false
+  edit = false,
+  thumbnailImageId?: string | null,
 ): TransformedLandFormData => {
   const baseData: TransformedLandFormData = {
     price: Number(data.askingPrice),
@@ -67,8 +69,10 @@ export const transformLandForm = (
   };
 
   if (!edit) {
-    baseData.imageIds = uploadedImageIds ?? [];
+    baseData.normalImageIds = uploadedImageIds ?? [];
+    baseData.thumbnailImageId = thumbnailImageId ?? null;
   }
+
 
   return baseData;
 };

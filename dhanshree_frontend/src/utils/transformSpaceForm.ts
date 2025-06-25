@@ -10,8 +10,9 @@ export interface TransformedSpaceFormData {
   district: number | null;
   municipality: number | null;
   ward: number | null;
-  imageIds?: string[] | null;
-  details: {
+ thumbnailImageId?: string | null;
+  normalImageIds?: string[] | null;
+    details: {
     totalFloors: number;  
     floors: number;
     parking: number;
@@ -38,7 +39,8 @@ export interface TransformedSpaceFormData {
 export const transformSpaceForm = (
   data: SpaceFormValues,
   uploadedImageIds: string[] = [],
-  edit: boolean = false
+  edit: boolean = false,
+  thumbnailImageId?: string | null,
 ): TransformedSpaceFormData => {
   const baseData: TransformedSpaceFormData = {
     propertyCode: data.propertyCode,
@@ -75,7 +77,7 @@ export const transformSpaceForm = (
     },
   };
   if (!edit) {
-      baseData.imageIds = uploadedImageIds ?? []; 
-  }
+    baseData.normalImageIds = uploadedImageIds ?? [];
+    baseData.thumbnailImageId = thumbnailImageId ?? null;  }
   return baseData;
 };
