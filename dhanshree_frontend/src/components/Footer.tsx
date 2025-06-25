@@ -35,23 +35,7 @@ function Footer() {
       </div>
 
       {/* Newsletter */}
-      <div>
-        <h3 className="text-lg font-semibold mb-3">Newsletter</h3>
-        <p className="text-sm text-gray-400 mb-4">Subscribe to get the latest property updates.</p>
-        <form className="flex">
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="w-full px-4 py-2 rounded-l bg-gray-800 text-white focus:outline-none"
-          />
-          <button
-            type="submit"
-            className="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-r"
-          >
-            Subscribe
-          </button>
-        </form>
-      </div>
+ 
     </div>
 
     {/* Divider */}

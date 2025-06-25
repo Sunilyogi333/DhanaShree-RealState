@@ -37,7 +37,7 @@ export const generalNepaliFields: FormFieldConfig[] = [
   },
   {
     name: "landAreaNep",
-    label: "क्षेत्र",
+    label: "क्षेत्रफल",
     type: "textarea",
     icon: (
       <FontAwesomeIcon

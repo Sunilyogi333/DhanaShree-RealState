@@ -33,6 +33,11 @@ export default function Home() {
           description={t("viewTheLatestProperties")}
           status="latest"
         />
+        <PostCarousel
+          title={t("emergingProperties")}
+          description={t("viewTheEmergingProperties")}
+          status="emerging"
+        />
       </div>
 
       {/* Property Request Section */}

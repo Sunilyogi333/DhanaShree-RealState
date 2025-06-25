@@ -7,6 +7,7 @@ interface PropertyState {
   featuredPosts: fetchPropertyDetails[]; // For featured carousel
   exclusivePosts: fetchPropertyDetails[]; // For exclusive carousel
   latestPosts: fetchPropertyDetails[]; // For latest carousel
+  emergingPosts?: fetchPropertyDetails[]; // For emerging carousel, optional
   isLoading: boolean;
   error: string | null;
   pagination: {
@@ -22,6 +23,7 @@ const initialState: PropertyState = {
   featuredPosts: [],
   exclusivePosts: [],
   latestPosts: [],
+  emergingPosts: [], // Initialize as empty array
   isLoading: false,
   error: null,
   pagination: {
@@ -125,6 +127,25 @@ export const fetchFeaturedProperties = createAsyncThunk(
   }
 );
 
+export const fetchEmergingProperties = createAsyncThunk(
+  "property/fetchEmergingProperties",
+  async (params: PropertyFilters = {}) => {
+    const cleanParams: Record<string, any> = { status: "emerging" };
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        cleanParams[key] = value;
+      }
+    });
+
+    const response = await $axios.get("/property", {
+      params: cleanParams,
+    });
+
+    console.log("Emerging properties response:", response);
+    return response.data.data.results || [];
+  }
+);
 export const fetchExclusiveProperties = createAsyncThunk(
   "property/fetchExclusiveProperties",
   async (params: PropertyFilters = {}) => {
@@ -218,6 +239,13 @@ const propertySlice = createSlice({
       .addCase(fetchLatestProperties.rejected, (state, action) => {
         console.error("Failed to fetch latest properties:", action.error);
         state.latestPosts = [];
+      })
+      .addCase(fetchEmergingProperties.fulfilled, (state, action) => {
+        state.emergingPosts = action.payload;
+      })
+      .addCase(fetchEmergingProperties.rejected, (state, action) => {
+        console.error("Failed to fetch emerging properties:", action.error);
+        state.emergingPosts = [];
       });
   },
 });
