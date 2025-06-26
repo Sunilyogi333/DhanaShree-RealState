@@ -32,6 +32,7 @@ export const useCreateProperty = () => {
     onMutate: (data) => {
       console.log("Mutating property:", data);
     },
+  
   });
 
   return {

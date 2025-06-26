@@ -78,14 +78,14 @@ const landAreaUnits = [
 ];
 
 const facilities = [
-  { label: "Water Supply", value: "water_supply" },
+  { label: "Water Supply", value: "water supply" },
   { label: "Drainage", value: "drainage" },
   { label: "Electricity", value: "electricity" },
   { label: "Internet", value: "internet" },
   { label: "Parking", value: "parking" },
   { label: "Security", value: "security" },
   { label: "Garden", value: "garden" },
-  { label: "Swimming Pool", value: "swimming_pool" },
+  { label: "Swimming Pool", value: "swimming pool" },
   { label: "Gym", value: "gym" },
   { label: "Elevator", value: "elevator" },
 ];

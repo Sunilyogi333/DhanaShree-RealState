@@ -23,7 +23,8 @@ import { useTranslation } from "react-i18next";
 import { 
   fetchFeaturedProperties, 
   fetchExclusiveProperties, 
-  fetchLatestProperties 
+  fetchLatestProperties ,
+  fetchEmergingProperties,
 } from "@/store/slices/propertyDetailsSlice";
 
 export default function PostCarousel({
@@ -41,7 +42,7 @@ export default function PostCarousel({
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
 
-  const { featuredPosts, exclusivePosts, latestPosts, isLoading, error } = useSelector(
+  const { emergingPosts,featuredPosts, exclusivePosts, latestPosts, isLoading, error } = useSelector(
     (state: RootState) => state.property
   );
 
@@ -53,12 +54,14 @@ export default function PostCarousel({
         return exclusivePosts;
       case 'latest':
         return latestPosts;
+      case 'emerging':
+        return emergingPosts;
       default:
         return [];
     }
   };
 
-  const posts = getPosts();
+  const posts = getPosts() ?? [];
 
   useEffect(() => {
     // Dispatch the appropriate thunk based on status
@@ -71,6 +74,9 @@ export default function PostCarousel({
         break;
       case 'latest':
         dispatch(fetchLatestProperties({ page: 1, size: 10 }));
+        break;
+      case 'emerging':
+        dispatch(fetchEmergingProperties({ page: 1, size: 10 }));
         break;
     }
   }, [dispatch, status]);
@@ -141,17 +147,21 @@ export default function PostCarousel({
                     </div>
                   ))}
                 </div>
-              ) : (
-                chunkedPosts.map((section, index) => (
-                  <CarouselItem key={index}>
-                    <div className="grid grid-cols-2 md:grid-cols-3  lg:p-4 p-10 lg:gap-10 gap-5 space-y-10">
-                      {section.map((post: any) => (
-                        <Cardfm key={post.id} property={post} />
-                      ))}
-                    </div>
-                  </CarouselItem>
-                ))
-              )}
+                ) : chunkedPosts.length == 0 ?(
+                  <>
+                  <p className="text-shadow-gray-400 text-sm text-center mx-auto">Sorry there are no currenly any posts here :(</p>
+                  </>
+                ): (
+                  chunkedPosts.map((section, index) => (
+                    <CarouselItem key={index}>
+                      <div className="grid grid-cols-2 md:grid-cols-3  lg:p-4 p-10 lg:gap-10 gap-5 space-y-10">
+                        {section.map((post: any) => (
+                          <Cardfm key={post.id} property={post} />
+                        ))}
+                      </div>
+                    </CarouselItem>
+                  ))
+                )}
             </CarouselContent>
 
             {/* Controls */}
@@ -161,14 +171,18 @@ export default function PostCarousel({
             </div>
           </Carousel>
 
+          {!isLoading && posts.length > 0 && (
           <Link href="/List" className="flex justify-end gap-3">
             <Button
               variant="outline"
               className="bg-sky-700 text-white  px-2 py-3 hover:bg-sky-800 hover:text-white cursor-pointer"
             >
-              {t("viewAll")} <FontAwesomeIcon icon={faArrowRightLong} />
+                <>
+                  {t("viewAll")} <FontAwesomeIcon icon={faArrowRightLong} />
+                </>
             </Button>
           </Link>
+              )}
         </>
       )}
     </div>

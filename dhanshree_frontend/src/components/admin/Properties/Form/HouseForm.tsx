@@ -59,26 +59,26 @@ const defaultValues: Partial<HouseFormValues> = {
 
   facilities: ["parking"],
 
-  bedrooms: 1,
+  bedrooms: 0,
   bedroomsNep: "",
 
-  kitchens: 1,
+  kitchens: 0,
   kitchensNep: "",
 
-  floors: 1,
+  floors: 0,
   floorsNep: "",
 
-  livingRooms: 1,
+  livingRooms: 0,
   livingRoomsNep: "",
 
-  parkingSpaces: 1,
+  parkingSpaces: 0,
   parkingSpacesNep: "",
 
-  builtArea: 10,
+  builtArea: 0,
   builtAreaUnit: "",
   builtAreaNep: "",
 
-  landArea: 10,
+  landArea: 0,
   landAreaUnit: "",
   landAreaNep: "",
 
@@ -86,8 +86,8 @@ const defaultValues: Partial<HouseFormValues> = {
 
   province: 1,
   district: 0,
-  municipality: 1,
-  wardNo: 1,
+  municipality: 0,
+  wardNo: 0,
 };
 
 export default function HouseForm({

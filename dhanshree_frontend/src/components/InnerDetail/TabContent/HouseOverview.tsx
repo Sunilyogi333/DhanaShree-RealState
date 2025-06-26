@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useEffect,useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faRoad,
@@ -14,6 +15,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "next/navigation";
 import { fetchPropertyDetails } from "@/types/property";
+import { useTranslation } from "react-i18next";
 
 const iconMap = {
   ruler: faRulerCombined,
@@ -30,7 +32,7 @@ const iconMap = {
 
 function Overview({ property ,isLoading,error}: { property: fetchPropertyDetails,isLoading: boolean,error: boolean   }) {
   
- 
+ const { i18n } = useTranslation();
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -67,6 +69,16 @@ function Overview({ property ,isLoading,error}: { property: fetchPropertyDetails
     },
     { label: "Pricing", value: `Rs ${property.price.toLocaleString()}` ,icon: "dollar"},
   ];
+const [descriptionData, setDescriptionData] = useState<string>("");
+
+useEffect(() => {
+  if (i18n.language === "ne") {
+    setDescriptionData(property.details.description?.np || "");
+  } else {
+    setDescriptionData(property.details.description?.en || "");
+  }
+}, [i18n.language, property.details.description]);
+
 
   return (
     <>
@@ -105,7 +117,8 @@ function Overview({ property ,isLoading,error}: { property: fetchPropertyDetails
         <div className="bg-white p-4 rounded-lg shadow">
           <h1 className="font-medium py-4">Description</h1>
           <p className="text-gray-500 font-light">
-            {property.details.description.en}
+            {/* {property.details.description?.np} */}
+            {descriptionData} 
           </p>
         </div>
 
