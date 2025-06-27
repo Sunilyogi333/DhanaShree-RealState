@@ -60,7 +60,7 @@ function Cardfm({ property }: { property: fetchPropertyDetails }) {
                 </h1>
             </CardTitle>
             <CardDescription className="flex flex-col space-y-2 mt-2 ">
-      <div className="flex items-center gap-2 lg:w-[300px] overflow-hidden">
+      <div className="flex items-center gap-2 lg:w-[300px] w-[150px] overflow-hidden">
   <FontAwesomeIcon icon={faLocationDot} />
   <span className=" overflow-hidden  truncate ">
     {/* {t("location")}: {property.address?.municipality?.municipalityTitle},

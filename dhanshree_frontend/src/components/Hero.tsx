@@ -30,9 +30,9 @@ function Hero() {
 
 
   return (
-    <div className="flex h-[80vh] relative">
+    <div className="flex h-[80vh] relative lg:mb-0 mb-32 ">
       {/* Left Content */}
-      <div className="lg:w-2/3 bg-gradient-to-r from-sky-200 to-white flex flex-col justify-center  container">
+      <div className="lg:w-2/3 w-full  bg-sky-200 lg:bg-gradient-to-r from-sky-200 to-white flex flex-col justify-center   sm:container px-4">
         <h1
           className="text-4xl md:text-5xl font-bold text-gray-800 leading-tight mb-4"
           data-aos="zoom-in"
