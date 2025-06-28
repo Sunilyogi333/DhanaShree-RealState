@@ -22,9 +22,9 @@ const middleware = (app: Application) => {
   app.use(
     cors({
       origin: [
+        'http://localhost:3000',
         EnvironmentConfiguration.FRONTEND_URL,
         'http://localhost:4005',
-        'http://localhost:3000',
         'https://dhanashree-realstate.onrender.com',
       ],
       credentials: true,
