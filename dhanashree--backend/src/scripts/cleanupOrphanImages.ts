@@ -16,11 +16,11 @@ export default async function orphanImageCleanup() {
   })
 
   if (!orphanImages.length) {
-    console.log('✅ No orphan images found.')
+    console.log('No orphan images found.')
     return
   }
 
-  console.log(`🧹 Found ${orphanImages.length} orphan images. Deleting...`)
+  console.log(`Found ${orphanImages.length} orphan images. Deleting...`)
 
   for (const image of orphanImages) {
     await cloudinaryService.deleteByUrl(image.url)
@@ -28,5 +28,5 @@ export default async function orphanImageCleanup() {
 
   await imageRepo.remove(orphanImages)
 
-  console.log(`✅ Deleted ${orphanImages.length} orphan images.`)
+  console.log(`Deleted ${orphanImages.length} orphan images.`)
 }

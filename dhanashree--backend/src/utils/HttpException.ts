@@ -10,7 +10,7 @@ class HttpException extends Error {
     localizedMessage: MultiLanguage,
     statusCode: number = StatusCodes.INTERNAL_SERVER_ERROR
   ) {
-    super(localizedMessage.en) // ✅ Error class needs a string, so use English as base
+    super(localizedMessage.en) // Error class needs a string, so use English as base
     this.statusCode = statusCode
     this.localizedMessage = localizedMessage
     this.isOperational = true
