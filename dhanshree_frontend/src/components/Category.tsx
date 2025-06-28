@@ -3,23 +3,27 @@ import React from "react";
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
 import { useAxiosQuery } from "@/hooks/useAxiosQuery";
-
+import Link from "next/link";
 // Fix the Category type definition
 type Category = {
   title: string;
   listings: number;
   imageUrl: string;
+  filterBy: string; 
 };
 
 // Define the API response type
 type DashboardResponse = {
-  propertyByType: {
-    land: number;
-    house: number;
-    apartment: number;
-    flat: number;
-    space: number;
+  data: {
+    propertyByType: {
+      land: number;
+      house: number;
+      apartment: number;
+      flat: number;
+      space: number;
+    };
   };
+
 };
 
 export function Category() {
@@ -27,31 +31,44 @@ export function Category() {
 
   const response = useAxiosQuery<DashboardResponse>("/overview/dashboard");
 
+//   if (response.isLoading) {
+//   return <p>Loading...</p>;
+// }
+
+if (response.isError) {
+  return <p>Failed to load categories.</p>;
+}
+  console.log("Response from API:", response.data);
   const categories: Category[] = [
     {
       title: t("apartment"),
-      listings: response.data?.propertyByType?.apartment || 0,
+      listings: response.data?.data?.propertyByType?.apartment || 0,
       imageUrl: "/user/category/category_1.jpg",
+      filterBy:"apartment"
     },
     {
       title: t("spaces"),
-      listings: response.data?.propertyByType?.space || 0,
+      listings: response.data?.data?.propertyByType?.space || 0,
       imageUrl: "/user/category/category_2.jpg",
+      filterBy:"space"
     },
     {
       title: t("houses"),
-      listings: response.data?.propertyByType?.house || 0,
+      listings: response?.data?.data?.propertyByType?.house || 0,
       imageUrl: "/user/category/category_3.jpg",
+      filterBy:"house"
     },
     {
       title: t("land"),
-      listings: response.data?.propertyByType?.land || 0,
+      listings: response.data?.data?.propertyByType?.land || 0,
       imageUrl: "/user/category/category_1.jpg",
+      filterBy:"land"
     },
     {
       title: t("flats"),
-      listings: response.data?.propertyByType?.flat || 0,
+      listings: response.data?.data?.propertyByType?.flat || 0,
       imageUrl: "/user/category/category_1.jpg",
+      filterBy:"flat"
     },
   ];
 
@@ -61,7 +78,9 @@ export function Category() {
         {t("exploreByCategory")}
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+
         {categories.map((category, index) => (
+          <Link key={index} href={`/List?type=${category.filterBy}`} className="group">
           <div
             key={index}
             className="relative group overflow-hidden rounded-xl shadow-md lg:h-80 h-64 w-full cursor-pointer"
@@ -80,6 +99,7 @@ export function Category() {
               </p>
             </div>
           </div>
+          </Link>
         ))}
       </div>
     </section>

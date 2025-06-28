@@ -10,8 +10,9 @@ export interface TransformedApartmentFormData {
   district: number | null;
   municipality: number | null;
   ward: number | null;
-  imageIds?: string[] | null;
-  details: {
+ thumbnailImageId?: string | null;
+  normalImageIds?: string[] | null;  
+   details: {
     floors: number;
     apartmentType: string;
     builtYear: number | null;
@@ -36,7 +37,8 @@ export interface TransformedApartmentFormData {
 export const transformApartmentForm = (
   data: ApartmentFormValues,
   uploadedImageIds: string[] = [],
-  edit: boolean = false
+  edit: boolean = false,
+  thumbnailImageId?: string | null,
 ): TransformedApartmentFormData => {
   const baseData: TransformedApartmentFormData = {
     price: Number(data.askingPrice),
@@ -70,7 +72,9 @@ export const transformApartmentForm = (
     },
   };
   if (!edit) {
-    baseData.imageIds = uploadedImageIds ?? [];
+    baseData.normalImageIds = uploadedImageIds ?? [];
+    baseData.thumbnailImageId = thumbnailImageId ?? null;
+
   }
   return baseData;
 };

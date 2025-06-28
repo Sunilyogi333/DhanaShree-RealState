@@ -59,26 +59,26 @@ const defaultValues: Partial<HouseFormValues> = {
 
   facilities: ["parking"],
 
-  bedrooms: 1,
+  bedrooms: 0,
   bedroomsNep: "",
 
-  kitchens: 1,
+  kitchens: 0,
   kitchensNep: "",
 
-  floors: 1,
+  floors: 0,
   floorsNep: "",
 
-  livingRooms: 1,
+  livingRooms: 0,
   livingRoomsNep: "",
 
-  parkingSpaces: 1,
+  parkingSpaces: 0,
   parkingSpacesNep: "",
 
-  builtArea: 10,
+  builtArea: 0,
   builtAreaUnit: "",
   builtAreaNep: "",
 
-  landArea: 10,
+  landArea: 0,
   landAreaUnit: "",
   landAreaNep: "",
 
@@ -86,8 +86,8 @@ const defaultValues: Partial<HouseFormValues> = {
 
   province: 1,
   district: 0,
-  municipality: 1,
-  wardNo: 1,
+  municipality: 0,
+  wardNo: 0,
 };
 
 export default function HouseForm({
@@ -141,30 +141,40 @@ export default function HouseForm({
 
       setIsSubmitting(true);
       let imageIds: string[] = [];
+      let thumbnailIds: string | null = null;
 
       if (!edit) {
         const thumbnailFile = (values as HouseFormValues).thumbnail;
         const imageFiles = (values as HouseFormValues).images;
 
         const formData = new FormData();
-        if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
-        imageFiles?.forEach((img) => formData.append("images", img));
+        const thumbnailData = new FormData();
 
+        if (thumbnailFile){
+
+          console.log("thumbnail file is ", thumbnailFile);
+          thumbnailData.append("thumbnail", thumbnailFile);
+
+        } 
+        imageFiles?.forEach((img) => formData.append("images", img));
+        const thumbnailImage =await uploadImages(thumbnailData);
         const imageRes = await uploadImages(formData);
-        if (!imageRes.success) {
+        console.log("imageRes and the thumbnail res is", imageRes,thumbnailImage);
+        if (!imageRes.success || !thumbnailImage.success) {
           throw new Error("Image upload failed");
         }
         imageIds = imageRes.images.map((img: any) => img.id);
+        thumbnailIds = thumbnailImage.images[0]?.id ?? null;
       }
 
       const payload = transformHouseForm(
         values as HouseFormValues,
         imageIds,
+        thumbnailIds,
         edit
       );
-      console.log("payload for the create or updating property ", payload);
-
       if (!edit) {
+        console.log("Creating property with payload:", payload);
         createProperty(payload);
       } else if (propertyId) {
         updateProperty(propertyId, payload);

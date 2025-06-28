@@ -17,7 +17,7 @@ export default function Home() {
       {/* muni ko content chai paxi about us ma rakhni 
       <Feature/> */}
       <Category />
-      <div className="flex flex-col items-center justify-center gap-10 px-20  ">
+      <div className="flex flex-col items-center justify-center gap-10 lg:px-20 px-3 ">
         <PostCarousel
           title={t("featuredProperties")}
           description={t("viewTheFeaturedProperties")}
@@ -32,6 +32,11 @@ export default function Home() {
           title={t("latestProperties")}
           description={t("viewTheLatestProperties")}
           status="latest"
+        />
+        <PostCarousel
+          title={t("emergingProperties")}
+          description={t("viewTheEmergingProperties")}
+          status="emerging"
         />
       </div>
 

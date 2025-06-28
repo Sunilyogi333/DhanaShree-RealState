@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
 import { getLocalizedLabel } from "@/utils/formatAddressByLanguage";
+import { Combobox } from "./ui/combobox";
 
 const FormSchema = z.object({
   type: z.string().optional(),
@@ -96,10 +97,10 @@ function Filter() {
   };
 
   return (
-    <div className="shadow-2xl lg:-bottom-8 -bottom-40 lg:start-80 start-30 absolute z-99 rounded-2xl">
+    <div className="shadow-2xl md:-bottom-8  -bottom-52 md:start-80 start-0 absolute z-99 rounded-2xl">
       <Tabs
         defaultValue="sale"
-        className="lg:w-[800px] bg-white rounded-2xl px-10 py-5"
+        className="lg:w-[800px] w-[340px] bg-white rounded-2xl px-10 py-5"
         onValueChange={handleTabChange}
       >
         <TabsList>
@@ -128,13 +129,15 @@ function Filter() {
                         field.onChange(value === "" ? undefined : value)
                       }
                     >
-                      <FormControl>
-                        <SelectTrigger className="bg-white border border-white lg:w-[200px] w-full rounded-none">
+                    {/* !eta tira height badaunu parni xa dropdown content ko  */}
+
+                      <FormControl className="h-52">
+                        <SelectTrigger className="bg-white border border-white lg:w-[200px]  w-full rounded-none">
                           <SelectValue placeholder={t("type")} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="z-999">
-                        <SelectItem value="apartment">
+                      <SelectContent className="z-999 max-h-[300px] overflow-y-auto">
+                        <SelectItem value="apartment" >
                           {t("apartment")}
                         </SelectItem>
                         <SelectItem value="space">{t("spaces")}</SelectItem>
@@ -165,7 +168,7 @@ function Filter() {
                           <SelectValue placeholder={t("location")} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="z-999 h-30">
+                      <SelectContent className="z-999 h-52 overflow-y-auto">
                         {districtFields.map((district) => (
                           <SelectItem
                             key={district.id}
@@ -180,6 +183,25 @@ function Filter() {
                   </FormItem>
                 )}
               />
+              {/* <FormField
+  control={form.control}
+  name="district"
+  render={({ field }) => (
+    <FormItem>
+      <Combobox
+        options={districtFields.map((district) => ({
+          label: getLocalizedLabel(district, i18n.language),
+          value: district.id.toString(),
+        }))}
+        value={field.value}
+        onChange={(val) => field.onChange(val)}
+        placeholder={t("location")}
+        className="w-full"
+      />
+      <FormMessage />
+    </FormItem>
+  )}
+/> */}
 
               {/* Price Range Field for Sale */}
               <FormField

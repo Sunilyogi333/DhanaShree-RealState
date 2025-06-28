@@ -10,8 +10,9 @@ export interface TransformedFlatFormData {
   district: number | null;
   municipality: number | null;
   ward: number | null;
-  imageIds?: string[] | null;
-  details: {
+ thumbnailImageId?: string | null;
+  normalImageIds?: string[] | null; 
+   details: {
     bathrooms: number;
     bedrooms: number;
     kitchens: number;
@@ -46,7 +47,9 @@ export interface TransformedFlatFormData {
 export const transformFlatForm = (
   data: FlatFormValues,
   uploadedImageIds: string[] = [],
-  edit: boolean = false
+  edit: boolean = false,
+  thumbnailImageId?: string | null,
+
 ): TransformedFlatFormData => {
   const baseData: TransformedFlatFormData = {
     propertyCode: data.propertyCode,
@@ -58,7 +61,6 @@ export const transformFlatForm = (
     district: data.district ?? null,
     municipality: data.municipality ?? null,
     ward: data.wardNo ?? null,
-    imageIds: uploadedImageIds,
     details: {
       bathrooms: Number(data.bathrooms ?? 0),
       bedrooms: Number(data.bedrooms ?? 0),
@@ -91,8 +93,8 @@ export const transformFlatForm = (
     },
   };
   if (!edit) {
-    baseData.imageIds = uploadedImageIds ?? [];
+    baseData.normalImageIds = uploadedImageIds ?? [];
+    baseData.thumbnailImageId = thumbnailImageId ?? null;
   }
-
   return baseData;
 };

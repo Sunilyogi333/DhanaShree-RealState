@@ -41,28 +41,28 @@ const defaultValues: Partial<FlatFormValues> = {
   description: "",
   descriptionNp: "",
   status: PropertyStatus.EMERGING,
-  builtYear: 1990,
+  builtYear: 0,
   builtYearNep: "",
   images: [], 
   thumbnail: new File([""], "placeholder.png", { type: "image/png" }),
   facilities: ["parking"],
-  landArea: 10,
+  landArea:   0,
   landAreaUnit: "",
   landAreaNep: "",
   propertyPurpose: "sale",
   province: 1,
-  district: 1,
-  municipality: 1,
-  wardNo: 1,
-  floorNumber: 1,
+  district: 0,
+  municipality: 0,
+  wardNo: 0,
+  floorNumber: 0,
   apartmentType: "1bhk",
-  bedrooms: 1,
-  bathrooms: 1,
-  kitchens: 1,
-  floors: 1,
-  livingRooms: 1,
-  parkingSpaces: 1,
-  builtArea: 100,
+  bedrooms: 0,
+  bathrooms: 0,
+  kitchens: 0,
+  floors: 0,
+  livingRooms: 0,
+  parkingSpaces:0,
+  builtArea: 0,
   builtAreaUnit: "sqm",
   furnished: "semi",
   bedroomsNep: "",
@@ -115,24 +115,34 @@ export default function FlatForm({
       if (!canSubmit) return;
       setIsSubmitting(true);
       let imageIds: string[] = [];
+           let thumbnailIds: string | null = null;
+     
+     
+           if (!edit) {
+         const thumbnailFile = (values as FlatFormValues).thumbnail;
+                 const imageFiles = (values as FlatFormValues).images;
 
-      if (!edit) {
-        const thumbnailFile = (values as FlatFormValues).thumbnail;
-        const imageFiles = (values as FlatFormValues).images;
+                 const formData = new FormData();
+                 const thumbnailData = new FormData();
+         
+                 if (thumbnailFile){
+         
+                   console.log("thumbnail file is ", thumbnailFile);
+                   thumbnailData.append("thumbnail", thumbnailFile);
+         
+                 } 
+                 imageFiles?.forEach((img) => formData.append("images", img));
+                 const thumbnailImage =await uploadImages(thumbnailData);
+                 const imageRes = await uploadImages(formData);
+                 console.log("imageRes and the thumbnail res is", imageRes,thumbnailImage);
+                 if (!imageRes.success || !thumbnailImage.success) {
+                   throw new Error("Image upload failed");
+                 }
+                 imageIds = imageRes.images.map((img: any) => img.id);
+                 thumbnailIds = thumbnailImage.images[0]?.id ?? null;
+           }
 
-      const formData = new FormData();
-      if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
-      imageFiles?.forEach((img: File) => formData.append("images", img));
-
-      const imageRes = await uploadImages(formData);
-      if (!imageRes.success) {
-        throw new Error("Image upload failed");
-      }
-
-      imageIds = imageRes.images.map((img: { id: string }) => img.id);
-      }
-
-      const payload = transformFlatForm(values as FlatFormValues, imageIds, edit);
+      const payload = transformFlatForm(values as FlatFormValues, imageIds, edit, thumbnailIds);
       console.log("payload for the create or updating property ", payload);
 
       if (!edit) {

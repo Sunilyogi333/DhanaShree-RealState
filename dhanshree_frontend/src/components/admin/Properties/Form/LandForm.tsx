@@ -108,26 +108,38 @@ export default function LandForm({
 
       setIsSubmitting(true);
       let imageIds: string[] = [];
+      let thumbnailIds: string | null = null;
+
 
       if (!edit) {
-        const thumbnailFile = (values as LandFormValues).thumbnail;
-        const imageFiles = (values as LandFormValues).images;
+    const thumbnailFile = (values as LandFormValues).thumbnail;
+            const imageFiles = (values as LandFormValues).images;
 
-        const formData = new FormData();
-        if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
-        imageFiles?.forEach((img) => formData.append("images", img));
-
-        const imageRes = await uploadImages(formData);
-        if (!imageRes.success) {
-          throw new Error("Image upload failed");
-        }
-        imageIds = imageRes.images.map((img: any) => img.id);
+            const formData = new FormData();
+            const thumbnailData = new FormData();
+    
+            if (thumbnailFile){
+    
+              console.log("thumbnail file is ", thumbnailFile);
+              thumbnailData.append("thumbnail", thumbnailFile);
+    
+            } 
+            imageFiles?.forEach((img) => formData.append("images", img));
+            const thumbnailImage =await uploadImages(thumbnailData);
+            const imageRes = await uploadImages(formData);
+            console.log("imageRes and the thumbnail res is", imageRes,thumbnailImage);
+            if (!imageRes.success || !thumbnailImage.success) {
+              throw new Error("Image upload failed");
+            }
+            imageIds = imageRes.images.map((img: any) => img.id);
+            thumbnailIds = thumbnailImage.images[0]?.id ?? null;
       }
 
       const payload = transformLandForm(
         values as LandFormValues,
         imageIds,
-        edit
+        edit,
+        thumbnailIds,
       );
       console.log("payload for the create or updating property ", payload);
 
