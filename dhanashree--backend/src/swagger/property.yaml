@@ -62,7 +62,7 @@ paths:
                         en:
                           type: string
                           example: 'Spacious 3BHK apartment'
-                        np:
+                        ne:
                           type: string
                           example: 'तीन कोठाको अपार्टमेन्ट'
                     facing:
